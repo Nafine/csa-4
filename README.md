@@ -1,0 +1,1 @@
+- **Вариант**: `alg | acc | neum | mc | tick | binary | stream | mem | cstr | prob1 | pipeline`

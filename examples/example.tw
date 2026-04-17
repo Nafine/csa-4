@@ -1,0 +1,18 @@
+string hello = "hello"
+int a = 1
+int b = 2
+
+b = a + b
+b = a - b
+b = a * b
+b = a / b
+
+if (a > b) {
+    print()
+} else if (a < b) {}
+} else {}
+
+while (true) {
+    read()
+    print(hello)
+}
