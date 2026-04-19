@@ -9,8 +9,4 @@ b = a / b;
 
 if (a > b) {
     print(hello);
-} else if (a < b) {
-    print("a < b");
-} else {
-    print("else");
 }
