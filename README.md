@@ -91,3 +91,7 @@ BOOL_LIT ::= "true" | "false"
 STRING_LIT ::= \"[^"]*\"
 ID ::= [a-zA-Z_][a-zA-Z0-9_]*
 ```
+
+# Семантика
+
+---
