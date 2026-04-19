@@ -1,18 +1,16 @@
-string hello = "hello"
-int a = 1
-int b = 2
+hello = "hello";
+a = 1;
+b = 2;
 
-b = a + b
-b = a - b
-b = a * b
-b = a / b
+b = a + b;
+b = a - b;
+b = a * b;
+b = a / b;
 
 if (a > b) {
-    print()
-} else if (a < b) {}
-} else {}
-
-while (true) {
-    read()
-    print(hello)
+    print(hello);
+} else if (a < b) {
+    print("a < b");
+} else {
+    print("else");
 }
