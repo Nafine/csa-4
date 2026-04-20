@@ -1,4 +1,12 @@
-while (true) {
-    string testStr = read()
-    print(testStr)
+testStr := "123";
+
+def main() void {
+     callable(testStr);
+}
+
+def callable(str string, second int) void {
+    while (true) {
+        str = read();
+        print(testStr);
+    }
 }
