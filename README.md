@@ -43,8 +43,8 @@ stmt ::= var_decl
     | while_stmt
     | return_stmt
 
-var_decl ::= "var" ID type ";"
-    | ID "=" expr ";"
+var_decl ::= "var" ID type ("=" expr)? ";"
+    | ID ":=" expr ";"
 
 assign_stmt ::= ID "=" expr ";"
 

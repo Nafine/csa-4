@@ -16,7 +16,7 @@ def tokenize(code: str) -> list[Token]:
         ('BOOL_LIT', r'\b(?:true|false)\b'),
         ('KEYWORD', r'\b(?:def|var|if|else|while|return|print|read|int|float|bool|string|void)\b'),
         ('ID', r'[a-zA-Z_][a-zA-Z0-9_]*'),
-        ('OP', r'\|\||&&|==|!=|<=|>=|[+\-*/%<>=!]'),
+        ('OP', r':=|\|\||&&|==|!=|<=|>=|[+\-*/%<>=!]'),
         ('PUNCT', r'[(){},;]'),
         ('WS', r'\s+'),
         ('MISMATCH', r'.'),
@@ -47,5 +47,5 @@ def tokenize(code: str) -> list[Token]:
 if __name__ == '__main__':
     with open(sys.argv[1]) as f:
         raw_text = f.read()
-        tokenized_code = tokenize(raw_text)
-        print("\n".join(str(token) for token in tokenize(tokenized_code)))
+        tokenized_text = tokenize(raw_text)
+        print("\n".join(str(token) for token in tokenize(tokenized_text)))
