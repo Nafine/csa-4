@@ -148,8 +148,6 @@ class Parser:
         got = f"'{token.value}' ({token.type})" if token else "EOF"
         raise ParserError(f"Expected {expected}, got {got} at token index {self.pos}")
 
-    # --- Правила грамматики ---
-
     def parse(self) -> Program:
         top_levels: list[ASTNode] = []
         while self.peek() is not None:
@@ -270,7 +268,6 @@ class Parser:
             left_type = self.infer_type(expr.left)
             right_type = self.infer_type(expr.right)
 
-            # Приведение типов: если хотя бы один float, результат float
             if left_type == 'float' or right_type == 'float':
                 return 'float'
             return left_type

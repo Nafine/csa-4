@@ -3,7 +3,7 @@ a := 1;
 b := 2;
 
 def main() void {
-    b = a + b;
+    b = a + b * 3;
     b = a - b;
     b = a * b;
     b = a / b;
