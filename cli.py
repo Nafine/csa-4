@@ -1,8 +1,8 @@
 import pprint
 import sys
 
-from parser import Parser
-from tokenizer import tokenize
+from translator.parser import Parser
+from translator.tokenizer import tokenize
 
 if __name__ == '__main__':
     with open(sys.argv[1]) as f:
