@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 from dataclasses import dataclass
 
-from tokenizer import Token, tokenize
+from .tokenizer import Token
 
 
 class ASTNode:

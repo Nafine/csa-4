@@ -21,7 +21,8 @@ class Opcode(IntEnum):
     JMP = 0x30  # unconditional jump
     BEQ = 0x31  # branch if equal (Z=1)
     BNE = 0x32  # branch if not equal (Z=0)
-    BMI = 0x33  # branch if minus (N=1)
+    BGE = 0x33  # branch if greater or equal (N=0)
+    BLT = 0x34  # branch if less (N=1)
 
     CALL = 0x40
     RET = 0x41
