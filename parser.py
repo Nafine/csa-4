@@ -101,7 +101,7 @@ class Identifier(ASTNode):
 
 @dataclass
 class FuncCall(ASTNode):
-    name: str  # Имя функции или 'print' / 'read'
+    name: str
     args: List[ASTNode]
 
 
@@ -164,7 +164,7 @@ class Parser:
             return self.parse_func_decl()
         elif self.match('KEYWORD', 'var'):
             return self.parse_var_decl()
-        elif self.match('ID') and self.peek_next():
+        elif self.match('ID') and self.peek_next() and self.peek_next().value == ':=':
             return self.parse_short_var_decl()
         else:
             raise ParserError(f"Expected function or variable declaration at top level, got {self.peek()}")

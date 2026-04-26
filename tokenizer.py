@@ -1,5 +1,4 @@
 import re
-import sys
 from typing import NamedTuple
 
 
@@ -43,9 +42,3 @@ def tokenize(code: str) -> list[Token]:
         tokens.append(Token(kind, value))
 
     return tokens
-
-if __name__ == '__main__':
-    with open(sys.argv[1]) as f:
-        raw_text = f.read()
-        tokenized_text = tokenize(raw_text)
-        print("\n".join(str(token) for token in tokenize(tokenized_text)))
