@@ -66,7 +66,7 @@ class ControlUnit:
         mc = self.UOPS[self.uPC]
 
         signals = self._decode_mc(mc)
-        print(signals)
+        #print(signals)
         alu = self._execute_alu(signals)
         self._latch_registers(signals, alu)
         self._update_flags_and_branch(signals)
@@ -104,11 +104,11 @@ class ControlUnit:
             5: to_signed32(left + right - 1) & dp.MASK_32,
         }
 
-        print(f'alu_res: {alu_ops[signals['alu']]}, alu: {signals['alu']}')
-
         return alu_ops[signals['alu']]
 
     def _latch_registers(self, signals, alu_result):
+        if signals['mem_w']:
+            self.dp.write_memory()
         self._latch_acc(signals, alu_result)
         self._latch_ip(signals, alu_result)
         self._latch_sp(signals, alu_result)
@@ -140,7 +140,12 @@ class ControlUnit:
     def _latch_ar(self, signals, alu_result):
         if not signals['ar_l']:
             return
-        self.dp.ar = alu_result
+        sources = {
+            0b00: self.dp.ip,
+            0b01: self.dp.cr & 0xFFFFFF,
+            0b10: self.dp.acc & 0xFFFFFF,
+        }
+        self.dp.ar = sources[signals['ar_sel']]
 
     def _update_flags_and_branch(self, signals):
         cond = signals['cond']
@@ -153,6 +158,9 @@ class ControlUnit:
         )
 
         self.tick += 1
+        self.print_state()
+
+        self.last_uPC = self.uPC
         self.uPC = signals['next_addr'] if cond_true else (self.uPC + 1) & 0x3F
 
         if signals['halted']:
@@ -164,7 +172,7 @@ class ControlUnit:
     def print_state(self):
         self.log.write(f'Tick: [{self.tick}] uPC={self.uPC:02} CR={self.dp.cr:08x}\n')
         self.log.write(f'ACC={self.dp.acc:11} IP={self.dp.ip:08x} SP={self.dp.sp:08x}\n')
-        self.log.write(f'AR={self.dp.ar} Z={self.dp.Z} N={self.dp.N}\n')
+        self.log.write(f'AR={self.dp.ar:08x} Z={self.dp.Z} N={self.dp.N}\n')
         self.log.write('-----------------------------\n')
 
 
@@ -175,12 +183,23 @@ def _dump(label, cu):
           f'Z={cu.dp.Z} N={cu.dp.N}')
 
 
-if __name__ == '__main__':
-    cu = ControlUnit()
+def _run_checks(label, checks):
+    print(f'-- {label} --')
+    ok = True
+    for name, got, want in checks:
+        status = 'OK' if got == want else 'FAIL'
+        if got != want:
+            ok = False
+        print(f'  {status}: {name}={got:#x}, ожидалось {want:#x}')
+    return ok
 
+
+if __name__ == '__main__':
+    # === FETCH ===
+    cu = ControlUnit()
     cu.dp.data_mem[0] = 0xDEADBEEF
     cu.dp.ip = 0
-    cu.dp.ar = 0  # FETCH в текущей реализации не грузит AR — выставляем вручную
+    cu.dp.ar = 0  # FETCH в текущей реализации не грузит AR - выставляем вручную
 
     _dump('init', cu)
     cu.step()
@@ -188,13 +207,48 @@ if __name__ == '__main__':
     cu.step()
     _dump('after inc', cu)
 
-    checks = [
+    _run_checks('FETCH', [
         ('CR', cu.dp.cr, 0xDEADBEEF),
-        ('IP', cu.dp.ip, 1),  # IP++
-        ('AR', cu.dp.ar, 0),  # не должен поменяться
-    ]
-    for name, got, want in checks:
-        status = 'OK' if got == want else 'FAIL'
-        print(f'  {status}: {name}={got:#x}, ожидалось {want:#x}')
+        ('IP', cu.dp.ip, 1),
+        ('AR', cu.dp.ar, 0),
+    ])
+    cu.log.close()
 
+    # === LOAD: LD 0x10 ===
+    cu = ControlUnit(log_path='trace_load.log')
+    cu.dp.data_mem[0] = 0x01000010   # opcode LD (0x01), operand 0x10
+    cu.dp.data_mem[0x10] = 0xCAFE
+    cu.dp.ip = 0
+    cu.dp.ar = 0
+
+    _dump('LOAD init', cu)
+    for _ in range(4):  # FETCH x2 + LOAD x2
+        cu.step()
+    _dump('LOAD done', cu)
+
+    _run_checks('LOAD', [
+        ('ACC', cu.dp.acc, 0xCAFE),
+        ('AR',  cu.dp.ar,  0x10),
+        ('uPC', cu.uPC,    0),     # вернулись к FETCH
+    ])
+    cu.log.close()
+
+    # === STORE: ST 0x20 ===
+    cu = ControlUnit(log_path='trace_store.log')
+    cu.dp.data_mem[0] = 0x03000020   # opcode ST (0x03), operand 0x20
+    cu.dp.acc = 0xBEEF
+    cu.dp.ip = 0
+    cu.dp.ar = 0
+
+    _dump('STORE init', cu)
+    cu.step(); cu.step()             # FETCH
+    cu.uPC = 4                       # декодера опкодов нет - прыгаем в STORE вручную
+    cu.step(); cu.step()             # STORE
+    _dump('STORE done', cu)
+
+    _run_checks('STORE', [
+        ('Mem[0x20]', cu.dp.data_mem[0x20], 0xBEEF),
+        ('AR',        cu.dp.ar,             0x20),
+        ('uPC',       cu.uPC,               0),
+    ])
     cu.log.close()

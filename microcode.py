@@ -25,3 +25,11 @@ UOPS = [0] * 64
 # FETCH
 UOPS[0] = encode_signals(alu_right=0b11, cr_l=1) # Mem[AR] -> CR
 UOPS[1] = encode_signals(alu=0b100, ip_l=1) # IP++
+
+# LOAD: AC <- Mem[arg]
+UOPS[2] = encode_signals(ar_sel=0b01, ar_l=1)                              # AR <- CR.arg
+UOPS[3] = encode_signals(alu_right=0b11, acc_l=1, cond=0b001, next_addr=0) # AC <- Mem[AR]; -> FETCH
+
+# STORE: Mem[arg] <- AC
+UOPS[4] = encode_signals(ar_sel=0b01, ar_l=1)                              # AR <- CR.arg
+UOPS[5] = encode_signals(mem_w=1, cond=0b001, next_addr=0)                 # Mem[AR] <- AC; -> FETCH
