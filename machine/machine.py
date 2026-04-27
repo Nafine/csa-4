@@ -16,13 +16,13 @@ class DataPath:
 
         self.Z = 0
         self.N = 0
-        self.halted = 0
 
 
 class ControlUnit:
     def __init__(self, data_path):
-        self.data_path = data_path
+        self.dp = data_path
         self.tick = 0
+        self.halted = 0
 
     def tick(self):
         self.tick += 1
@@ -31,4 +31,7 @@ class ControlUnit:
         return self.tick
 
     def process_next_tick(self):
-        pass
+        if self.halted:
+            return
+
+        instr = self.dp.data_mem[self.dp.ip]
