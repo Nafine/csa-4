@@ -1,14 +1,24 @@
-"""Тесты микрокоманд CSA-4.
-
-Не покрыты:
-- BEQ/BNE/BGE/BLT — next_addr=20 в MROM[28..31] явно неверный (должен быть JMP),
-  и при cond=false происходит mp+1 в случайный uop. Сначала надо починить микрокод.
-- POP — MROM[35] = encode_signals() пустая, ACC не загружается, нет возврата в FETCH.
-"""
-
 from machine import ControlUnit, to_signed32
 
 MASK_32 = 0xFFFFFFFF
+
+
+def _exec_branch(word, log_path, *, Z=None, N=None):
+    """FETCH branch-инструкции, выставляем флаги после FETCH,
+    докручиваем такты до возврата в FETCH (mp == 0)."""
+    cu = ControlUnit(log_path=log_path)
+    cu.dp.data_mem[0] = word
+    for _ in range(3):  # FETCH
+        cu.step()
+    if Z is not None:
+        cu.dp.Z = Z
+    if N is not None:
+        cu.dp.N = N
+    safety = 0
+    while cu.mp != 0 and safety < 20:
+        cu.step()
+        safety += 1
+    return cu
 
 
 def test_fetch():
@@ -138,6 +148,63 @@ def test_jmp():
     assert cu.mp == 0, f'MP={cu.mp}'
     cu.log.close()
 
+
+def test_beq_taken():
+    cu = _exec_branch(0x31000010, 'log/trace_beq_taken.log', Z=1)
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_beq_not_taken():
+    cu = _exec_branch(0x31000010, 'log/trace_beq_not_taken.log', Z=0)
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_bne_taken():
+    cu = _exec_branch(0x32000010, 'log/trace_bne_taken.log', Z=0)
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_bne_not_taken():
+    cu = _exec_branch(0x32000010, 'log/trace_bne_not_taken.log', Z=1)
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_bge_taken():
+    cu = _exec_branch(0x33000010, 'log/trace_bge_taken.log', N=0)
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_bge_not_taken():
+    cu = _exec_branch(0x33000010, 'log/trace_bge_not_taken.log', N=1)
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_blt_taken():
+    cu = _exec_branch(0x34000010, 'log/trace_blt_taken.log', N=1)
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_blt_not_taken():
+    cu = _exec_branch(0x34000010, 'log/trace_blt_not_taken.log', N=0)
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
 def test_push():
     cu = ControlUnit(log_path='log/trace_push.log')
     cu.dp.data_mem[0] = 0x40000000  # PUSH
@@ -150,12 +217,75 @@ def test_push():
     cu.log.close()
 
 
+def test_pop():
+    cu = ControlUnit(log_path='log/trace_pop.log')
+    cu.dp.data_mem[0] = 0x41000000  # POP
+    sp_before = cu.dp.sp  # 2047
+    cu.dp.sp = 2046
+    cu.dp.data_mem[2047] = 0x111
+    for _ in range(7):
+        cu.step()
+    assert cu.dp.sp == sp_before, f'SP={cu.dp.sp}'
+    assert cu.dp.acc == 0x111, f'ACC={cu.dp.acc:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_call():
+    cu = ControlUnit(log_path='log/trace_call.log')
+    cu.dp.data_mem[0] = 0x50000010  # CALL 0x10
+    sp_before = cu.dp.sp  # 2047
+    for _ in range(6):  # FETCH 3 + CALL 3
+        cu.step()
+    assert cu.dp.data_mem[sp_before] == 1, f'mem[{sp_before:#x}]={cu.dp.data_mem[sp_before]:#x}'
+    assert cu.dp.sp == sp_before - 1, f'SP={cu.dp.sp}'
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_ret():
+    cu = ControlUnit(log_path='log/trace_ret.log')
+    cu.dp.data_mem[0] = 0x51000000  # RET
+    acc_before = cu.dp.acc
+    sp_before = cu.dp.sp  # 2047
+    cu.dp.sp = 2046
+    cu.dp.data_mem[2047] = 0x111
+    for _ in range(7):  # FETCH 3 + RET 4
+        cu.step()
+    assert cu.dp.ip == 0x111, f'IP={cu.dp.ip:#x}'
+    assert cu.dp.sp == sp_before, f'SP={cu.dp.sp}'
+    assert cu.dp.acc == acc_before, f'ACC={cu.dp.acc:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_call_ret():
+    """Интеграционный: CALL по адресу 0, RET по адресу 0x10.
+    Должны вернуться к IP=1 (адрес после CALL) с восстановленным SP."""
+    cu = ControlUnit(log_path='log/trace_call_ret.log')
+    cu.dp.data_mem[0] = 0x50000010  # CALL 0x10
+    cu.dp.data_mem[0x10] = 0x51000000  # RET
+    sp_before = cu.dp.sp  # 2047
+    for _ in range(13):  # FETCH 3 + CALL 3 + FETCH 3 + RET 4
+        cu.step()
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.dp.sp == sp_before, f'SP={cu.dp.sp}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
 if __name__ == '__main__':
     tests = [
         test_fetch, test_load, test_ldi, test_store,
         test_add, test_sub, test_mul,
         test_div, test_rem, test_cmp_eq,
-        test_jmp, test_push,
+        test_jmp,
+        test_beq_taken, test_beq_not_taken,
+        test_bne_taken, test_bne_not_taken,
+        test_bge_taken, test_bge_not_taken,
+        test_blt_taken, test_blt_not_taken,
+        test_push, test_pop, test_call, test_ret, test_call_ret,
     ]
     failed = []
     for t in tests:

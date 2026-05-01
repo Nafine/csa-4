@@ -1,4 +1,4 @@
-from microcode import MROM, DECODER, Cond, ArSel, Alu, AluLeft, AluRight
+from microcode import MROM, DECODER, Cond, ArSel, Alu, AluLeft, AluRight, MemSrc
 
 
 def to_signed32(val):
@@ -36,11 +36,11 @@ class DataPath:
                 raise Exception("Input buffer is empty")
         return self.data_mem[self.ar]
 
-    def write_memory(self):
+    def write_memory(self, value):
         if self.ar == 0x84:
-            self.output_buffer.append(self.acc)
+            self.output_buffer.append(value)
         else:
-            self.data_mem[self.ar] = self.acc
+            self.data_mem[self.ar] = value
 
 
 class ControlUnit:
@@ -74,13 +74,14 @@ class ControlUnit:
 
     def _decode_mc(self, mc):
         return {
-            'halted': (mc >> 25) & 1,
-            'acc_l': (mc >> 24) & 1,
-            'dr_l': (mc >> 23) & 1,
-            'sp_l': (mc >> 22) & 1,
-            'ip_l': (mc >> 21) & 1,
-            'cr_l': (mc >> 20) & 1,
-            'ar_l': (mc >> 19) & 1,
+            'halted': (mc >> 26) & 1,
+            'acc_l': (mc >> 25) & 1,
+            'dr_l': (mc >> 24) & 1,
+            'sp_l': (mc >> 23) & 1,
+            'ip_l': (mc >> 22) & 1,
+            'cr_l': (mc >> 21) & 1,
+            'ar_l': (mc >> 20) & 1,
+            'mem_src': (mc >> 19) & 1,
             'mem_w': (mc >> 18) & 1,
             'ar_sel': (mc >> 16) & 0b11,
             'alu_left': (mc >> 14) & 0b11,
@@ -109,14 +110,16 @@ class ControlUnit:
 
         result = alu_ops[signals['alu']]
 
-        dp.N = 1 if result < 0 else 0
-        dp.Z = 1 if result == 0 else 0
+        if not (signals['alu_left'] == AluLeft.ZERO and signals['alu_right'] == AluRight.ZERO):
+            dp.N = 1 if result < 0 else 0
+            dp.Z = 1 if result == 0 else 0
 
         return result
 
     def _latch_registers(self, signals, alu_result):
         if signals['mem_w']:
-            self.dp.write_memory()
+            value = self.dp.ip if signals['mem_src'] == MemSrc.IP else self.dp.acc
+            self.dp.write_memory(value)
         self._latch_ip(signals, alu_result)
         self._latch_dr(signals)
         self._latch_sp(signals, alu_result)

@@ -42,19 +42,26 @@ class Cond(IntEnum):
     DECODE = 0b111  # MP <- DECODER[CR.opcode]
 
 
+class MemSrc(IntEnum):
+    ACC = 0
+    IP = 1
+
+
 def encode_signals(halted=0,
                    acc_l=0, dr_l=0, sp_l=0, ip_l=0, cr_l=0, ar_l=0, mem_w=0,
+                   mem_src=MemSrc.ACC,
                    ar_sel=ArSel.IP,
                    alu_left=AluLeft.ZERO, alu_right=AluRight.ZERO,
                    alu=Alu.ADD, cond=Cond.NONE, next_addr=0):
     return (
-            (halted & 1) << 25 |
-            (acc_l & 1) << 24 |
-            (dr_l & 1) << 23 |
-            (sp_l & 1) << 22 |
-            (ip_l & 1) << 21 |
-            (cr_l & 1) << 20 |
-            (ar_l & 1) << 19 |
+            (halted & 1) << 26 |
+            (acc_l & 1) << 25 |
+            (dr_l & 1) << 24 |
+            (sp_l & 1) << 23 |
+            (ip_l & 1) << 22 |
+            (cr_l & 1) << 21 |
+            (ar_l & 1) << 20 |
+            (mem_src & 1) << 19 |
             (mem_w & 1) << 18 |
             (int(ar_sel) & 0b11) << 16 |
             (int(alu_left) & 0b11) << 14 |
@@ -128,25 +135,39 @@ MROM[28] = encode_signals(cond=Cond.EQ, next_addr=27)
 MROM[29] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
 
 # BNE: IP <- arg if Z = 0
-MROM[29] = encode_signals(cond=Cond.NE, next_addr=27)
-MROM[29] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
+MROM[30] = encode_signals(cond=Cond.NE, next_addr=27)
+MROM[31] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
 
 # BGE: IP <- arg if N = 0
-MROM[30] = encode_signals(cond=Cond.GE, next_addr=27)
-MROM[29] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
+MROM[32] = encode_signals(cond=Cond.GE, next_addr=27)
+MROM[33] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
 
 # BLT: IP < arg if N = 1
-MROM[31] = encode_signals(cond=Cond.LT, next_addr=27)
-MROM[29] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
+MROM[34] = encode_signals(cond=Cond.LT, next_addr=27)
+MROM[35] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
 
 # PUSH: Mem[SP] <- ACC
-MROM[32] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
-MROM[33] = encode_signals(mem_w=1, sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC, cond=Cond.ALWAYS,
+MROM[36] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
+MROM[37] = encode_signals(mem_w=1, sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC, cond=Cond.ALWAYS,
                           next_addr=0)  # Mem[AR] <- ACC; SP <- SP - 1; -> FETCH
 
-# POP: ACC <- Mem[--SP]
-MROM[34] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC)  # --SP
-MROM[35] = encode_signals()
+# POP: ACC <- Mem[++SP]
+MROM[38] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.INC)  # SP++
+MROM[39] = encode_signals(ar_l=1, ar_sel=ArSel.SP) # AR <- SP
+MROM[40] = encode_signals(dr_l=1) # DR <- Mem[AR]
+MROM[41] = encode_signals(acc_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0) # ACC <- DR; -> FETCH
+
+# CALL: Mem[SP] <- IP; SP--; IP <- CR.arg
+MROM[42] = encode_signals(ar_l=1, ar_sel=ArSel.SP)                                              # AR <- SP
+MROM[43] = encode_signals(mem_w=1, mem_src=MemSrc.IP,
+                          sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC)                             # Mem[AR] <- IP; SP--
+MROM[44] = encode_signals(ip_l=1, alu_right=AluRight.CR_ARG, cond=Cond.ALWAYS, next_addr=0)     # IP <- CR.arg; -> FETCH
+
+# RET: IP <- Mem[++SP]
+MROM[45] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.INC)  # SP++
+MROM[46] = encode_signals(ar_l=1, ar_sel=ArSel.SP) # AR <- SP
+MROM[47] = encode_signals(dr_l=1) # DR <- Mem[AR]
+MROM[48] = encode_signals(ip_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0) # IP <- DR; -> FETCH
 
 # DECODER[opcode] = адрес первого uop команды.
 # Неизвестный опкод ведёт на 0 (FETCH) -- по сути пропуск.
@@ -163,8 +184,10 @@ DECODER[Opcode.REM] = 21
 DECODER[Opcode.CMP] = 24
 DECODER[Opcode.JMP] = 27
 DECODER[Opcode.BEQ] = 28
-DECODER[Opcode.BNE] = 29
-DECODER[Opcode.BGE] = 30
-DECODER[Opcode.BLT] = 31
-DECODER[Opcode.PUSH] = 32
-DECODER[Opcode.POP] = 34
+DECODER[Opcode.BNE] = 30
+DECODER[Opcode.BGE] = 32
+DECODER[Opcode.BLT] = 34
+DECODER[Opcode.PUSH] = 36
+DECODER[Opcode.POP] = 38
+DECODER[Opcode.CALL] = 42
+DECODER[Opcode.RET] = 45
