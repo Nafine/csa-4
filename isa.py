@@ -24,10 +24,11 @@ class Opcode(IntEnum):
     BGE = 0x33  # branch if greater or equal (N=0)
     BLT = 0x34  # branch if less (N=1)
 
-    CALL = 0x40
-    RET = 0x41
-    PUSH = 0x42
-    POP = 0x43
+    PUSH = 0x40
+    POP = 0x41
+
+    CALL = 0x50
+    RET = 0x51
 
     HALT = 0xFF
 
