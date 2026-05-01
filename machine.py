@@ -74,7 +74,8 @@ class ControlUnit:
 
     def _decode_mc(self, mc):
         return {
-            'halted': (mc >> 26) & 1,
+            'halted': (mc >> 27) & 1,
+            'flag_l': (mc >> 26) & 1,
             'acc_l': (mc >> 25) & 1,
             'dr_l': (mc >> 24) & 1,
             'sp_l': (mc >> 23) & 1,
@@ -110,9 +111,9 @@ class ControlUnit:
 
         result = alu_ops[signals['alu']]
 
-        if not (signals['alu_left'] == AluLeft.ZERO and signals['alu_right'] == AluRight.ZERO):
-            dp.N = 1 if result < 0 else 0
-            dp.Z = 1 if result == 0 else 0
+        if signals['flag_l']:
+            self.dp.N = 1 if (result & self.dp.BIT_31) else 0
+            self.dp.Z = 1 if result == 0 else 0
 
         return result
 
@@ -131,8 +132,6 @@ class ControlUnit:
         if not signals['acc_l']:
             return
         self.dp.acc = alu_result
-        self.dp.N = 1 if (alu_result & self.dp.BIT_31) else 0
-        self.dp.Z = 1 if alu_result == 0 else 0
 
     def _latch_dr(self, signals, ):
         if not signals['dr_l']:
