@@ -30,6 +30,7 @@ class Alu(IntEnum):
     REM = 4
     INC = 5  # left + right + 1
     DEC = 6  # left + right - 1
+    NOT = 7
 
 
 class Cond(IntEnum):
@@ -143,32 +144,55 @@ MROM[31] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
 MROM[32] = encode_signals(cond=Cond.GE, next_addr=27)
 MROM[33] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
 
+# BGT: IP <- arg if N = 0 && Z = 0
+MROM[34] = encode_signals(cond=Cond.LT, next_addr=0)
+MROM[35] = encode_signals(cond=Cond.EQ, next_addr=0)
+MROM[36] = encode_signals(cond=Cond.ALWAYS, next_addr=27)
+
+# BLE: IP <- arg if N = 1 || Z = 1
+MROM[37] = encode_signals(cond=Cond.LT, next_addr=27)
+MROM[38] = encode_signals(cond=Cond.EQ, next_addr=27)
+MROM[39] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
+
 # BLT: IP < arg if N = 1
-MROM[34] = encode_signals(cond=Cond.LT, next_addr=27)
-MROM[35] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
+MROM[40] = encode_signals(cond=Cond.LT, next_addr=27)
+MROM[41] = encode_signals(cond=Cond.ALWAYS, next_addr=0)
 
 # PUSH: Mem[SP] <- ACC
-MROM[36] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
-MROM[37] = encode_signals(mem_w=1, sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC, cond=Cond.ALWAYS,
+MROM[42] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
+MROM[43] = encode_signals(mem_w=1, sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC, cond=Cond.ALWAYS,
                           next_addr=0)  # Mem[AR] <- ACC; SP <- SP - 1; -> FETCH
 
 # POP: ACC <- Mem[++SP]
-MROM[38] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.INC)  # SP++
-MROM[39] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
-MROM[40] = encode_signals(dr_l=1)  # DR <- Mem[AR]
-MROM[41] = encode_signals(acc_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0)  # ACC <- DR; -> FETCH
+MROM[44] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.INC)  # SP++
+MROM[45] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
+MROM[46] = encode_signals(dr_l=1)  # DR <- Mem[AR]
+MROM[47] = encode_signals(acc_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0)  # ACC <- DR; -> FETCH
 
 # CALL: Mem[SP] <- IP; SP--; IP <- CR.arg
-MROM[42] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
-MROM[43] = encode_signals(mem_w=1, mem_src=MemSrc.IP,
+MROM[48] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
+MROM[49] = encode_signals(mem_w=1, mem_src=MemSrc.IP,
                           sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC)  # Mem[AR] <- IP; SP--
-MROM[44] = encode_signals(ip_l=1, alu_right=AluRight.CR_ARG, cond=Cond.ALWAYS, next_addr=0)  # IP <- CR.arg; -> FETCH
+MROM[50] = encode_signals(ip_l=1, alu_right=AluRight.CR_ARG, cond=Cond.ALWAYS, next_addr=0)  # IP <- CR.arg; -> FETCH
 
 # RET: IP <- Mem[++SP]
-MROM[45] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.INC)  # SP++
-MROM[46] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
-MROM[47] = encode_signals(dr_l=1)  # DR <- Mem[AR]
-MROM[48] = encode_signals(ip_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0)  # IP <- DR; -> FETCH
+MROM[51] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.INC)  # SP++
+MROM[52] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
+MROM[53] = encode_signals(dr_l=1)  # DR <- Mem[AR]
+MROM[54] = encode_signals(ip_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0)  # IP <- DR; -> FETCH
+
+# NOT: ACC <- ~ACC
+
+MROM[55] = encode_signals(acc_l=1, alu_left=AluLeft.ACC, alu=Alu.NOT, cond=Cond.ALWAYS,
+                          next_addr=0)  # ACC <- ~ACC; -> FETCH
+
+# NEG: ACC <- -ACC
+MROM[56] = encode_signals(acc_l=1, alu_left=AluLeft.ACC, alu=Alu.NOT)  # ACC <- ~ACC;
+MROM[57] = encode_signals(flag_l=1, acc_l=1, alu_left=AluLeft.ACC, alu=Alu.INC, cond=Cond.ALWAYS,
+                          next_addr=0)  # AC; -> FETCH
+
+# HALT
+MROM[58] = encode_signals(halted=1)
 
 # DECODER[opcode] = адрес первого uop команды.
 # Неизвестный опкод ведёт на 0 (FETCH) -- по сути пропуск.
@@ -183,12 +207,17 @@ DECODER[Opcode.MUL] = 15
 DECODER[Opcode.DIV] = 18
 DECODER[Opcode.REM] = 21
 DECODER[Opcode.CMP] = 24
+DECODER[Opcode.NOT] = 55
+DECODER[Opcode.NEG] = 56
 DECODER[Opcode.JMP] = 27
 DECODER[Opcode.BEQ] = 28
 DECODER[Opcode.BNE] = 30
 DECODER[Opcode.BGE] = 32
-DECODER[Opcode.BLT] = 34
-DECODER[Opcode.PUSH] = 36
-DECODER[Opcode.POP] = 38
-DECODER[Opcode.CALL] = 42
-DECODER[Opcode.RET] = 45
+DECODER[Opcode.BGT] = 34
+DECODER[Opcode.BLE] = 37
+DECODER[Opcode.BLT] = 40
+DECODER[Opcode.PUSH] = 42
+DECODER[Opcode.POP] = 44
+DECODER[Opcode.CALL] = 48
+DECODER[Opcode.RET] = 51
+DECODER[Opcode.HALT] = 58

@@ -19,10 +19,12 @@ class Opcode(IntEnum):
     NEG = 0x22
 
     JMP = 0x30  # unconditional jump
-    BEQ = 0x31  # branch if equal (Z=1)
-    BNE = 0x32  # branch if not equal (Z=0)
-    BGE = 0x33  # branch if greater or equal (N=0)
-    BLT = 0x34  # branch if less (N=1)
+    BEQ = 0x31  # branch if equal (Z = 1)
+    BNE = 0x32  # branch if not equal (Z = 0)
+    BGE = 0x33  # branch if greater or equal (N = 0)
+    BGT = 0x34  # branch if greater (N = 0 && Z = 0)
+    BLE = 0x35  # branch if less or equal (N = 1 || Z = 1)
+    BLT = 0x36  # branch if less (N = 1)
 
     PUSH = 0x40
     POP = 0x41

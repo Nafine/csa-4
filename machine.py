@@ -107,6 +107,7 @@ class ControlUnit:
             Alu.REM: to_signed32(left % right) if right != 0 else 0 & dp.MASK_32,
             Alu.INC: to_signed32(left + right + 1) & dp.MASK_32,
             Alu.DEC: to_signed32(left + right - 1) & dp.MASK_32,
+            Alu.NOT: to_signed32(~(left + right)) & dp.MASK_32
         }
 
         result = alu_ops[signals['alu']]

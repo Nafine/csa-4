@@ -138,6 +138,27 @@ def test_cmp_eq():
     assert cu.mp == 0, f'MP={cu.mp}'
     cu.log.close()
 
+def test_not():
+    cu = ControlUnit(log_path='log/trace_not.log')
+    cu.dp.data_mem[0] = 0x21000000  # NOT: ACC <- ~ACC
+    cu.dp.acc = 0x0
+    for _ in range(4):  # FETCH 3 + CMP 1
+        cu.step()
+    assert cu.dp.acc == 0xFFFFFFFF, f'ACC={cu.dp.acc}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+def test_neg():
+    cu = ControlUnit(log_path='log/trace_neg.log')
+    cu.dp.data_mem[0] = 0x22000000  # NEG: ACC <- -ACC
+    cu.dp.acc = 0x1
+    for _ in range(5):  # FETCH 3 + NEG 2
+        cu.step()
+    assert cu.dp.acc == 0xFFFFFFFF, f'ACC={cu.dp.acc}'
+    assert cu.dp.N == 1, f'N={cu.dp.N}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
 
 def test_jmp():
     cu = ControlUnit(log_path='log/trace_jmp.log')
@@ -192,14 +213,56 @@ def test_bge_not_taken():
 
 
 def test_blt_taken():
-    cu = _exec_branch(0x34000010, 'log/trace_blt_taken.log', N=1)
+    cu = _exec_branch(0x36000010, 'log/trace_blt_taken.log', N=1)
     assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
     assert cu.mp == 0, f'MP={cu.mp}'
     cu.log.close()
 
 
 def test_blt_not_taken():
-    cu = _exec_branch(0x34000010, 'log/trace_blt_not_taken.log', N=0)
+    cu = _exec_branch(0x36000010, 'log/trace_blt_not_taken.log', N=0)
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_bgt_taken():
+    cu = _exec_branch(0x34000010, 'log/trace_bgt_taken.log', Z=0, N=0)
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_bgt_not_taken_n():
+    cu = _exec_branch(0x34000010, 'log/trace_bgt_not_taken_n.log', Z=0, N=1)
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_bgt_not_taken_z():
+    cu = _exec_branch(0x34000010, 'log/trace_bgt_not_taken_z.log', Z=1, N=0)
+    assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_ble_taken_n():
+    cu = _exec_branch(0x35000010, 'log/trace_ble_taken_n.log', Z=0, N=1)
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_ble_taken_z():
+    cu = _exec_branch(0x35000010, 'log/trace_ble_taken_z.log', Z=1, N=0)
+    assert cu.dp.ip == 0x10, f'IP={cu.dp.ip:#x}'
+    assert cu.mp == 0, f'MP={cu.mp}'
+    cu.log.close()
+
+
+def test_ble_not_taken():
+    cu = _exec_branch(0x35000010, 'log/trace_ble_not_taken.log', Z=0, N=0)
     assert cu.dp.ip == 1, f'IP={cu.dp.ip:#x}'
     assert cu.mp == 0, f'MP={cu.mp}'
     cu.log.close()
@@ -279,11 +342,14 @@ if __name__ == '__main__':
     tests = [
         test_fetch, test_load, test_ldi, test_store,
         test_add, test_sub, test_mul,
-        test_div, test_rem, test_cmp_eq,
+        test_div, test_rem,
+        test_cmp_eq, test_not, test_neg,
         test_jmp,
         test_beq_taken, test_beq_not_taken,
         test_bne_taken, test_bne_not_taken,
         test_bge_taken, test_bge_not_taken,
+        test_bgt_taken, test_bgt_not_taken_n, test_bgt_not_taken_z,
+        test_ble_taken_n, test_ble_taken_z, test_ble_not_taken,
         test_blt_taken, test_blt_not_taken,
         test_push, test_pop, test_call, test_ret, test_call_ret,
     ]
