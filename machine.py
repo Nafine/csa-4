@@ -8,6 +8,9 @@ def to_signed32(val):
 
 
 class DataPath:
+    OUTPUT_ADDR = 0x84
+    INPUT_ADDR = 0x80
+
     def __init__(self, mem_size: int, input_buffer):
         self.data_mem = [0] * mem_size
 
@@ -29,7 +32,7 @@ class DataPath:
         self.N = 0
 
     def read_memory(self):
-        if self.ar == 0x80:
+        if self.ar == self.INPUT_ADDR:
             if self.input_buffer:
                 return self.input_buffer.pop(0)
             else:
@@ -37,7 +40,7 @@ class DataPath:
         return self.data_mem[self.ar]
 
     def write_memory(self, value):
-        if self.ar == 0x84:
+        if self.ar == self.OUTPUT_ADDR:
             self.output_buffer.append(value)
         else:
             self.data_mem[self.ar] = value
@@ -47,7 +50,7 @@ class ControlUnit:
     def __init__(self, log_path="trace.log", input_buffer=None):
         if input_buffer is None:
             input_buffer = []
-        self.dp = DataPath(2048, input_buffer)
+        self.dp = DataPath(2**18, input_buffer)
 
         self.MROM = MROM
         self.mp = 0
@@ -56,6 +59,10 @@ class ControlUnit:
         self.halted = 0
 
         self.log = open(log_path, 'w', encoding='utf-8')
+
+    def run(self):
+        while not self.halted:
+            self.step()
 
     def tick(self):
         self.tick += 1

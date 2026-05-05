@@ -283,9 +283,9 @@ def test_push():
 def test_pop():
     cu = ControlUnit(log_path='log/trace_pop.log')
     cu.dp.data_mem[0] = 0x41000000  # POP
-    sp_before = cu.dp.sp  # 2047
-    cu.dp.sp = 2046
-    cu.dp.data_mem[2047] = 0x111
+    sp_before = cu.dp.sp
+    cu.dp.sp = sp_before - 1
+    cu.dp.data_mem[sp_before] = 0x111
     for _ in range(7):
         cu.step()
     assert cu.dp.sp == sp_before, f'SP={cu.dp.sp}'
@@ -311,9 +311,9 @@ def test_ret():
     cu = ControlUnit(log_path='log/trace_ret.log')
     cu.dp.data_mem[0] = 0x51000000  # RET
     acc_before = cu.dp.acc
-    sp_before = cu.dp.sp  # 2047
-    cu.dp.sp = 2046
-    cu.dp.data_mem[2047] = 0x111
+    sp_before = cu.dp.sp
+    cu.dp.sp = sp_before - 1
+    cu.dp.data_mem[sp_before] = 0x111
     for _ in range(7):  # FETCH 3 + RET 4
         cu.step()
     assert cu.dp.ip == 0x111, f'IP={cu.dp.ip:#x}'

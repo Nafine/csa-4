@@ -84,10 +84,11 @@ MROM[2] = encode_signals(cr_l=1, alu_right=AluRight.DR, cond=Cond.DECODE)  # CR 
 # LOAD: ACC <- Mem[arg]
 MROM[3] = encode_signals(ar_l=1, ar_sel=ArSel.CR_ARG)  # AR <- CR.arg
 MROM[4] = encode_signals(dr_l=1)  # DR <- Mem[AR]
-MROM[5] = encode_signals(acc_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0)  # ACC <- DR; -> FETCH
+MROM[5] = encode_signals(flag_l=1, acc_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0)  # ACC <- DR; -> FETCH
 
 # LOAD IMM: ACC <- CR.arg
-MROM[6] = encode_signals(alu_right=AluRight.CR_ARG, acc_l=1, cond=Cond.ALWAYS, next_addr=0)  # ACC <- CR.arg; -> FETCH
+MROM[6] = encode_signals(flag_l=1, acc_l=1, alu_right=AluRight.CR_ARG, cond=Cond.ALWAYS,
+                         next_addr=0)  # ACC <- CR.arg; -> FETCH
 
 # STORE: Mem[arg] <- ACC
 MROM[7] = encode_signals(ar_l=1, ar_sel=ArSel.CR_ARG)  # AR <- CR.arg
@@ -167,7 +168,8 @@ MROM[43] = encode_signals(mem_w=1, sp_l=1, alu_left=AluLeft.SP, alu=Alu.DEC, con
 MROM[44] = encode_signals(sp_l=1, alu_left=AluLeft.SP, alu=Alu.INC)  # SP++
 MROM[45] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
 MROM[46] = encode_signals(dr_l=1)  # DR <- Mem[AR]
-MROM[47] = encode_signals(acc_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_addr=0)  # ACC <- DR; -> FETCH
+MROM[47] = encode_signals(flag_l=1, acc_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS,
+                          next_addr=0)  # ACC <- DR; -> FETCH
 
 # CALL: Mem[SP] <- IP; SP--; IP <- CR.arg
 MROM[48] = encode_signals(ar_l=1, ar_sel=ArSel.SP)  # AR <- SP
@@ -183,7 +185,7 @@ MROM[54] = encode_signals(ip_l=1, alu_right=AluRight.DR, cond=Cond.ALWAYS, next_
 
 # NOT: ACC <- ~ACC
 
-MROM[55] = encode_signals(acc_l=1, alu_left=AluLeft.ACC, alu=Alu.NOT, cond=Cond.ALWAYS,
+MROM[55] = encode_signals(flag_l=1, acc_l=1, alu_left=AluLeft.ACC, alu=Alu.NOT, cond=Cond.ALWAYS,
                           next_addr=0)  # ACC <- ~ACC; -> FETCH
 
 # NEG: ACC <- -ACC
