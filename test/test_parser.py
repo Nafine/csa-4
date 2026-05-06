@@ -45,12 +45,12 @@ def test_top_level_var_decl():
 
 
 def test_top_level_short_var_decl():
-    prog = _parse('pi := 3.14; def main() void {}')
+    prog = _parse('num := 3; def main() void {}')
     decl = prog.top_levels[0]
     assert isinstance(decl, VarDecl)
-    assert decl.name == 'pi'
-    assert decl.var_type == 'float'  # инференс по литералу
-    assert decl.expr.value == 3.14
+    assert decl.name == 'num'
+    assert decl.var_type == 'int'  # инференс по литералу
+    assert decl.expr.value == 3
 
 
 def test_func_with_params_and_return():

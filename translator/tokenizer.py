@@ -9,7 +9,6 @@ class Token(NamedTuple):
 
 def tokenize(code: str) -> list[Token]:
     token_specification = [
-        ('FLOAT_LIT', r'\d+\.\d+'),
         ('INT_LIT', r'\d+'),
         ('STRING_LIT', r'"(?:\\.|[^"\\])*"'),
         ('BOOL_LIT', r'\b(?:true|false)\b'),

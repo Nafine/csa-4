@@ -55,7 +55,7 @@ def test_ldi():
 
 def test_store():
     cu = ControlUnit(log_path='log/trace_store.log')
-    cu.dp.data_mem[0] = 0x03000020  # ST 0x20
+    cu.dp.data_mem[0] = 0x04000020  # ST 0x20
     cu.dp.acc = 0xBEEF
     for _ in range(5):  # FETCH 3 + STORE 2
         cu.step()

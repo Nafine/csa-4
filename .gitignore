@@ -1,4 +1,5 @@
 .idea
+trace.log
 
 # Python-generated files
 __pycache__/

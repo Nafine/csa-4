@@ -1,0 +1,39 @@
+var maxPalindrome int = 0;
+
+def reverse(n int) int {
+    var reversed int = 0;
+    var temp int = n;
+    while (temp > 0) {
+        reversed = (reversed * 10) + (temp % 10);
+        temp = temp / 10;
+    }
+    return reversed;
+}
+
+def isPalindrome(n int) bool {
+    return n == reverse(n);
+}
+
+def solve() void {
+    var i int = 999;
+    while (i >= 100) {
+        var j int = i;
+        while (j >= 100) {
+            var prod int = i * j;
+
+            if (prod <= maxPalindrome) {
+                j = 0;
+            } else if (isPalindrome(prod)) {
+                maxPalindrome = prod;
+            }
+
+            j = j - 1;
+        }
+        i = i - 1;
+    }
+    print(maxPalindrome);
+}
+
+def main() void {
+    solve();
+}

@@ -15,14 +15,14 @@ if __name__ == '__main__':
 
             cu = ControlUnit()
             for index, instr in enumerate(instructions):
-                print(instr)
                 cu.dp.data_mem[index] = instr.to_binary()
             data_base = len(instructions)
             for offset, value in enumerate(data):
                 cu.dp.data_mem[data_base + offset] = value
 
             cu.run()
-            print(cu.dp.output_buffer)
+            print(''.join([str(_) for _ in cu.dp.output_buffer]))
+            print(f'ticks: {cu.current_tick()}')
 
             # print("--- AST Tree ---")
             # pprint.pprint(ast_tree)

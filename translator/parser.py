@@ -90,7 +90,7 @@ class UnaryExpr(ASTNode):
 
 @dataclass
 class Literal(ASTNode):
-    value: Union[str, int, float, bool]
+    value: Union[str, int, bool]
     literal_type: str
 
 
@@ -193,7 +193,7 @@ class Parser:
 
     def parse_type(self) -> str:
         token = self.consume('KEYWORD')
-        if token.value not in ['int', 'float', 'bool', 'string', 'void']:
+        if token.value not in ['int', 'bool', 'string', 'void']:
             raise ParserError(f"Expected type, got {token.value}")
         return token.value
 
@@ -257,7 +257,6 @@ class Parser:
     def infer_type(self, expr: ASTNode) -> str:
         if isinstance(expr, Literal):
             if expr.literal_type == 'INT_LIT': return 'int'
-            if expr.literal_type == 'FLOAT_LIT': return 'float'
             if expr.literal_type == 'BOOL_LIT': return 'bool'
             if expr.literal_type == 'STRING_LIT': return 'string'
 
@@ -268,8 +267,6 @@ class Parser:
             left_type = self.infer_type(expr.left)
             right_type = self.infer_type(expr.right)
 
-            if left_type == 'float' or right_type == 'float':
-                return 'float'
             return left_type
 
         elif isinstance(expr, UnaryExpr):
@@ -387,8 +384,6 @@ class Parser:
 
         if self.match('INT_LIT'):
             return Literal(int(self.advance().value), 'INT_LIT')
-        elif self.match('FLOAT_LIT'):
-            return Literal(float(self.advance().value), 'FLOAT_LIT')
         elif self.match('BOOL_LIT'):
             val = True if self.advance().value == 'true' else False
             return Literal(val, 'BOOL_LIT')

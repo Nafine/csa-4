@@ -6,7 +6,8 @@ from enum import unique, IntEnum
 class Opcode(IntEnum):
     LD = 0x01
     LDI = 0x02
-    ST = 0x03
+    LDR = 0x03
+    ST = 0x04
 
     ADD = 0x10
     SUB = 0x11

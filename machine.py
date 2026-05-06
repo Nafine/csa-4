@@ -8,11 +8,12 @@ def to_signed32(val):
 
 
 class DataPath:
-    OUTPUT_ADDR = 0x84
-    INPUT_ADDR = 0x80
+    MEM_SIZE = 2 ** 12
+    OUTPUT_ADDR = MEM_SIZE - 0x04
+    INPUT_ADDR = MEM_SIZE - 0x08
 
-    def __init__(self, mem_size: int, input_buffer):
-        self.data_mem = [0] * mem_size
+    def __init__(self, input_buffer):
+        self.data_mem = [0] * self.MEM_SIZE
 
         self.input_buffer = input_buffer
         self.output_buffer = []
@@ -24,7 +25,7 @@ class DataPath:
         self.acc = 0
         self.dr = 0
         self.ip = 0
-        self.sp = (mem_size - 1) & self.MASK_32
+        self.sp = (self.INPUT_ADDR - 1) & self.MASK_32
         self.ar = 0
         self.cr = 0
 
@@ -50,7 +51,7 @@ class ControlUnit:
     def __init__(self, log_path="trace.log", input_buffer=None):
         if input_buffer is None:
             input_buffer = []
-        self.dp = DataPath(2**18, input_buffer)
+        self.dp = DataPath(input_buffer)
 
         self.MROM = MROM
         self.mp = 0
@@ -66,6 +67,7 @@ class ControlUnit:
 
     def tick(self):
         self.tick += 1
+        #self.print_state()
 
     def current_tick(self):
         return self.tick
@@ -168,6 +170,7 @@ class ControlUnit:
             ArSel.IP: self.dp.ip,
             ArSel.CR_ARG: self.dp.cr & 0xFFFFFF,
             ArSel.SP: self.dp.sp,
+            ArSel.DR: self.dp.dr,
         }
         self.dp.ar = sources[signals['ar_sel']]
 
@@ -182,7 +185,6 @@ class ControlUnit:
         )
 
         self.tick += 1
-        self.print_state()
 
         if cond == Cond.DECODE:
             opcode = (self.dp.cr >> 24) & 0xFF

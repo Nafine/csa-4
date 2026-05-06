@@ -28,21 +28,25 @@ class CodeGenerator:
         self.data: list[int] = []
         self.symbols: dict[str, _Symbol] = {}
         self.symbol_patches: list[_Patch] = []
+        self.string_symbols: set[str] = set()
+        self.current_function: str | None = None
+        self.function_decls: dict[str, FuncDecl] = {}
 
     def generate(self, program: Program) -> tuple[list[Instruction], list[int]]:
         self.instructions = []
         self.data = []
         self.symbols = {}
         self.symbol_patches = []
+        self.string_symbols = set()
+        self.function_decls = {}
 
         main_decl: FuncDecl | None = None
-        function_decls: list[FuncDecl] = []
 
         for node in program.top_levels:
             if isinstance(node, VarDecl):
                 self._compile_top_var_decl(node)
             elif isinstance(node, FuncDecl):
-                function_decls.append(node)
+                self.function_decls[node.name] = node
                 if node.name == 'main':
                     main_decl = node
             else:
@@ -53,23 +57,40 @@ class CodeGenerator:
 
         jmp_main = self._compile_branch(Opcode.JMP)
 
-        for func in function_decls:
-            if func.name == 'main':
+        for fname, fdecl in self.function_decls.items():
+            for p in fdecl.params:
+                self._allocate(f'{fname}.{p.name}')
+                if p.param_type == 'string':
+                    self.string_symbols.add(f'{fname}.{p.name}')
+
+        for fname, fdecl in self.function_decls.items():
+            if fname == 'main':
                 continue
-            self.symbols[func.name] = _Symbol('function', self._ip())
-            self._compile_block(func.body)
+            self.symbols[fname] = _Symbol('function', self._ip())
+            self.current_function = fname
+            self._compile_block(fdecl.body)
+            self.current_function = None
             self._compile_primary(Instruction(Opcode.RET))
 
         main_addr = self._ip()
         self.symbols[main_decl.name] = _Symbol('function', main_addr)
         self._patch_branch(jmp_main, main_addr)
 
+        self.current_function = 'main'
         self._compile_block(main_decl.body)
+        self.current_function = None
         self._compile_primary(Instruction(Opcode.HALT))
 
         self._resolve_symbols()
 
         return list(self.instructions), list(self.data)
+
+    def _resolve(self, name: str) -> str:
+        if self.current_function is not None:
+            local = f'{self.current_function}.{name}'
+            if local in self.symbols:
+                return local
+        return name
 
     def _resolve_symbols(self) -> None:
         data_base = len(self.instructions)
@@ -139,14 +160,15 @@ class CodeGenerator:
         self._patch_branch(jz_while, loop_start)
 
     def _compile_assign(self, assign: AssignStmt):
-        if assign.name not in self.symbols:
-            self._allocate(assign.name)
+        if self._qualify(assign.name) not in self.symbols:
+            self._allocate(self._qualify(assign.name))
         self._compile_expression(assign.expr)
         self._store(assign.name)
 
     def _compile_top_var_decl(self, decl: VarDecl) -> None:
         if decl.expr is None:
             self._allocate(decl.name)
+            self._tag_if_string(decl)
             return
         if isinstance(decl.expr, Literal) and decl.expr.literal_type in ('INT_LIT', 'FLOAT_LIT', 'BOOL_LIT'):
             self._allocate(decl.name, self._literal_to_int(decl.expr))
@@ -154,11 +176,19 @@ class CodeGenerator:
         self._compile_var_decl(decl)
 
     def _compile_var_decl(self, decl: VarDecl) -> None:
-        self._allocate(decl.name)
+        self._allocate(self._qualify(decl.name))
+        self._tag_if_string(decl)
         if decl.expr is None:
             return
         self._compile_expression(decl.expr)
         self._store(decl.name)
+
+    def _tag_if_string(self, decl: VarDecl) -> None:
+        is_string = decl.var_type == 'string'
+        if not is_string and isinstance(decl.expr, Identifier):
+            is_string = self._resolve(decl.expr.name) in self.string_symbols
+        if is_string:
+            self.string_symbols.add(self._qualify(decl.name))
 
     @staticmethod
     def _literal_to_int(lit: Literal) -> int:
@@ -170,38 +200,45 @@ class CodeGenerator:
             return 1 if lit.value else 0
         raise CodegenError(f'cannot statically materialize literal type: {lit.literal_type}')
 
-    def _allocate(self, name: str, value: int = 0) -> int:
-        existing = self.symbols.get(name)
-        if existing is not None:
-            return existing.offset
-        offset = len(self.data)
-        self.data.append(value)
-        self.symbols[name] = _Symbol('data', offset)
-        return offset
-
-    def _allocate_cstr(self, value: str) -> str:
-        name = f'str:{value}'
-        if name in self.symbols:
-            return name
-        offset = len(self.data)
-        for char in value:
-            self.data.append(ord(char))
-        self.data.append(0)
-        self.symbols[name] = _Symbol('data', offset)
-        return name
-
     def _tmp_name(self) -> str:
         name = '$tmp'
         if name not in self.symbols:
             self._allocate(name)
         return name
 
+    def _print_ptr_name(self) -> str:
+        name = '$print_ptr'
+        if name not in self.symbols:
+            self._allocate(name)
+        return name
+
+    def _one_name(self) -> str:
+        name = '$one'
+        if name not in self.symbols:
+            self._allocate(name, value=1)
+        return name
+
+    def _emit_print_string_loop(self) -> None:
+        ptr = self._print_ptr_name()
+        one = self._one_name()
+        self._emit_symbol_ref(Opcode.ST, ptr)
+        loop_start = self._ip()
+        self._emit_symbol_ref(Opcode.LDR, ptr)
+        jz_end = self._compile_branch(Opcode.BEQ)
+        self._compile_primary(Instruction(Opcode.ST, DataPath.OUTPUT_ADDR))
+        self._emit_symbol_ref(Opcode.LD, ptr)
+        self._emit_symbol_ref(Opcode.ADD, one)
+        self._emit_symbol_ref(Opcode.ST, ptr)
+        back = self._compile_branch(Opcode.JMP)
+        self._patch_branch(back, loop_start)
+        self._patch_branch(jz_end, self._ip())
+
     def _compile_expression(self, expr) -> None:
         if isinstance(expr, Literal):
             self._compile_lit(expr)
             return
         if isinstance(expr, Identifier):
-            self._emit_symbol_ref(Opcode.LD, expr.name)
+            self._emit_symbol_ref(Opcode.LD, self._resolve(expr.name))
             return
         if isinstance(expr, UnaryExpr):
             self._compile_unary(expr)
@@ -220,8 +257,12 @@ class CodeGenerator:
             arg = call.args[0]
             if isinstance(arg, Literal) and arg.literal_type == 'STRING_LIT':
                 name = self._allocate_cstr(arg.value)
-                self._emit_symbol_ref(Opcode.LD, name)
-                self._compile_primary(Instruction(Opcode.ST, DataPath.OUTPUT_ADDR))
+                self._emit_symbol_ref(Opcode.LDI, name)
+                self._emit_print_string_loop()
+                return
+            if isinstance(arg, Identifier) and self._resolve(arg.name) in self.string_symbols:
+                self._emit_symbol_ref(Opcode.LD, self._resolve(arg.name))
+                self._emit_print_string_loop()
                 return
             self._compile_expression(arg)
             self._compile_primary(Instruction(Opcode.ST, DataPath.OUTPUT_ADDR))
@@ -232,13 +273,28 @@ class CodeGenerator:
             self._compile_primary(Instruction(Opcode.LD, DataPath.INPUT_ADDR))
             return
 
-        for arg in call.args:
+        func = self.function_decls.get(call.name)
+        if func is None:
+            raise CodegenError(f'unknown function: {call.name}')
+        if len(call.args) != len(func.params):
+            raise CodegenError(
+                f'{call.name}: expected {len(func.params)} args, got {len(call.args)}'
+            )
+
+        for arg, param in zip(call.args, func.params):
             self._compile_expression(arg)
-            self._compile_primary(Instruction(Opcode.PUSH))
+            self._emit_symbol_ref(Opcode.ST, f'{call.name}.{param.name}')
 
         self._emit_symbol_ref(Opcode.CALL, call.name)
 
     def _compile_binary(self, expr: BinaryExpr) -> None:
+        if expr.op == '&&':
+            self._compile_logical_and(expr)
+            return
+        if expr.op == '||':
+            self._compile_logical_or(expr)
+            return
+
         tmp_name = self._tmp_name()
         self._compile_expression(expr.left)
         self._compile_primary(Instruction(Opcode.PUSH))
@@ -284,6 +340,32 @@ class CodeGenerator:
         self._compile_primary(Instruction(Opcode.LDI, 1))
         self._patch_branch(branch_end, self._ip())
 
+    def _compile_logical_and(self, expr: BinaryExpr) -> None:
+        self._compile_expression(expr.left)
+        sc_false_left = self._compile_branch(Opcode.BEQ)
+        self._compile_expression(expr.right)
+        sc_false_right = self._compile_branch(Opcode.BEQ)
+        self._compile_primary(Instruction(Opcode.LDI, 1))
+        end = self._compile_branch(Opcode.JMP)
+        false_label = self._ip()
+        self._compile_primary(Instruction(Opcode.LDI, 0))
+        self._patch_branch(sc_false_left, false_label)
+        self._patch_branch(sc_false_right, false_label)
+        self._patch_branch(end, self._ip())
+
+    def _compile_logical_or(self, expr: BinaryExpr) -> None:
+        self._compile_expression(expr.left)
+        sc_true_left = self._compile_branch(Opcode.BNE)
+        self._compile_expression(expr.right)
+        sc_true_right = self._compile_branch(Opcode.BNE)
+        self._compile_primary(Instruction(Opcode.LDI, 0))
+        end = self._compile_branch(Opcode.JMP)
+        true_label = self._ip()
+        self._compile_primary(Instruction(Opcode.LDI, 1))
+        self._patch_branch(sc_true_left, true_label)
+        self._patch_branch(sc_true_right, true_label)
+        self._patch_branch(end, self._ip())
+
     def _patch_branch(self, index: int, target: int):
         self.instructions[index].operand = target
 
@@ -294,7 +376,7 @@ class CodeGenerator:
         if expr.op in ('++', '--'):
             if not isinstance(expr.expr, Identifier):
                 raise CodegenError('increment/decrement supports only variables')
-            name = expr.expr.name
+            name = self._resolve(expr.expr.name)
             tmp_name = self._tmp_name()
             self._compile_primary(Instruction(Opcode.LDI, 1))
             self._emit_symbol_ref(Opcode.ST, tmp_name)
@@ -316,8 +398,6 @@ class CodeGenerator:
     def _compile_lit(self, lit):
         match lit.literal_type:
             case 'INT_LIT':
-                self._compile_primary(Instruction(Opcode.LDI, lit.value))
-            case 'FLOAT_LIT':
                 self._compile_primary(Instruction(Opcode.LDI, int(lit.value)))
             case 'BOOL_LIT':
                 self._compile_primary(Instruction(Opcode.LDI, 1 if lit.value else 0))
@@ -334,7 +414,32 @@ class CodeGenerator:
         self.symbol_patches.append(_Patch(index, name))
         return index
 
+    def _qualify(self, name: str) -> str:
+        if self.current_function is not None:
+            return f'{self.current_function}.{name}'
+        return name
+
+    def _allocate(self, name: str, value: int = 0) -> int:
+        existing = self.symbols.get(name)
+        if existing is not None:
+            return existing.offset
+        offset = len(self.data)
+        self.data.append(value)
+        self.symbols[name] = _Symbol('data', offset)
+        return offset
+
+    def _allocate_cstr(self, value: str) -> str:
+        name = f'str:{value}'
+        if name in self.symbols:
+            return name
+        offset = len(self.data)
+        for char in value:
+            self.data.append(ord(char))
+        self.data.append(0)
+        self.symbols[name] = _Symbol('data', offset)
+        return name
+
     def _store(self, name: str) -> None:
         if name not in self.symbols:
-            self._allocate(name)
-        self._emit_symbol_ref(Opcode.ST, name)
+            self._allocate(self._qualify(name))
+        self._emit_symbol_ref(Opcode.ST, self._resolve(name))
