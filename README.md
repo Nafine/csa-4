@@ -71,11 +71,9 @@ expr ::= expr "||" expr
 
 unary_expr ::= "!" expr 
     | "-" expr
-    | postfix_expr
 
 primary_expr ::= ID
     | INT_LIT
-    | FLOAT_LIT
     | BOOL_LIT
     | STRING_LIT
     | "(" expr ")"
@@ -87,10 +85,9 @@ func_call ::= ID "(" args? ")"
 
 args ::= expr ("," expr)*
 
-type ::= "int" | "float" | "bool" | "string" | "void"
+type ::= "int" | "bool" | "string" | "void"
 
 INT_LIT ::= [0-9]+
-FLOAT_LIT ::= [0-9]+\.[0.9]+
 BOOL_LIT ::= "true" | "false"
 STRING_LIT ::= \"[^"]*\"
 ID ::= [a-zA-Z_][a-zA-Z0-9_]*
@@ -145,8 +142,8 @@ ID ::= [a-zA-Z_][a-zA-Z0-9_]*
   |   ....   | свободная память                            |
   |          |                                             |
   |--------------------------------------------------------+
-  | 0xFFFFFF | Начало стека                                |
-  |--------------------------------------------------------+
+  | 0xFFFFFD | Начало стека                                |
+  +--------------------------------------------------------+
   
 ```
 
@@ -177,27 +174,28 @@ ID ::= [a-zA-Z_][a-zA-Z0-9_]*
 
 | Команда  | Опкод | Такты | Описание                               |
 |:---------|:------|-------|:---------------------------------------|
-| **LD**   | 0x01  | 2     | AC <- Mem[arg]                         |
-| **LDI**  | 0x02  | 1     | AC <- arg                              |
-| **ST**   | 0x03  | 2     | Mem[arg] <- AC                         |
-| **ADD**  | 0x10  |       | AC <- AC + Mem[arg]                    |
-| **SUB**  | 0x11  |       | AC <- AC - Mem[arg]                    |
-| **MUL**  | 0x12  |       | AC <- AC * Mem[arg]                    |
-| **DIV**  | 0x13  |       | AC <- AC / Mem[arg]                    |
-| **REM**  | 0x14  |       | AC <- AC % Mem[arg]                    |
-| **CMP**  | 0x20  |       | Set NZ From AC - Mem[arg]              |
-| **NOT**  | 0x21  |       | AC <- ~AC                              |
-| **NEG**  | 0x22  |       | AC <- ~AC + 1                          |
-| **JMP**  | 0x30  |       | IP <- arg                              |
-| **BEQ**  | 0x31  |       | IP <- arg if Z = 1 else IP + 1         |
-| **BNE**  | 0x32  |       | IP <- arg if Z = 0 else IP + 1         |
-| **BGT**  | 0x33  |       | IP <- arg if AC > Mem[arg] else IP + 1 |
-| **BLT**  | 0x34  |       | IP <- arg if AC < Mem[arg] else IP + 1 |
-| **CALL** | 0x40  |       | PUSH(IP); IP <- arg                    |
-| **RET**  | 0x41  |       | IP <- POP()                            |
-| **PUSH** | 0x42  |       | MEM[SP] <- AC; SP--                    |
-| **POP**  | 0x43  |       | SP++; AC <- Mem[SP]                    |
-| **HALT** | 0xFF  |       | 💀                                     |
+| **LD**   | 0x01  | 3     | AC <- Mem[arg]                         |
+| **LDR**  | 0x02  | 5     | AC <- Mem[Mem[arg]]                    |
+| **LDI**  | 0x03  | 1     | AC <- arg                              |
+| **ST**   | 0x04  | 2     | Mem[arg] <- AC                         |
+| **ADD**  | 0x10  | 3     | AC <- AC + Mem[arg]                    |
+| **SUB**  | 0x11  | 3     | AC <- AC - Mem[arg]                    |
+| **MUL**  | 0x12  | 3     | AC <- AC * Mem[arg]                    |
+| **DIV**  | 0x13  | 3     | AC <- AC / Mem[arg]                    |
+| **REM**  | 0x14  | 3     | AC <- AC % Mem[arg]                    |
+| **CMP**  | 0x20  | 3     | Set NZ From AC - Mem[arg]              |
+| **NOT**  | 0x21  | 1     | AC <- ~AC                              |
+| **NEG**  | 0x22  | 2     | AC <- ~AC + 1                          |
+| **JMP**  | 0x30  | 1     | IP <- arg                              |
+| **BEQ**  | 0x31  | 2     | IP <- arg if Z = 1 else IP + 1         |
+| **BNE**  | 0x32  | 2     | IP <- arg if Z = 0 else IP + 1         |
+| **BGT**  | 0x33  | 2     | IP <- arg if AC > Mem[arg] else IP + 1 |
+| **BLT**  | 0x34  | 2     | IP <- arg if AC < Mem[arg] else IP + 1 |
+| **CALL** | 0x40  | 3     | PUSH(IP); IP <- arg                    |
+| **RET**  | 0x41  | 4     | IP <- Mem[++SP]                        |
+| **PUSH** | 0x42  | 2     | MEM[SP] <- AC; SP--                    |
+| **POP**  | 0x43  | 4     | SP++; AC <- Mem[SP]                    |
+| **HALT** | 0xFF  | 1     | 💀                                     |
 
 ### Способ кодирования инструкций
 
@@ -233,13 +231,14 @@ python3 cli.py <input.tw> <output.bin>
 ### Data Path
 
 - Защелки
-    - acc_l, sp_l, ip_l, cr_l, ar_l -- замкнуть соответствующий регистр
+    - flag_l, acc_l, sp_l, ip_l, cr_l, ar_l -- замкнуть соответствующий регистр
 - Управляющие сигналы
-    - ar_sel -- выбрать источник для AR (ip, cr)
+    - ar_sel -- выбрать источник для AR (ip, cr, sp, dt)
     - alu_left -- выбрать левый операнд для ALU (acc, sp)
     - alu_right -- выбрать правый операнд для ALU (cr, ip, mem)
     - alu -- выбрать операцию для ALU (ADD, SUB, MUL, DIV, INC, DEC)
     - mem_w -- защелкнуть данные в память по адресу AR
+    - mem_src -- выбрать источник записи в память 
     - cond -- режим условия для переходов
 
 ### Control Unit
@@ -250,22 +249,25 @@ python3 cli.py <input.tw> <output.bin>
 
 ### Микрокоманды
 
-1 типа микрокоманды - 24 бита, с битами, отводимыми на сигналы управления и адрес следующей микрокоманды.
+1 тип микрокоманды - 28 бит, с битами, отводимыми на сигналы управления и адрес следующей микрокоманды.
 
-| Биты  | Сигнал    | Описание                                              |
-|-------|-----------|-------------------------------------------------------|
-| 23    | halted    | 1 = остановка симуляции                               |
-| 22    | acc_l     | 1 = замкнуть acc                                      |
-| 21    | sp_l      | 1 = замкнуть sp                                       |
-| 20    | ip_l      | 1 = замкнуть ip                                       |
-| 19    | cr_l      | 1 = замкнуть cr                                       |
-| 18    | ar_l      | 1 = замкнуть ar                                       |
-| 17    | mem_w     | 1 = защелкнуть данные в память по адресу              |
-| 16    | ar_sel    | 0 = ip, 1 = cr                                        |
-| 15-14 | alu_left  | 00 = 0, 01 = ac, 10 = sp                              |
-| 13-12 | alu_right | 00 = 0, 01 = cr, 10 = ip, 11 = mem                    |
-| 11-9  | alu       | 000 ADD, 001 SUB, 010 MUL, 011 DIV, 100 INC, 101 DEC  |
-| 8-6   | cond      | режим условия                                         |
-| 5-0   | next_addr | адрес следующей микрокоманды                          |
+| Биты  | Сигнал    | Описание                                                      |
+|-------|-----------|---------------------------------------------------------------|
+| 27    | halted    | 1 = остановка симуляции                                       |
+| 26    | flag_l    | 1 = замкнуть N, Z                                             |
+| 25    | acc_l     | 1 = замкнуть acc                                              |
+| 24    | dr_l      | 1 = замкнуть dr                                               |
+| 23    | sp_l      | 1 = замкнуть sp                                               |
+| 22    | ip_l      | 1 = замкнуть ip                                               |
+| 21    | cr_l      | 1 = замкнуть cr                                               |
+| 20    | ar_l      | 1 = замкнуть ar                                               |
+| 19    | mem_src   | 0 = acc, 1 = ip                                               |
+| 18    | mem_w     | 1 = защелкнуть данные в память по адресу                      |
+| 16    | ar_sel    | 00 = ip, 10 = cr, 10 = sp, 11 = dr                            |
+| 15-14 | alu_left  | 00 = 0, 01 = ac, 10 = sp                                      |
+| 13-12 | alu_right | 00 = 0, 01 = cr, 10 = ip, 11 = mem                            |
+| 11-9  | alu       | 000 ADD, 001 SUB, 010 MUL, 011 DIV, 100 INC, 101 DEC, 111 NOT |
+| 8-6   | cond      | режим условия                                                 |
+| 5-0   | next_addr | адрес следующей микрокоманды                                  |
 
 

@@ -1,5 +1,6 @@
 .idea
 trace.log
+*.bin
 
 # Python-generated files
 __pycache__/

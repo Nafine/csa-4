@@ -5,7 +5,7 @@ from machine import ControlUnit
 def _load(cu, *instructions, data=None):
     """Кладёт программу с адреса 0 и опциональные значения данных."""
     for i, ins in enumerate(instructions):
-        cu.dp.data_mem[i] = ins.to_binary()
+        cu.dp.data_mem[i] = ins.encode()
     if data:
         for addr, value in data.items():
             cu.dp.data_mem[addr] = value

@@ -1,3 +1,6 @@
+import array
+import os
+import struct
 from dataclasses import dataclass
 from enum import unique, IntEnum
 
@@ -5,8 +8,8 @@ from enum import unique, IntEnum
 @unique
 class Opcode(IntEnum):
     LD = 0x01
-    LDI = 0x02
-    LDR = 0x03
+    LDR = 0x02
+    LDI = 0x03
     ST = 0x04
 
     ADD = 0x10
@@ -41,13 +44,21 @@ class Instruction:
     opcode: Opcode
     operand: int = 0
 
-    def to_binary(self):
+    def to_bytes(self) -> bytes:
+        return struct.pack(">I", self.encode())
+
+    @staticmethod
+    def from_bytes(data) -> 'Instruction':
+        (word,) = struct.unpack('>I', data)
+        return Instruction.decode(word)
+
+    def encode(self):
         mask = (1 << 24) - 1
         op = self.operand & mask
         return (self.opcode.value << 24) | op
 
     @staticmethod
-    def from_binary(word: int) -> 'Instruction':
+    def decode(word: int) -> 'Instruction':
         opcode_value = (word >> 24) & 0xFF
         operand = word & ((1 << 24) - 1)
         if operand & (1 << 23):  # sign-extend negative values
@@ -57,3 +68,18 @@ class Instruction:
 
     def __str__(self):
         return f"{self.opcode.name} {self.operand:#04x}"
+
+
+def write_file(path: str, instructions: list[Instruction], data: list[int]) -> None:
+    with open(path, 'wb') as f:
+        for instr in instructions:
+            f.write(instr.to_bytes())
+        for cell in data:
+            f.write(struct.pack('>I', cell))
+
+
+def read_file(path: str) -> list[int]:
+    with open(path, 'rb') as f:
+        blob = f.read()
+    n = len(blob) // 4
+    return list(struct.unpack(f'>{n}I', blob))

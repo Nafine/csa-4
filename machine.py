@@ -9,8 +9,8 @@ def to_signed32(val):
 
 class DataPath:
     MEM_SIZE = 2 ** 12
-    OUTPUT_ADDR = MEM_SIZE - 0x04
-    INPUT_ADDR = MEM_SIZE - 0x08
+    OUTPUT_ADDR = MEM_SIZE - 1
+    INPUT_ADDR = MEM_SIZE - 2
 
     def __init__(self, input_buffer):
         self.data_mem = [0] * self.MEM_SIZE
