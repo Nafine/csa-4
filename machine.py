@@ -27,6 +27,9 @@ class DataPath:
     MEM_SIZE = 2 ** 12
     OUTPUT_ADDR = MEM_SIZE - 1
     INPUT_ADDR = MEM_SIZE - 2
+    MASK_32 = (1 << 32) - 1
+    MASK_24 = (1 << 24) - 1
+    BIT_31 = (1 << 31)
 
     def __init__(self, input_buffer):
         self.data_mem = [0] * self.MEM_SIZE
@@ -34,9 +37,6 @@ class DataPath:
         self.input_buffer = input_buffer
         self.output_buffer = []
 
-        self.MASK_32 = (1 << 32) - 1
-        self.MASK_24 = (1 << 24) - 1
-        self.BIT_31 = (1 << 31)
 
         self.acc = 0
         self.dr = 0
@@ -52,8 +52,7 @@ class DataPath:
         if self.ar == self.INPUT_ADDR:
             if self.input_buffer:
                 return self.input_buffer.pop(0)
-            else:
-                raise Exception("Input buffer is empty")
+            return -1 & self.MASK_32
         return self.data_mem[self.ar]
 
     def write_memory(self, value):
@@ -90,8 +89,8 @@ class ControlUnit:
         )
 
     def step(self) -> None:
-        self.tick += 1
         mc = self.MROM[self.mp]
+        self.tick += 1
 
         signals = self._decode_mc(mc)
         alu = self._execute_alu(signals)

@@ -108,6 +108,22 @@ class ParserError(Exception):
     pass
 
 
+_ESCAPE = {'n': '\n', 't': '\t', 'r': '\r', '\\': '\\', '"': '"', "'": "'", '0': '\0'}
+
+
+def _decode_escapes(s: str) -> str:
+    out: list[str] = []
+    i = 0
+    while i < len(s):
+        if s[i] == '\\' and i + 1 < len(s):
+            out.append(_ESCAPE.get(s[i + 1], s[i + 1]))
+            i += 2
+        else:
+            out.append(s[i])
+            i += 1
+    return ''.join(out)
+
+
 class Parser:
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
@@ -388,8 +404,7 @@ class Parser:
             val = True if self.advance().value == 'true' else False
             return Literal(val, 'BOOL_LIT')
         elif self.match('STRING_LIT'):
-            # Снимаем кавычки
-            val = self.advance().value[1:-1]
+            val = _decode_escapes(self.advance().value[1:-1])
             return Literal(val, 'STRING_LIT')
         elif self.match('PUNCT', '('):
             self.consume('PUNCT', '(')

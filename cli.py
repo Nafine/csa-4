@@ -1,10 +1,9 @@
 import argparse
 import sys
 import time
-from pprint import pprint
 
 from isa import Instruction, read_file, write_file
-from machine import ControlUnit
+from machine import ControlUnit, DataPath
 from simulator import Simulator
 from translator.codegen import CodeGenerator
 from translator.parser import Parser
@@ -14,7 +13,7 @@ from translator.tokenizer import tokenize
 def compile_source(source: str) -> tuple[list[Instruction], list[int]]:
     tokens = tokenize(source)
     ast_tree = Parser(tokens).parse()
-    pprint(ast_tree)
+    # pprint(ast_tree)
     generator = CodeGenerator()
     return generator.generate(ast_tree)
 
@@ -23,6 +22,7 @@ def compile_file(input_file: str, output_file: str) -> None:
     with open(input_file) as f:
         instructions, data = compile_source(f.read())
     write_file(output_file, instructions, data)
+
 
 def file_to_buf(path: str) -> list[int]:
     words: list[int] = []
@@ -34,9 +34,15 @@ def file_to_buf(path: str) -> list[int]:
             word = int.from_bytes(byte_chunk, byteorder='little')
             words.append(word)
 
-    print('\n'.join([f'{word:08x}' for word in words]))
     return words
 
+def buf_to_str(buf: list[int]) -> str:
+    out = ''
+    for char in buf:
+        if char == -1 & DataPath.MASK_32:
+            break
+        out += chr(char)
+    return out
 
 def run_file(machine_file: str, input_file: str | None = None, trace_file: str | None = None) -> None:
     data = read_file(machine_file)
@@ -52,7 +58,7 @@ def run_file(machine_file: str, input_file: str | None = None, trace_file: str |
     end_time = time.time_ns()
     print(f'Time in ms: {(end_time - begin_time) // 1_000_000}')
     print([f'{word:#x}' for word in cu.dp.output_buffer])
-    print(''.join(map(chr, cu.dp.output_buffer)))
+    print(buf_to_str(cu.dp.output_buffer))
 
 
 def main(argv: list[str]) -> None:
