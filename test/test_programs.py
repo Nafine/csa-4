@@ -13,7 +13,7 @@ def _load(cu, *instructions, data=None):
 
 def test_prog_arith():
     """(5 + 3) - 2 = 6 -> mem[0x12]"""
-    cu = ControlUnit(log_path='log/prog_arith.log')
+    cu = ControlUnit()
     _load(cu,
           Instruction(Opcode.LDI, 5),  # 0: ACC = 5
           Instruction(Opcode.ADD, 0x10),  # 1: ACC += mem[0x10]
@@ -25,12 +25,11 @@ def test_prog_arith():
     for _ in range(50):
         cu.step()
     assert cu.dp.data_mem[0x12] == 6, f'mem[0x12]={cu.dp.data_mem[0x12]}'
-    cu.log.close()
 
 
 def test_prog_branch():
     """if ACC == mem[0x10] -> mem[0x12] = 1, иначе 0."""
-    cu = ControlUnit(log_path='log/prog_branch.log')
+    cu = ControlUnit()
     _load(cu,
           Instruction(Opcode.LDI, 5),  # 0: ACC = 5
           Instruction(Opcode.CMP, 0x10),  # 1: сравнить с mem[0x10]
@@ -45,12 +44,11 @@ def test_prog_branch():
     for _ in range(60):
         cu.step()
     assert cu.dp.data_mem[0x12] == 1, f'mem[0x12]={cu.dp.data_mem[0x12]}'
-    cu.log.close()
 
 
 def test_prog_call_ret():
     """main: ACC=10, CALL inc, ST mem[0x12].  inc: ACC += mem[0x10]; RET."""
-    cu = ControlUnit(log_path='log/prog_call_ret.log')
+    cu = ControlUnit()
     _load(cu,
           Instruction(Opcode.LDI, 10),  # 0
           Instruction(Opcode.CALL, 5),  # 1: вызов inc
@@ -64,12 +62,11 @@ def test_prog_call_ret():
     for _ in range(60):
         cu.step()
     assert cu.dp.data_mem[0x12] == 11, f'mem[0x12]={cu.dp.data_mem[0x12]}'
-    cu.log.close()
 
 
 def test_prog_stack():
     """PUSH 0xAA; ACC=0x55; ST mem[0x10]; POP; ST mem[0x11]."""
-    cu = ControlUnit(log_path='log/prog_stack.log')
+    cu = ControlUnit()
     _load(cu,
           Instruction(Opcode.LDI, 0xAA),  # 0
           Instruction(Opcode.PUSH),  # 1
@@ -83,7 +80,6 @@ def test_prog_stack():
         cu.step()
     assert cu.dp.data_mem[0x10] == 0x55, f'mem[0x10]={cu.dp.data_mem[0x10]:#x}'
     assert cu.dp.data_mem[0x11] == 0xAA, f'mem[0x11]={cu.dp.data_mem[0x11]:#x}'
-    cu.log.close()
 
 
 def test_factorial():
@@ -96,7 +92,7 @@ def test_factorial():
         if n <= 1 return 1
         else return n * fac(n-1)
     """
-    cu = ControlUnit(log_path='log/prog_factorial.log')
+    cu = ControlUnit()
 
     _load(cu,
           Instruction(Opcode.LD, 0x32),  # 0: ACC = 5 (загружаем N)
@@ -136,23 +132,5 @@ def test_factorial():
         cu.step()
 
     assert cu.dp.data_mem[0x33] == 40320, f'mem[0x33]={cu.dp.data_mem[0x33]}'
-    cu.log.close()
 
 
-if __name__ == '__main__':
-    tests = [
-        test_prog_arith,
-        test_prog_branch,
-        test_prog_call_ret,
-        test_prog_stack,
-        test_factorial
-    ]
-    failed = []
-    for t in tests:
-        try:
-            t()
-            print(f'  OK: {t.__name__}')
-        except AssertionError as e:
-            print(f'FAIL: {t.__name__}: {e}')
-            failed.append(t.__name__)
-    print(f'\n{len(tests) - len(failed)}/{len(tests)} passed')

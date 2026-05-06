@@ -13,10 +13,10 @@ def is_palindrome(n int) bool {
 
 def main() void {
     var max_pal int = 0;
-    var i int = 999;
+    var i int = 99;
 
-    while (i >= 100) {
-        var j int = 999;
+    while (i >= 10) {
+        var j int = 99;
 
         while (j >= i) {
             var prod int = i * j;

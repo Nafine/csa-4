@@ -1,8 +1,6 @@
-import array
-import os
 import struct
 from dataclasses import dataclass
-from enum import unique, IntEnum
+from enum import IntEnum, unique
 
 
 @unique

@@ -1,4 +1,3 @@
-from typing import List, Optional, Union
 from dataclasses import dataclass
 
 from .tokenizer import Token
@@ -10,7 +9,7 @@ class ASTNode:
 
 @dataclass
 class Program(ASTNode):
-    top_levels: List[ASTNode]
+    top_levels: list[ASTNode]
 
 
 @dataclass
@@ -21,13 +20,13 @@ class Param(ASTNode):
 
 @dataclass
 class Block(ASTNode):
-    stmts: List[ASTNode]
+    stmts: list[ASTNode]
 
 
 @dataclass
 class FuncDecl(ASTNode):
     name: str
-    params: List[Param]
+    params: list[Param]
     return_type: str
     body: Block
 
@@ -36,7 +35,7 @@ class FuncDecl(ASTNode):
 class VarDecl(ASTNode):
     name: str
     var_type: str
-    expr: Optional[ASTNode] = None
+    expr: ASTNode | None = None
 
 
 @dataclass
@@ -55,8 +54,8 @@ class ElifBranch(ASTNode):
 class IfStmt(ASTNode):
     condition: ASTNode
     then_block: Block
-    elifs: List[ElifBranch]
-    else_block: Optional[Block]
+    elifs: list[ElifBranch]
+    else_block: Block | None
 
 
 @dataclass
@@ -67,7 +66,7 @@ class WhileStmt(ASTNode):
 
 @dataclass
 class ReturnStmt(ASTNode):
-    expr: Optional[ASTNode]
+    expr: ASTNode | None
 
 
 @dataclass
@@ -90,7 +89,7 @@ class UnaryExpr(ASTNode):
 
 @dataclass
 class Literal(ASTNode):
-    value: Union[str, int, bool]
+    value: str | int | bool
     literal_type: str
 
 
@@ -102,7 +101,7 @@ class Identifier(ASTNode):
 @dataclass
 class FuncCall(ASTNode):
     name: str
-    args: List[ASTNode]
+    args: list[ASTNode]
 
 
 class ParserError(Exception):
@@ -110,16 +109,16 @@ class ParserError(Exception):
 
 
 class Parser:
-    def __init__(self, tokens: List[Token]):
+    def __init__(self, tokens: list[Token]):
         self.tokens = tokens
         self.pos = 0
 
-    def peek(self) -> Optional[Token]:
+    def peek(self) -> Token | None:
         if self.pos < len(self.tokens):
             return self.tokens[self.pos]
         return None
 
-    def peek_next(self) -> Optional[Token]:
+    def peek_next(self) -> Token | None:
         if self.pos + 1 < len(self.tokens):
             return self.tokens[self.pos + 1]
         return None
@@ -129,7 +128,7 @@ class Parser:
         self.pos += 1
         return token
 
-    def match(self, expected_type: str, expected_value: Optional[str] = None) -> bool:
+    def match(self, expected_type: str, expected_value: str | None = None) -> bool:
         token = self.peek()
         if not token:
             return False
@@ -139,7 +138,7 @@ class Parser:
             return False
         return True
 
-    def consume(self, expected_type: str, expected_value: Optional[str] = None) -> Token:
+    def consume(self, expected_type: str, expected_value: str | None = None) -> Token:
         if self.match(expected_type, expected_value):
             return self.advance()
 
@@ -179,7 +178,7 @@ class Parser:
         body = self.parse_block()
         return FuncDecl(name, params, ret_type, body)
 
-    def parse_params(self) -> List[Param]:
+    def parse_params(self) -> list[Param]:
         params = [self.parse_param()]
         while self.match('PUNCT', ','):
             self.consume('PUNCT', ',')
@@ -256,21 +255,22 @@ class Parser:
 
     def infer_type(self, expr: ASTNode) -> str:
         if isinstance(expr, Literal):
-            if expr.literal_type == 'INT_LIT': return 'int'
-            if expr.literal_type == 'BOOL_LIT': return 'bool'
-            if expr.literal_type == 'STRING_LIT': return 'string'
+            if expr.literal_type == 'INT_LIT':
+                return 'int'
+            if expr.literal_type == 'BOOL_LIT':
+                return 'bool'
+            if expr.literal_type == 'STRING_LIT':
+                return 'string'
 
         elif isinstance(expr, BinaryExpr):
             if expr.op in ['&&', '||', '==', '!=', '<', '>', '<=', '>=']:
                 return 'bool'
 
-            left_type = self.infer_type(expr.left)
-            right_type = self.infer_type(expr.right)
-
-            return left_type
+            return self.infer_type(expr.left)
 
         elif isinstance(expr, UnaryExpr):
-            if expr.op == '!': return 'bool'
+            if expr.op == '!':
+                return 'bool'
             return self.infer_type(expr.expr)
 
         return 'unknown'
@@ -416,7 +416,7 @@ class Parser:
 
         raise ParserError(f"Unexpected token in expression: {token}")
 
-    def parse_args(self) -> List[ASTNode]:
+    def parse_args(self) -> list[ASTNode]:
         args = [self.parse_expr()]
         while self.match('PUNCT', ','):
             self.consume('PUNCT', ',')

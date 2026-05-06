@@ -11,4 +11,10 @@ def main() void {
     if (a > b) {
         print(hello);
     }
+
+    a = 1;
+    b = 2;
+    c := 3;
+
+    print(a + b + (a * b * (a + c)));
 }

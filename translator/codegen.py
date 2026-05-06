@@ -2,8 +2,21 @@ from dataclasses import dataclass
 
 from isa import Instruction, Opcode
 from machine import DataPath
-from translator.parser import Program, FuncDecl, VarDecl, Literal, Identifier, UnaryExpr, BinaryExpr, FuncCall, \
-    AssignStmt, ExprStmt, IfStmt, ReturnStmt, WhileStmt
+from translator.parser import (
+    AssignStmt,
+    BinaryExpr,
+    ExprStmt,
+    FuncCall,
+    FuncDecl,
+    Identifier,
+    IfStmt,
+    Literal,
+    Program,
+    ReturnStmt,
+    UnaryExpr,
+    VarDecl,
+    WhileStmt,
+)
 
 
 class CodegenError(Exception):
@@ -86,9 +99,42 @@ class CodeGenerator:
 
         return list(self.instructions), list(self.data)
 
+    def _ip(self) -> int:
+        return len(self.instructions)
+
+    def _emit_symbol_ref(self, opcode: Opcode, name: str) -> int:
+        index = self._compile_primary(Instruction(opcode, 0))
+        self.symbol_patches.append(_Patch(index, name))
+        return index
+
+    def _allocate(self, name: str, value: int = 0) -> int:
+        existing = self.symbols.get(name)
+        if existing is not None:
+            return existing.offset
+        offset = len(self.data)
+        self.data.append(value)
+        self.symbols[name] = _Symbol('data', offset)
+        return offset
+
+    def _allocate_cstr(self, value: str) -> str:
+        name = f'str:{value}'
+        if name in self.symbols:
+            return name
+        offset = len(self.data)
+        for char in value:
+            self.data.append(ord(char))
+        self.data.append(0)
+        self.symbols[name] = _Symbol('data', offset)
+        return name
+
+    def _qualify(self, name: str) -> str:
+        if not self.scope_stack:
+            return name
+        return '.'.join(self.scope_stack) + '.' + name
+
     def _resolve(self, name: str) -> str:
         for i in range(len(self.scope_stack), 0, -1):
-            prefix = ''.join(self.scope_stack[:i])
+            prefix = '.'.join(self.scope_stack[:i])
             candidate = f'{prefix}.{name}'
             if candidate in self.symbols:
                 return candidate
@@ -107,15 +153,6 @@ class CodeGenerator:
             else:
                 raise CodegenError(f'unknown symbol kind: {sym.kind}')
 
-    def _ip(self) -> int:
-        return len(self.instructions)
-
-    def _compile_block(self, block):
-        self._enter_scope()
-        for stmt in block.stmts:
-            self._compile_stmt(stmt)
-        self._exit_scope()
-
     def _enter_scope(self, name: str | None = None):
         if name is None:
             name = f'scope_{self.scope_counter}'
@@ -124,6 +161,12 @@ class CodeGenerator:
 
     def _exit_scope(self) -> None:
         self.scope_stack.pop()
+
+    def _compile_block(self, block):
+        self._enter_scope()
+        for stmt in block.stmts:
+            self._compile_stmt(stmt)
+        self._exit_scope()
 
     def _compile_stmt(self, stmt) -> None:
         if isinstance(stmt, VarDecl):
@@ -173,28 +216,30 @@ class CodeGenerator:
         self._patch_branch(jz_while, loop_start)
 
     def _compile_assign(self, assign: AssignStmt):
-        if self._qualify(assign.name) not in self.symbols:
-            self._allocate(self._qualify(assign.name))
+        resolved = self._resolve(assign.name)
+        if resolved not in self.symbols:
+            raise CodegenError(f'assignment to undeclared variable: {assign.name}')
         self._compile_expression(assign.expr)
-        self._store(assign.name)
+        self._emit_symbol_ref(Opcode.ST, resolved)
 
     def _compile_top_var_decl(self, decl: VarDecl) -> None:
         if decl.expr is None:
             self._allocate(decl.name)
             self._tag_if_string(decl)
             return
-        if isinstance(decl.expr, Literal) and decl.expr.literal_type in ('INT_LIT', 'FLOAT_LIT', 'BOOL_LIT'):
+        if isinstance(decl.expr, Literal) and decl.expr.literal_type in ('INT_LIT', 'BOOL_LIT'):
             self._allocate(decl.name, self._literal_to_int(decl.expr))
             return
         self._compile_var_decl(decl)
 
     def _compile_var_decl(self, decl: VarDecl) -> None:
-        self._allocate(self._qualify(decl.name))
+        qualified = self._qualify(decl.name)
+        self._allocate(qualified)
         self._tag_if_string(decl)
         if decl.expr is None:
             return
         self._compile_expression(decl.expr)
-        self._store(decl.name)
+        self._emit_symbol_ref(Opcode.ST, qualified)
 
     def _tag_if_string(self, decl: VarDecl) -> None:
         is_string = decl.var_type == 'string'
@@ -294,7 +339,7 @@ class CodeGenerator:
                 f'{call.name}: expected {len(func.params)} args, got {len(call.args)}'
             )
 
-        for arg, param in zip(call.args, func.params):
+        for arg, param in zip(call.args, func.params, strict=True):
             self._compile_expression(arg)
             self._emit_symbol_ref(Opcode.ST, f'{call.name}.{param.name}')
 
@@ -421,38 +466,3 @@ class CodeGenerator:
     def _compile_primary(self, instruction) -> int:
         self.instructions.append(instruction)
         return len(self.instructions) - 1
-
-    def _emit_symbol_ref(self, opcode: Opcode, name: str) -> int:
-        index = self._compile_primary(Instruction(opcode, 0))
-        self.symbol_patches.append(_Patch(index, name))
-        return index
-
-    def _qualify(self, name: str) -> str:
-        if not self.scope_stack:
-            return name
-        return ''.join(self.scope_stack) + '.' + name
-
-    def _allocate(self, name: str, value: int = 0) -> int:
-        existing = self.symbols.get(name)
-        if existing is not None:
-            return existing.offset
-        offset = len(self.data)
-        self.data.append(value)
-        self.symbols[name] = _Symbol('data', offset)
-        return offset
-
-    def _allocate_cstr(self, value: str) -> str:
-        name = f'str:{value}'
-        if name in self.symbols:
-            return name
-        offset = len(self.data)
-        for char in value:
-            self.data.append(ord(char))
-        self.data.append(0)
-        self.symbols[name] = _Symbol('data', offset)
-        return name
-
-    def _store(self, name: str) -> None:
-        if name not in self.symbols:
-            self._allocate(self._qualify(name))
-        self._emit_symbol_ref(Opcode.ST, self._resolve(name))

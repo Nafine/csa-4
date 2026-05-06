@@ -1,13 +1,27 @@
 from pathlib import Path
 
-from translator.tokenizer import tokenize
+import pytest
+
 from translator.parser import (
-    Parser, ParserError,
-    Program, FuncDecl, VarDecl, AssignStmt,
-    IfStmt, ElifBranch, WhileStmt, ReturnStmt, ExprStmt,
-    BinaryExpr, UnaryExpr, Literal, Identifier, FuncCall,
+    AssignStmt,
+    BinaryExpr,
     Block,
+    ElifBranch,
+    ExprStmt,
+    FuncCall,
+    FuncDecl,
+    Identifier,
+    IfStmt,
+    Literal,
+    Parser,
+    ParserError,
+    Program,
+    ReturnStmt,
+    UnaryExpr,
+    VarDecl,
+    WhileStmt,
 )
+from translator.tokenizer import tokenize
 
 
 def _parse(src):
@@ -27,12 +41,8 @@ def test_empty_main():
 
 
 def test_missing_main_raises():
-    try:
+    with pytest.raises(ParserError, match='main'):
         _parse('var x int = 1;')
-    except ParserError as e:
-        assert 'main' in str(e)
-        return
-    assert False, 'expected ParserError'
 
 
 def test_top_level_var_decl():
@@ -151,11 +161,8 @@ def test_func_call_with_args():
 
 def test_builtin_must_be_called():
     """`print` без скобок должен дать ParserError."""
-    try:
+    with pytest.raises(ParserError):
         _parse('def main() void { x := print; }')
-    except ParserError:
-        return
-    assert False, 'expected ParserError'
 
 
 EXAMPLES = Path(__file__).resolve().parent.parent / 'examples'
@@ -171,27 +178,3 @@ def test_while_tw_parses():
     assert any(isinstance(n, FuncDecl) and n.name == 'main' for n in prog.top_levels)
 
 
-if __name__ == '__main__':
-    tests = [
-        test_empty_main, test_missing_main_raises,
-        test_top_level_var_decl, test_top_level_short_var_decl,
-        test_func_with_params_and_return,
-        test_arith_precedence, test_paren_overrides_precedence,
-        test_unary_minus_and_not, test_logical_chain,
-        test_if_else, test_if_elif_else,
-        test_while, test_return_with_and_without_expr,
-        test_func_call_with_args, test_builtin_must_be_called,
-        test_example_tw_parses, test_while_tw_parses,
-    ]
-    failed = []
-    for t in tests:
-        try:
-            t()
-            print(f'  OK: {t.__name__}')
-        except AssertionError as e:
-            print(f'FAIL: {t.__name__}: {e}')
-            failed.append(t.__name__)
-        except ParserError as e:
-            print(f'FAIL: {t.__name__}: ParserError: {e}')
-            failed.append(t.__name__)
-    print(f'\n{len(tests) - len(failed)}/{len(tests)} passed')

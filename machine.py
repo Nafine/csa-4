@@ -1,10 +1,26 @@
-from microcode import MROM, DECODER, Cond, ArSel, Alu, AluLeft, AluRight, MemSrc
+from dataclasses import dataclass
+
+from microcode import DECODER, MROM, Alu, AluLeft, AluRight, ArSel, Cond, MemSrc
 
 
 def to_signed32(val):
     if val & (1 << 31):
         return val - (1 << 32)
     return val
+
+
+@dataclass(frozen=True)
+class CpuState:
+    tick: int
+    mp: int
+    cr: int
+    acc: int
+    ip: int
+    sp: int
+    ar: int
+    dr: int
+    Z: int
+    N: int
 
 
 class DataPath:
@@ -48,7 +64,7 @@ class DataPath:
 
 
 class ControlUnit:
-    def __init__(self, log_path="trace.log", input_buffer=None):
+    def __init__(self, input_buffer: list[int] | None =None):
         if input_buffer is None:
             input_buffer = []
         self.dp = DataPath(input_buffer)
@@ -59,24 +75,25 @@ class ControlUnit:
         self.tick = 0
         self.halted = 0
 
-        self.log = open(log_path, 'w', encoding='utf-8')
+    def snapshot(self) -> CpuState:
+        return CpuState(
+            tick=self.tick,
+            mp=self.mp,
+            cr=self.dp.cr,
+            acc=self.dp.acc,
+            ip=self.dp.ip,
+            sp=self.dp.sp,
+            ar=self.dp.ar,
+            dr=self.dp.dr,
+            Z=self.dp.Z,
+            N=self.dp.N,
+        )
 
-    def run(self):
-        while not self.halted:
-            self.step()
-
-    def tick(self):
+    def step(self) -> None:
         self.tick += 1
-        #self.print_state()
-
-    def current_tick(self):
-        return self.tick
-
-    def step(self):
         mc = self.MROM[self.mp]
 
         signals = self._decode_mc(mc)
-        # print(signals)
         alu = self._execute_alu(signals)
         self._latch_registers(signals, alu)
         self._update_flags_and_branch(signals)
@@ -184,8 +201,6 @@ class ControlUnit:
                 (cond == Cond.LT and self.dp.N == 1)
         )
 
-        self.tick += 1
-
         if cond == Cond.DECODE:
             opcode = (self.dp.cr >> 24) & 0xFF
             self.mp = DECODER[opcode]
@@ -194,9 +209,3 @@ class ControlUnit:
 
         if signals['halted']:
             self.halted = True
-
-    def print_state(self):
-        self.log.write(f'Tick: [{self.tick}] uPC={self.mp:02} CR={self.dp.cr:08x}\n')
-        self.log.write(f'ACC={self.dp.acc:11} IP={self.dp.ip:08x} SP={self.dp.sp:08x}\n')
-        self.log.write(f'AR={self.dp.ar:08x} Z={self.dp.Z} N={self.dp.N}\n')
-        self.log.write('-----------------------------\n')
