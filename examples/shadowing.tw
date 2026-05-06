@@ -1,0 +1,14 @@
+x := 1;
+def main() void {
+    print(x);
+
+    if (x > 0) {
+        x := 2;
+        print(x);
+        if (x > 0) {
+            a := 3;
+            print(a);
+        }
+    }
+    print(x);
+}

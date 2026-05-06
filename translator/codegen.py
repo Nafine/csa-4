@@ -29,7 +29,8 @@ class CodeGenerator:
         self.symbols: dict[str, _Symbol] = {}
         self.symbol_patches: list[_Patch] = []
         self.string_symbols: set[str] = set()
-        self.current_function: str | None = None
+        self.scope_stack: list[str] = []
+        self.scope_counter: int = 0
         self.function_decls: dict[str, FuncDecl] = {}
 
     def generate(self, program: Program) -> tuple[list[Instruction], list[int]]:
@@ -67,18 +68,18 @@ class CodeGenerator:
             if fname == 'main':
                 continue
             self.symbols[fname] = _Symbol('function', self._ip())
-            self.current_function = fname
+            self._enter_scope(fname)
             self._compile_block(fdecl.body)
-            self.current_function = None
+            self._exit_scope()
             self._compile_primary(Instruction(Opcode.RET))
 
         main_addr = self._ip()
         self.symbols[main_decl.name] = _Symbol('function', main_addr)
         self._patch_branch(jmp_main, main_addr)
 
-        self.current_function = 'main'
+        self._enter_scope('main')
         self._compile_block(main_decl.body)
-        self.current_function = None
+        self._exit_scope()
         self._compile_primary(Instruction(Opcode.HALT))
 
         self._resolve_symbols()
@@ -86,10 +87,11 @@ class CodeGenerator:
         return list(self.instructions), list(self.data)
 
     def _resolve(self, name: str) -> str:
-        if self.current_function is not None:
-            local = f'{self.current_function}.{name}'
-            if local in self.symbols:
-                return local
+        for i in range(len(self.scope_stack), 0, -1):
+            prefix = ''.join(self.scope_stack[:i])
+            candidate = f'{prefix}.{name}'
+            if candidate in self.symbols:
+                return candidate
         return name
 
     def _resolve_symbols(self) -> None:
@@ -109,8 +111,19 @@ class CodeGenerator:
         return len(self.instructions)
 
     def _compile_block(self, block):
+        self._enter_scope()
         for stmt in block.stmts:
             self._compile_stmt(stmt)
+        self._exit_scope()
+
+    def _enter_scope(self, name: str | None = None):
+        if name is None:
+            name = f'scope_{self.scope_counter}'
+            self.scope_counter += 1
+        self.scope_stack.append(name)
+
+    def _exit_scope(self) -> None:
+        self.scope_stack.pop()
 
     def _compile_stmt(self, stmt) -> None:
         if isinstance(stmt, VarDecl):
@@ -415,9 +428,9 @@ class CodeGenerator:
         return index
 
     def _qualify(self, name: str) -> str:
-        if self.current_function is not None:
-            return f'{self.current_function}.{name}'
-        return name
+        if not self.scope_stack:
+            return name
+        return ''.join(self.scope_stack) + '.' + name
 
     def _allocate(self, name: str, value: int = 0) -> int:
         existing = self.symbols.get(name)
