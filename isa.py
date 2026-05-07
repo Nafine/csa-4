@@ -9,6 +9,7 @@ class Opcode(IntEnum):
     LDR = 0x02
     LDI = 0x03
     ST = 0x04
+    STR = 0x05
 
     ADD = 0x10
     SUB = 0x11
@@ -74,6 +75,16 @@ def write_file(path: str, instructions: list[Instruction], data: list[int]) -> N
             f.write(instr.to_bytes())
         for cell in data:
             f.write(struct.pack('>I', cell))
+
+
+def write_debug(path: str, instructions: list[Instruction], data: list[int]) -> None:
+    base = len(instructions)
+    with open(path, 'w', encoding='utf-8') as f:
+        for addr, instr in enumerate(instructions):
+            f.write(f'{addr:04x} - {instr.encode():08x} - {instr}\n')
+        for offset, cell in enumerate(data):
+            addr = base + offset
+            f.write(f'{addr:04x} - {cell & 0xFFFFFFFF:08x} - .word {cell:#x}\n')
 
 
 def read_file(path: str) -> list[int]:

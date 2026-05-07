@@ -9,12 +9,16 @@ dependencies = []
 [dependency-groups]
 dev = [
     "pytest>=8",
+    "pyyaml>=6",
     "ruff>=0.15.11",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
 pythonpath = ["."]
+markers = [
+    "slow: long-running golden case (e.g. real Euler 4); skip with -m 'not slow'",
+]
 
 [tool.ruff]
 line-length = 120

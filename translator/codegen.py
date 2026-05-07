@@ -47,13 +47,6 @@ class CodeGenerator:
         self.function_decls: dict[str, FuncDecl] = {}
 
     def generate(self, program: Program) -> tuple[list[Instruction], list[int]]:
-        self.instructions = []
-        self.data = []
-        self.symbols = {}
-        self.symbol_patches = []
-        self.string_symbols = set()
-        self.function_decls = {}
-
         main_decl: FuncDecl | None = None
 
         for node in program.top_levels:
@@ -276,6 +269,24 @@ class CodeGenerator:
             self._allocate(name, value=1)
         return name
 
+    def _peek_tmp_name(self) -> str:
+        name = '$peek_tmp'
+        if name not in self.symbols:
+            self._allocate(name)
+        return name
+
+    def _poke_val_name(self) -> str:
+        name = '$poke_val'
+        if name not in self.symbols:
+            self._allocate(name)
+        return name
+
+    def _poke_addr_name(self) -> str:
+        name = '$poke_addr'
+        if name not in self.symbols:
+            self._allocate(name)
+        return name
+
     def _emit_print_string_loop(self) -> None:
         ptr = self._print_ptr_name()
         one = self._one_name()
@@ -329,6 +340,26 @@ class CodeGenerator:
             if call.args:
                 raise CodegenError('read() expects zero arguments')
             self._compile_primary(Instruction(Opcode.LD, DataPath.INPUT_ADDR))
+            return
+        elif call.name == 'peek':
+            if len(call.args) != 1:
+                raise CodegenError('peek() expects exactly one argument')
+            tmp = self._peek_tmp_name()
+            self._compile_expression(call.args[0])
+            self._emit_symbol_ref(Opcode.ST, tmp)
+            self._emit_symbol_ref(Opcode.LDR, tmp)
+            return
+        elif call.name == 'poke':
+            if len(call.args) != 2:
+                raise CodegenError('poke() expects exactly two arguments')
+            val_slot = self._poke_val_name()
+            addr_slot = self._poke_addr_name()
+            self._compile_expression(call.args[1])
+            self._emit_symbol_ref(Opcode.ST, val_slot)
+            self._compile_expression(call.args[0])
+            self._emit_symbol_ref(Opcode.ST, addr_slot)
+            self._emit_symbol_ref(Opcode.LD, val_slot)
+            self._emit_symbol_ref(Opcode.STR, addr_slot)
             return
 
         func = self.function_decls.get(call.name)
@@ -456,12 +487,25 @@ class CodeGenerator:
     def _compile_lit(self, lit):
         match lit.literal_type:
             case 'INT_LIT':
-                self._compile_primary(Instruction(Opcode.LDI, int(lit.value)))
+                self._compile_int(int(lit.value))
             case 'BOOL_LIT':
                 self._compile_primary(Instruction(Opcode.LDI, 1 if lit.value else 0))
             case 'STRING_LIT':
                 name = self._allocate_cstr(lit.value)
                 self._emit_symbol_ref(Opcode.LDI, name)
+
+    def _compile_int(self, value: int) -> None:
+        if 0 <= value < (1 << 24):
+            self._compile_primary(Instruction(Opcode.LDI, value))
+            return
+        name = self._intern_const(value)
+        self._emit_symbol_ref(Opcode.LD, name)
+
+    def _intern_const(self, value: int) -> str:
+        name = f'$const:{value & 0xFFFFFFFF}'
+        if name not in self.symbols:
+            self._allocate(name, value & 0xFFFFFFFF)
+        return name
 
     def _compile_primary(self, instruction) -> int:
         self.instructions.append(instruction)

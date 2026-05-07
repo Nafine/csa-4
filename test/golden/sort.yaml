@@ -1,0 +1,1184 @@
+in_source: |-
+  // Reads a null-terminated byte sequence from input, sorts it ascending, prints it.
+  // Storage layout: scratch buffer at address 200 (free area between data and stack).
+
+  def main() void {
+      var BUF int = 200;
+      var n int = 0;
+      var c int = read();
+
+      while (c != 0) {
+          poke(BUF + n, c);
+          n = n + 1;
+          c = read();
+      }
+
+      var i int = 0;
+      while (i < n) {
+          var j int = 0;
+          while (j < n - 1 - i) {
+              var a int = peek(BUF + j);
+              var b int = peek(BUF + j + 1);
+              if (a > b) {
+                  poke(BUF + j, b);
+                  poke(BUF + j + 1, a);
+              }
+              j = j + 1;
+          }
+          i = i + 1;
+      }
+
+      var k int = 0;
+      while (k < n) {
+          print(peek(BUF + k));
+          k = k + 1;
+      }
+  }
+in_stdin: edcba
+in_limit: 50000
+out_ast: |-
+  Program(top_levels=[ FuncDecl(name='main',
+                                params=[],
+                                return_type='void',
+                                body=Block(stmts=[ VarDecl(name='BUF',
+                                                           var_type='int',
+                                                           expr=Literal(value=200,
+                                                                        literal_type='INT_LIT')),
+                                                   VarDecl(name='n',
+                                                           var_type='int',
+                                                           expr=Literal(value=0,
+                                                                        literal_type='INT_LIT')),
+                                                   VarDecl(name='c',
+                                                           var_type='int',
+                                                           expr=FuncCall(name='read',
+                                                                         args=[])),
+                                                   WhileStmt(condition=BinaryExpr(left=Identifier(name='c'),
+                                                                                  op='!=',
+                                                                                  right=Literal(value=0,
+                                                                                                literal_type='INT_LIT')),
+                                                             body=Block(stmts=[ ExprStmt(expr=FuncCall(name='poke',
+                                                                                                       args=[ BinaryExpr(left=Identifier(name='BUF'),
+                                                                                                                         op='+',
+                                                                                                                         right=Identifier(name='n')),
+                                                                                                              Identifier(name='c')])),
+                                                                                AssignStmt(name='n',
+                                                                                           expr=BinaryExpr(left=Identifier(name='n'),
+                                                                                                           op='+',
+                                                                                                           right=Literal(value=1,
+                                                                                                                         literal_type='INT_LIT'))),
+                                                                                AssignStmt(name='c',
+                                                                                           expr=FuncCall(name='read',
+                                                                                                         args=[ ]))])),
+                                                   VarDecl(name='i',
+                                                           var_type='int',
+                                                           expr=Literal(value=0,
+                                                                        literal_type='INT_LIT')),
+                                                   WhileStmt(condition=BinaryExpr(left=Identifier(name='i'),
+                                                                                  op='<',
+                                                                                  right=Identifier(name='n')),
+                                                             body=Block(stmts=[ VarDecl(name='j',
+                                                                                        var_type='int',
+                                                                                        expr=Literal(value=0,
+                                                                                                     literal_type='INT_LIT')),
+                                                                                WhileStmt(condition=BinaryExpr(left=Identifier(name='j'),
+                                                                                                               op='<',
+                                                                                                               right=BinaryExpr(left=BinaryExpr(left=Identifier(name='n'),
+                                                                                                                                                op='-',
+                                                                                                                                                right=Literal(value=1,
+                                                                                                                                                              literal_type='INT_LIT')),
+                                                                                                                                op='-',
+                                                                                                                                right=Identifier(name='i'))),
+                                                                                          body=Block(stmts=[ VarDecl(name='a',
+                                                                                                                     var_type='int',
+                                                                                                                     expr=FuncCall(name='peek',
+                                                                                                                                   args=[ BinaryExpr(left=Identifier(name='BUF'),
+                                                                                                                                                     op='+',
+                                                                                                                                                     right=Identifier(name='j'))])),
+                                                                                                             VarDecl(name='b',
+                                                                                                                     var_type='int',
+                                                                                                                     expr=FuncCall(name='peek',
+                                                                                                                                   args=[ BinaryExpr(left=BinaryExpr(left=Identifier(name='BUF'),
+                                                                                                                                                                     op='+',
+                                                                                                                                                                     right=Identifier(name='j')),
+                                                                                                                                                     op='+',
+                                                                                                                                                     right=Literal(value=1,
+                                                                                                                                                                   literal_type='INT_LIT'))])),
+                                                                                                             IfStmt(condition=BinaryExpr(left=Identifier(name='a'),
+                                                                                                                                         op='>',
+                                                                                                                                         right=Identifier(name='b')),
+                                                                                                                    then_block=Block(stmts=[ ExprStmt(expr=FuncCall(name='poke',
+                                                                                                                                                                    args=[ BinaryExpr(left=Identifier(name='BUF'),
+                                                                                                                                                                                      op='+',
+                                                                                                                                                                                      right=Identifier(name='j')),
+                                                                                                                                                                           Identifier(name='b')])),
+                                                                                                                                             ExprStmt(expr=FuncCall(name='poke',
+                                                                                                                                                                    args=[ BinaryExpr(left=BinaryExpr(left=Identifier(name='BUF'),
+                                                                                                                                                                                                      op='+',
+                                                                                                                                                                                                      right=Identifier(name='j')),
+                                                                                                                                                                                      op='+',
+                                                                                                                                                                                      right=Literal(value=1,
+                                                                                                                                                                                                    literal_type='INT_LIT')),
+                                                                                                                                                                           Identifier(name='a')]))]),
+                                                                                                                    elifs=[ ],
+                                                                                                                    else_block=None),
+                                                                                                             AssignStmt(name='j',
+                                                                                                                        expr=BinaryExpr(left=Identifier(name='j'),
+                                                                                                                                        op='+',
+                                                                                                                                        right=Literal(value=1,
+                                                                                                                                                      literal_type='INT_LIT')))])),
+                                                                                AssignStmt(name='i',
+                                                                                           expr=BinaryExpr(left=Identifier(name='i'),
+                                                                                                           op='+',
+                                                                                                           right=Literal(value=1,
+                                                                                                                         literal_type='INT_LIT')))])),
+                                                   VarDecl(name='k',
+                                                           var_type='int',
+                                                           expr=Literal(value=0,
+                                                                        literal_type='INT_LIT')),
+                                                   WhileStmt(condition=BinaryExpr(left=Identifier(name='k'),
+                                                                                  op='<',
+                                                                                  right=Identifier(name='n')),
+                                                             body=Block(stmts=[ ExprStmt(expr=FuncCall(name='print',
+                                                                                                       args=[ FuncCall(name='peek',
+                                                                                                                       args=[ BinaryExpr(left=Identifier(name='BUF'),
+                                                                                                                                         op='+',
+                                                                                                                                         right=Identifier(name='k'))])])),
+                                                                                AssignStmt(name='k',
+                                                                                           expr=BinaryExpr(left=Identifier(name='k'),
+                                                                                                           op='+',
+                                                                                                           right=Literal(value=1,
+                                                                                                                         literal_type='INT_LIT')))]))]))])
+out_code: 30 00 00 01 03 00 00 C8 04 00 00 B7 03 00 00 00 04 00 00 B8 01 00 0F FE
+  04 00 00 B9 01 00 00 B9 40 00 00 00 03 00 00 00 04 00 00 BA 41 00 00 00 20 00
+  00 BA 32 00 00 10 03 00 00 00 30 00 00 11 03 00 00 01 31 00 00 27 01 00 00 B9
+  04 00 00 BB 01 00 00 B7 40 00 00 00 01 00 00 B8 04 00 00 BA 41 00 00 00 10 00
+  00 BA 04 00 00 BC 01 00 00 BB 05 00 00 BC 01 00 00 B8 40 00 00 00 03 00 00 01
+  04 00 00 BA 41 00 00 00 10 00 00 BA 04 00 00 B8 01 00 0F FE 04 00 00 B9 30 00
+  00 07 03 00 00 00 04 00 00 BD 01 00 00 BD 40 00 00 00 01 00 00 B8 04 00 00 BA
+  41 00 00 00 20 00 00 BA 36 00 00 32 03 00 00 00 30 00 00 33 03 00 00 01 31 00
+  00 98 03 00 00 00 04 00 00 BE 01 00 00 BE 40 00 00 00 01 00 00 B8 40 00 00 00
+  03 00 00 01 04 00 00 BA 41 00 00 00 11 00 00 BA 40 00 00 00 01 00 00 BD 04 00
+  00 BA 41 00 00 00 11 00 00 BA 04 00 00 BA 41 00 00 00 20 00 00 BA 36 00 00 49
+  03 00 00 00 30 00 00 4A 03 00 00 01 31 00 00 90 01 00 00 B7 40 00 00 00 01 00
+  00 BE 04 00 00 BA 41 00 00 00 10 00 00 BA 04 00 00 C0 02 00 00 C0 04 00 00 BF
+  01 00 00 B7 40 00 00 00 01 00 00 BE 04 00 00 BA 41 00 00 00 10 00 00 BA 40 00
+  00 00 03 00 00 01 04 00 00 BA 41 00 00 00 10 00 00 BA 04 00 00 C0 02 00 00 C0
+  04 00 00 C1 01 00 00 BF 40 00 00 00 01 00 00 C1 04 00 00 BA 41 00 00 00 20 00
+  00 BA 34 00 00 6B 03 00 00 00 30 00 00 6C 03 00 00 01 31 00 00 88 01 00 00 C1
+  04 00 00 BB 01 00 00 B7 40 00 00 00 01 00 00 BE 04 00 00 BA 41 00 00 00 10 00
+  00 BA 04 00 00 BC 01 00 00 BB 05 00 00 BC 01 00 00 BF 04 00 00 BB 01 00 00 B7
+  40 00 00 00 01 00 00 BE 04 00 00 BA 41 00 00 00 10 00 00 BA 40 00 00 00 03 00
+  00 01 04 00 00 BA 41 00 00 00 10 00 00 BA 04 00 00 BC 01 00 00 BB 05 00 00 BC
+  01 00 00 BE 40 00 00 00 03 00 00 01 04 00 00 BA 41 00 00 00 10 00 00 BA 04 00
+  00 BE 30 00 00 36 01 00 00 BD 40 00 00 00 03 00 00 01 04 00 00 BA 41 00 00 00
+  10 00 00 BA 04 00 00 BD 30 00 00 29 03 00 00 00 04 00 00 C2 01 00 00 C2 40 00
+  00 00 01 00 00 B8 04 00 00 BA 41 00 00 00 20 00 00 BA 36 00 00 A3 03 00 00 00
+  30 00 00 A4 03 00 00 01 31 00 00 B6 01 00 00 B7 40 00 00 00 01 00 00 C2 04 00
+  00 BA 41 00 00 00 10 00 00 BA 04 00 00 C0 02 00 00 C0 04 00 0F FF 01 00 00 C2
+  40 00 00 00 03 00 00 01 04 00 00 BA 41 00 00 00 10 00 00 BA 04 00 00 C2 30 00
+  00 9A FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  00 00
+out_code_hex: |-
+  0000 - 30000001 - JMP 0x01
+  0001 - 030000c8 - LDI 0xc8
+  0002 - 040000b7 - ST 0xb7
+  0003 - 03000000 - LDI 0x00
+  0004 - 040000b8 - ST 0xb8
+  0005 - 01000ffe - LD 0xffe
+  0006 - 040000b9 - ST 0xb9
+  0007 - 010000b9 - LD 0xb9
+  0008 - 40000000 - PUSH 0x00
+  0009 - 03000000 - LDI 0x00
+  000a - 040000ba - ST 0xba
+  000b - 41000000 - POP 0x00
+  000c - 200000ba - CMP 0xba
+  000d - 32000010 - BNE 0x10
+  000e - 03000000 - LDI 0x00
+  000f - 30000011 - JMP 0x11
+  0010 - 03000001 - LDI 0x01
+  0011 - 31000027 - BEQ 0x27
+  0012 - 010000b9 - LD 0xb9
+  0013 - 040000bb - ST 0xbb
+  0014 - 010000b7 - LD 0xb7
+  0015 - 40000000 - PUSH 0x00
+  0016 - 010000b8 - LD 0xb8
+  0017 - 040000ba - ST 0xba
+  0018 - 41000000 - POP 0x00
+  0019 - 100000ba - ADD 0xba
+  001a - 040000bc - ST 0xbc
+  001b - 010000bb - LD 0xbb
+  001c - 050000bc - STR 0xbc
+  001d - 010000b8 - LD 0xb8
+  001e - 40000000 - PUSH 0x00
+  001f - 03000001 - LDI 0x01
+  0020 - 040000ba - ST 0xba
+  0021 - 41000000 - POP 0x00
+  0022 - 100000ba - ADD 0xba
+  0023 - 040000b8 - ST 0xb8
+  0024 - 01000ffe - LD 0xffe
+  0025 - 040000b9 - ST 0xb9
+  0026 - 30000007 - JMP 0x07
+  0027 - 03000000 - LDI 0x00
+  0028 - 040000bd - ST 0xbd
+  0029 - 010000bd - LD 0xbd
+  002a - 40000000 - PUSH 0x00
+  002b - 010000b8 - LD 0xb8
+  002c - 040000ba - ST 0xba
+  002d - 41000000 - POP 0x00
+  002e - 200000ba - CMP 0xba
+  002f - 36000032 - BLT 0x32
+  0030 - 03000000 - LDI 0x00
+  0031 - 30000033 - JMP 0x33
+  0032 - 03000001 - LDI 0x01
+  0033 - 31000098 - BEQ 0x98
+  0034 - 03000000 - LDI 0x00
+  0035 - 040000be - ST 0xbe
+  0036 - 010000be - LD 0xbe
+  0037 - 40000000 - PUSH 0x00
+  0038 - 010000b8 - LD 0xb8
+  0039 - 40000000 - PUSH 0x00
+  003a - 03000001 - LDI 0x01
+  003b - 040000ba - ST 0xba
+  003c - 41000000 - POP 0x00
+  003d - 110000ba - SUB 0xba
+  003e - 40000000 - PUSH 0x00
+  003f - 010000bd - LD 0xbd
+  0040 - 040000ba - ST 0xba
+  0041 - 41000000 - POP 0x00
+  0042 - 110000ba - SUB 0xba
+  0043 - 040000ba - ST 0xba
+  0044 - 41000000 - POP 0x00
+  0045 - 200000ba - CMP 0xba
+  0046 - 36000049 - BLT 0x49
+  0047 - 03000000 - LDI 0x00
+  0048 - 3000004a - JMP 0x4a
+  0049 - 03000001 - LDI 0x01
+  004a - 31000090 - BEQ 0x90
+  004b - 010000b7 - LD 0xb7
+  004c - 40000000 - PUSH 0x00
+  004d - 010000be - LD 0xbe
+  004e - 040000ba - ST 0xba
+  004f - 41000000 - POP 0x00
+  0050 - 100000ba - ADD 0xba
+  0051 - 040000c0 - ST 0xc0
+  0052 - 020000c0 - LDR 0xc0
+  0053 - 040000bf - ST 0xbf
+  0054 - 010000b7 - LD 0xb7
+  0055 - 40000000 - PUSH 0x00
+  0056 - 010000be - LD 0xbe
+  0057 - 040000ba - ST 0xba
+  0058 - 41000000 - POP 0x00
+  0059 - 100000ba - ADD 0xba
+  005a - 40000000 - PUSH 0x00
+  005b - 03000001 - LDI 0x01
+  005c - 040000ba - ST 0xba
+  005d - 41000000 - POP 0x00
+  005e - 100000ba - ADD 0xba
+  005f - 040000c0 - ST 0xc0
+  0060 - 020000c0 - LDR 0xc0
+  0061 - 040000c1 - ST 0xc1
+  0062 - 010000bf - LD 0xbf
+  0063 - 40000000 - PUSH 0x00
+  0064 - 010000c1 - LD 0xc1
+  0065 - 040000ba - ST 0xba
+  0066 - 41000000 - POP 0x00
+  0067 - 200000ba - CMP 0xba
+  0068 - 3400006b - BGT 0x6b
+  0069 - 03000000 - LDI 0x00
+  006a - 3000006c - JMP 0x6c
+  006b - 03000001 - LDI 0x01
+  006c - 31000088 - BEQ 0x88
+  006d - 010000c1 - LD 0xc1
+  006e - 040000bb - ST 0xbb
+  006f - 010000b7 - LD 0xb7
+  0070 - 40000000 - PUSH 0x00
+  0071 - 010000be - LD 0xbe
+  0072 - 040000ba - ST 0xba
+  0073 - 41000000 - POP 0x00
+  0074 - 100000ba - ADD 0xba
+  0075 - 040000bc - ST 0xbc
+  0076 - 010000bb - LD 0xbb
+  0077 - 050000bc - STR 0xbc
+  0078 - 010000bf - LD 0xbf
+  0079 - 040000bb - ST 0xbb
+  007a - 010000b7 - LD 0xb7
+  007b - 40000000 - PUSH 0x00
+  007c - 010000be - LD 0xbe
+  007d - 040000ba - ST 0xba
+  007e - 41000000 - POP 0x00
+  007f - 100000ba - ADD 0xba
+  0080 - 40000000 - PUSH 0x00
+  0081 - 03000001 - LDI 0x01
+  0082 - 040000ba - ST 0xba
+  0083 - 41000000 - POP 0x00
+  0084 - 100000ba - ADD 0xba
+  0085 - 040000bc - ST 0xbc
+  0086 - 010000bb - LD 0xbb
+  0087 - 050000bc - STR 0xbc
+  0088 - 010000be - LD 0xbe
+  0089 - 40000000 - PUSH 0x00
+  008a - 03000001 - LDI 0x01
+  008b - 040000ba - ST 0xba
+  008c - 41000000 - POP 0x00
+  008d - 100000ba - ADD 0xba
+  008e - 040000be - ST 0xbe
+  008f - 30000036 - JMP 0x36
+  0090 - 010000bd - LD 0xbd
+  0091 - 40000000 - PUSH 0x00
+  0092 - 03000001 - LDI 0x01
+  0093 - 040000ba - ST 0xba
+  0094 - 41000000 - POP 0x00
+  0095 - 100000ba - ADD 0xba
+  0096 - 040000bd - ST 0xbd
+  0097 - 30000029 - JMP 0x29
+  0098 - 03000000 - LDI 0x00
+  0099 - 040000c2 - ST 0xc2
+  009a - 010000c2 - LD 0xc2
+  009b - 40000000 - PUSH 0x00
+  009c - 010000b8 - LD 0xb8
+  009d - 040000ba - ST 0xba
+  009e - 41000000 - POP 0x00
+  009f - 200000ba - CMP 0xba
+  00a0 - 360000a3 - BLT 0xa3
+  00a1 - 03000000 - LDI 0x00
+  00a2 - 300000a4 - JMP 0xa4
+  00a3 - 03000001 - LDI 0x01
+  00a4 - 310000b6 - BEQ 0xb6
+  00a5 - 010000b7 - LD 0xb7
+  00a6 - 40000000 - PUSH 0x00
+  00a7 - 010000c2 - LD 0xc2
+  00a8 - 040000ba - ST 0xba
+  00a9 - 41000000 - POP 0x00
+  00aa - 100000ba - ADD 0xba
+  00ab - 040000c0 - ST 0xc0
+  00ac - 020000c0 - LDR 0xc0
+  00ad - 04000fff - ST 0xfff
+  00ae - 010000c2 - LD 0xc2
+  00af - 40000000 - PUSH 0x00
+  00b0 - 03000001 - LDI 0x01
+  00b1 - 040000ba - ST 0xba
+  00b2 - 41000000 - POP 0x00
+  00b3 - 100000ba - ADD 0xba
+  00b4 - 040000c2 - ST 0xc2
+  00b5 - 3000009a - JMP 0x9a
+  00b6 - ff000000 - HALT 0x00
+  00b7 - 00000000 - .word 0x0
+  00b8 - 00000000 - .word 0x0
+  00b9 - 00000000 - .word 0x0
+  00ba - 00000000 - .word 0x0
+  00bb - 00000000 - .word 0x0
+  00bc - 00000000 - .word 0x0
+  00bd - 00000000 - .word 0x0
+  00be - 00000000 - .word 0x0
+  00bf - 00000000 - .word 0x0
+  00c0 - 00000000 - .word 0x0
+  00c1 - 00000000 - .word 0x0
+  00c2 - 00000000 - .word 0x0
+out_stdout: |
+  ticks: 7657
+  output_words: 5
+  output_hex: ['0x61', '0x62', '0x63', '0x64', '0x65']
+  output_num: [97, 98, 99, 100, 101]
+  output_text: 'abcde'
+out_log: |-
+  Tick: [1] uPC=01 CR=00000000
+  ACC=          0 IP=00000000 SP=00000ffd
+  AR=00000000 Z=0 N=0
+  -----------------------------
+  Tick: [2] uPC=02 CR=00000000
+  ACC=          0 IP=00000001 SP=00000ffd
+  AR=00000000 Z=0 N=0
+  -----------------------------
+  Tick: [3] uPC=32 CR=30000001
+  ACC=          0 IP=00000001 SP=00000ffd
+  AR=00000000 Z=0 N=0
+  -----------------------------
+  Tick: [4] uPC=00 CR=30000001
+  ACC=          0 IP=00000001 SP=00000ffd
+  AR=00000000 Z=0 N=0
+  -----------------------------
+  Tick: [5] uPC=01 CR=30000001
+  ACC=          0 IP=00000001 SP=00000ffd
+  AR=00000001 Z=0 N=0
+  -----------------------------
+  Tick: [6] uPC=02 CR=30000001
+  ACC=          0 IP=00000002 SP=00000ffd
+  AR=00000001 Z=0 N=0
+  -----------------------------
+  Tick: [7] uPC=11 CR=030000c8
+  ACC=          0 IP=00000002 SP=00000ffd
+  AR=00000001 Z=0 N=0
+  -----------------------------
+  Tick: [8] uPC=00 CR=030000c8
+  ACC=        200 IP=00000002 SP=00000ffd
+  AR=00000001 Z=0 N=0
+  -----------------------------
+  Tick: [9] uPC=01 CR=030000c8
+  ACC=        200 IP=00000002 SP=00000ffd
+  AR=00000002 Z=0 N=0
+  -----------------------------
+  Tick: [10] uPC=02 CR=030000c8
+  ACC=        200 IP=00000003 SP=00000ffd
+  AR=00000002 Z=0 N=0
+  -----------------------------
+  Tick: [11] uPC=12 CR=040000b7
+  ACC=        200 IP=00000003 SP=00000ffd
+  AR=00000002 Z=0 N=0
+  -----------------------------
+  Tick: [12] uPC=13 CR=040000b7
+  ACC=        200 IP=00000003 SP=00000ffd
+  AR=000000b7 Z=0 N=0
+  -----------------------------
+  Tick: [13] uPC=00 CR=040000b7
+  ACC=        200 IP=00000003 SP=00000ffd
+  AR=000000b7 Z=0 N=0
+  -----------------------------
+  Tick: [14] uPC=01 CR=040000b7
+  ACC=        200 IP=00000003 SP=00000ffd
+  AR=00000003 Z=0 N=0
+  -----------------------------
+  Tick: [15] uPC=02 CR=040000b7
+  ACC=        200 IP=00000004 SP=00000ffd
+  AR=00000003 Z=0 N=0
+  -----------------------------
+  Tick: [16] uPC=11 CR=03000000
+  ACC=        200 IP=00000004 SP=00000ffd
+  AR=00000003 Z=0 N=0
+  -----------------------------
+  Tick: [17] uPC=00 CR=03000000
+  ACC=          0 IP=00000004 SP=00000ffd
+  AR=00000003 Z=1 N=0
+  -----------------------------
+  Tick: [18] uPC=01 CR=03000000
+  ACC=          0 IP=00000004 SP=00000ffd
+  AR=00000004 Z=1 N=0
+  -----------------------------
+  Tick: [19] uPC=02 CR=03000000
+  ACC=          0 IP=00000005 SP=00000ffd
+  AR=00000004 Z=1 N=0
+  -----------------------------
+  Tick: [20] uPC=12 CR=040000b8
+  ACC=          0 IP=00000005 SP=00000ffd
+  AR=00000004 Z=1 N=0
+  -----------------------------
+  Tick: [21] uPC=13 CR=040000b8
+  ACC=          0 IP=00000005 SP=00000ffd
+  AR=000000b8 Z=1 N=0
+  -----------------------------
+  Tick: [22] uPC=00 CR=040000b8
+  ACC=          0 IP=00000005 SP=00000ffd
+  AR=000000b8 Z=1 N=0
+  -----------------------------
+  Tick: [23] uPC=01 CR=040000b8
+  ACC=          0 IP=00000005 SP=00000ffd
+  AR=00000005 Z=1 N=0
+  -----------------------------
+  Tick: [24] uPC=02 CR=040000b8
+  ACC=          0 IP=00000006 SP=00000ffd
+  AR=00000005 Z=1 N=0
+  -----------------------------
+  Tick: [25] uPC=03 CR=01000ffe
+  ACC=          0 IP=00000006 SP=00000ffd
+  AR=00000005 Z=1 N=0
+  -----------------------------
+  Tick: [26] uPC=04 CR=01000ffe
+  ACC=          0 IP=00000006 SP=00000ffd
+  AR=00000ffe Z=1 N=0
+  -----------------------------
+  Tick: [27] uPC=05 CR=01000ffe
+  ACC=          0 IP=00000006 SP=00000ffd
+  AR=00000ffe Z=1 N=0
+  -----------------------------
+  Tick: [28] uPC=00 CR=01000ffe
+  ACC=        101 IP=00000006 SP=00000ffd
+  AR=00000ffe Z=0 N=0
+  -----------------------------
+  Tick: [29] uPC=01 CR=01000ffe
+  ACC=        101 IP=00000006 SP=00000ffd
+  AR=00000006 Z=0 N=0
+  -----------------------------
+  Tick: [30] uPC=02 CR=01000ffe
+  ACC=        101 IP=00000007 SP=00000ffd
+  AR=00000006 Z=0 N=0
+  -----------------------------
+  Tick: [31] uPC=12 CR=040000b9
+  ACC=        101 IP=00000007 SP=00000ffd
+  AR=00000006 Z=0 N=0
+  -----------------------------
+  Tick: [32] uPC=13 CR=040000b9
+  ACC=        101 IP=00000007 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [33] uPC=00 CR=040000b9
+  ACC=        101 IP=00000007 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [34] uPC=01 CR=040000b9
+  ACC=        101 IP=00000007 SP=00000ffd
+  AR=00000007 Z=0 N=0
+  -----------------------------
+  Tick: [35] uPC=02 CR=040000b9
+  ACC=        101 IP=00000008 SP=00000ffd
+  AR=00000007 Z=0 N=0
+  -----------------------------
+  Tick: [36] uPC=03 CR=010000b9
+  ACC=        101 IP=00000008 SP=00000ffd
+  AR=00000007 Z=0 N=0
+  -----------------------------
+  Tick: [37] uPC=04 CR=010000b9
+  ACC=        101 IP=00000008 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [38] uPC=05 CR=010000b9
+  ACC=        101 IP=00000008 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [39] uPC=00 CR=010000b9
+  ACC=        101 IP=00000008 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [40] uPC=01 CR=010000b9
+  ACC=        101 IP=00000008 SP=00000ffd
+  AR=00000008 Z=0 N=0
+  -----------------------------
+  Tick: [41] uPC=02 CR=010000b9
+  ACC=        101 IP=00000009 SP=00000ffd
+  AR=00000008 Z=0 N=0
+  -----------------------------
+  Tick: [42] uPC=47 CR=40000000
+  ACC=        101 IP=00000009 SP=00000ffd
+  AR=00000008 Z=0 N=0
+  -----------------------------
+  Tick: [43] uPC=48 CR=40000000
+  ACC=        101 IP=00000009 SP=00000ffd
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [44] uPC=00 CR=40000000
+  ACC=        101 IP=00000009 SP=00000ffc
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [45] uPC=01 CR=40000000
+  ACC=        101 IP=00000009 SP=00000ffc
+  AR=00000009 Z=0 N=0
+  -----------------------------
+  Tick: [46] uPC=02 CR=40000000
+  ACC=        101 IP=0000000a SP=00000ffc
+  AR=00000009 Z=0 N=0
+  -----------------------------
+  Tick: [47] uPC=11 CR=03000000
+  ACC=        101 IP=0000000a SP=00000ffc
+  AR=00000009 Z=0 N=0
+  -----------------------------
+  Tick: [48] uPC=00 CR=03000000
+  ACC=          0 IP=0000000a SP=00000ffc
+  AR=00000009 Z=1 N=0
+  -----------------------------
+  Tick: [49] uPC=01 CR=03000000
+  ACC=          0 IP=0000000a SP=00000ffc
+  AR=0000000a Z=1 N=0
+  -----------------------------
+  Tick: [50] uPC=02 CR=03000000
+  ACC=          0 IP=0000000b SP=00000ffc
+  AR=0000000a Z=1 N=0
+  -----------------------------
+  Tick: [51] uPC=12 CR=040000ba
+  ACC=          0 IP=0000000b SP=00000ffc
+  AR=0000000a Z=1 N=0
+  -----------------------------
+  Tick: [52] uPC=13 CR=040000ba
+  ACC=          0 IP=0000000b SP=00000ffc
+  AR=000000ba Z=1 N=0
+  -----------------------------
+  Tick: [53] uPC=00 CR=040000ba
+  ACC=          0 IP=0000000b SP=00000ffc
+  AR=000000ba Z=1 N=0
+  -----------------------------
+  Tick: [54] uPC=01 CR=040000ba
+  ACC=          0 IP=0000000b SP=00000ffc
+  AR=0000000b Z=1 N=0
+  -----------------------------
+  Tick: [55] uPC=02 CR=040000ba
+  ACC=          0 IP=0000000c SP=00000ffc
+  AR=0000000b Z=1 N=0
+  -----------------------------
+  Tick: [56] uPC=49 CR=41000000
+  ACC=          0 IP=0000000c SP=00000ffc
+  AR=0000000b Z=1 N=0
+  -----------------------------
+  Tick: [57] uPC=50 CR=41000000
+  ACC=          0 IP=0000000c SP=00000ffd
+  AR=0000000b Z=1 N=0
+  -----------------------------
+  Tick: [58] uPC=51 CR=41000000
+  ACC=          0 IP=0000000c SP=00000ffd
+  AR=00000ffd Z=1 N=0
+  -----------------------------
+  Tick: [59] uPC=52 CR=41000000
+  ACC=          0 IP=0000000c SP=00000ffd
+  AR=00000ffd Z=1 N=0
+  -----------------------------
+  Tick: [60] uPC=00 CR=41000000
+  ACC=        101 IP=0000000c SP=00000ffd
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [61] uPC=01 CR=41000000
+  ACC=        101 IP=0000000c SP=00000ffd
+  AR=0000000c Z=0 N=0
+  -----------------------------
+  Tick: [62] uPC=02 CR=41000000
+  ACC=        101 IP=0000000d SP=00000ffd
+  AR=0000000c Z=0 N=0
+  -----------------------------
+  Tick: [63] uPC=29 CR=200000ba
+  ACC=        101 IP=0000000d SP=00000ffd
+  AR=0000000c Z=0 N=0
+  -----------------------------
+  Tick: [64] uPC=30 CR=200000ba
+  ACC=        101 IP=0000000d SP=00000ffd
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [65] uPC=31 CR=200000ba
+  ACC=        101 IP=0000000d SP=00000ffd
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [66] uPC=00 CR=200000ba
+  ACC=        101 IP=0000000d SP=00000ffd
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [67] uPC=01 CR=200000ba
+  ACC=        101 IP=0000000d SP=00000ffd
+  AR=0000000d Z=0 N=0
+  -----------------------------
+  Tick: [68] uPC=02 CR=200000ba
+  ACC=        101 IP=0000000e SP=00000ffd
+  AR=0000000d Z=0 N=0
+  -----------------------------
+  Tick: [69] uPC=35 CR=32000010
+  ACC=        101 IP=0000000e SP=00000ffd
+  AR=0000000d Z=0 N=0
+  -----------------------------
+  Tick: [70] uPC=32 CR=32000010
+  ACC=        101 IP=0000000e SP=00000ffd
+  AR=0000000d Z=0 N=0
+  -----------------------------
+  Tick: [71] uPC=00 CR=32000010
+  ACC=        101 IP=00000010 SP=00000ffd
+  AR=0000000d Z=0 N=0
+  -----------------------------
+  Tick: [72] uPC=01 CR=32000010
+  ACC=        101 IP=00000010 SP=00000ffd
+  AR=00000010 Z=0 N=0
+  -----------------------------
+  Tick: [73] uPC=02 CR=32000010
+  ACC=        101 IP=00000011 SP=00000ffd
+  AR=00000010 Z=0 N=0
+  -----------------------------
+  Tick: [74] uPC=11 CR=03000001
+  ACC=        101 IP=00000011 SP=00000ffd
+  AR=00000010 Z=0 N=0
+  -----------------------------
+  Tick: [75] uPC=00 CR=03000001
+  ACC=          1 IP=00000011 SP=00000ffd
+  AR=00000010 Z=0 N=0
+  -----------------------------
+  Tick: [76] uPC=01 CR=03000001
+  ACC=          1 IP=00000011 SP=00000ffd
+  AR=00000011 Z=0 N=0
+  -----------------------------
+  Tick: [77] uPC=02 CR=03000001
+  ACC=          1 IP=00000012 SP=00000ffd
+  AR=00000011 Z=0 N=0
+  -----------------------------
+  Tick: [78] uPC=33 CR=31000027
+  ACC=          1 IP=00000012 SP=00000ffd
+  AR=00000011 Z=0 N=0
+  -----------------------------
+  Tick: [79] uPC=34 CR=31000027
+  ACC=          1 IP=00000012 SP=00000ffd
+  AR=00000011 Z=0 N=0
+  -----------------------------
+  Tick: [80] uPC=00 CR=31000027
+  ACC=          1 IP=00000012 SP=00000ffd
+  AR=00000011 Z=0 N=0
+  -----------------------------
+  Tick: [81] uPC=01 CR=31000027
+  ACC=          1 IP=00000012 SP=00000ffd
+  AR=00000012 Z=0 N=0
+  -----------------------------
+  Tick: [82] uPC=02 CR=31000027
+  ACC=          1 IP=00000013 SP=00000ffd
+  AR=00000012 Z=0 N=0
+  -----------------------------
+  Tick: [83] uPC=03 CR=010000b9
+  ACC=          1 IP=00000013 SP=00000ffd
+  AR=00000012 Z=0 N=0
+  -----------------------------
+  Tick: [84] uPC=04 CR=010000b9
+  ACC=          1 IP=00000013 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [85] uPC=05 CR=010000b9
+  ACC=          1 IP=00000013 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [86] uPC=00 CR=010000b9
+  ACC=        101 IP=00000013 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [87] uPC=01 CR=010000b9
+  ACC=        101 IP=00000013 SP=00000ffd
+  AR=00000013 Z=0 N=0
+  -----------------------------
+  Tick: [88] uPC=02 CR=010000b9
+  ACC=        101 IP=00000014 SP=00000ffd
+  AR=00000013 Z=0 N=0
+  -----------------------------
+  Tick: [89] uPC=12 CR=040000bb
+  ACC=        101 IP=00000014 SP=00000ffd
+  AR=00000013 Z=0 N=0
+  -----------------------------
+  Tick: [90] uPC=13 CR=040000bb
+  ACC=        101 IP=00000014 SP=00000ffd
+  AR=000000bb Z=0 N=0
+  -----------------------------
+  Tick: [91] uPC=00 CR=040000bb
+  ACC=        101 IP=00000014 SP=00000ffd
+  AR=000000bb Z=0 N=0
+  -----------------------------
+  Tick: [92] uPC=01 CR=040000bb
+  ACC=        101 IP=00000014 SP=00000ffd
+  AR=00000014 Z=0 N=0
+  -----------------------------
+  Tick: [93] uPC=02 CR=040000bb
+  ACC=        101 IP=00000015 SP=00000ffd
+  AR=00000014 Z=0 N=0
+  -----------------------------
+  Tick: [94] uPC=03 CR=010000b7
+  ACC=        101 IP=00000015 SP=00000ffd
+  AR=00000014 Z=0 N=0
+  -----------------------------
+  Tick: [95] uPC=04 CR=010000b7
+  ACC=        101 IP=00000015 SP=00000ffd
+  AR=000000b7 Z=0 N=0
+  -----------------------------
+  Tick: [96] uPC=05 CR=010000b7
+  ACC=        101 IP=00000015 SP=00000ffd
+  AR=000000b7 Z=0 N=0
+  -----------------------------
+  Tick: [97] uPC=00 CR=010000b7
+  ACC=        200 IP=00000015 SP=00000ffd
+  AR=000000b7 Z=0 N=0
+  -----------------------------
+  Tick: [98] uPC=01 CR=010000b7
+  ACC=        200 IP=00000015 SP=00000ffd
+  AR=00000015 Z=0 N=0
+  -----------------------------
+  Tick: [99] uPC=02 CR=010000b7
+  ACC=        200 IP=00000016 SP=00000ffd
+  AR=00000015 Z=0 N=0
+  -----------------------------
+  Tick: [100] uPC=47 CR=40000000
+  ACC=        200 IP=00000016 SP=00000ffd
+  AR=00000015 Z=0 N=0
+  -----------------------------
+  Tick: [101] uPC=48 CR=40000000
+  ACC=        200 IP=00000016 SP=00000ffd
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [102] uPC=00 CR=40000000
+  ACC=        200 IP=00000016 SP=00000ffc
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [103] uPC=01 CR=40000000
+  ACC=        200 IP=00000016 SP=00000ffc
+  AR=00000016 Z=0 N=0
+  -----------------------------
+  Tick: [104] uPC=02 CR=40000000
+  ACC=        200 IP=00000017 SP=00000ffc
+  AR=00000016 Z=0 N=0
+  -----------------------------
+  Tick: [105] uPC=03 CR=010000b8
+  ACC=        200 IP=00000017 SP=00000ffc
+  AR=00000016 Z=0 N=0
+  -----------------------------
+  Tick: [106] uPC=04 CR=010000b8
+  ACC=        200 IP=00000017 SP=00000ffc
+  AR=000000b8 Z=0 N=0
+  -----------------------------
+  Tick: [107] uPC=05 CR=010000b8
+  ACC=        200 IP=00000017 SP=00000ffc
+  AR=000000b8 Z=0 N=0
+  -----------------------------
+  Tick: [108] uPC=00 CR=010000b8
+  ACC=          0 IP=00000017 SP=00000ffc
+  AR=000000b8 Z=1 N=0
+  -----------------------------
+  Tick: [109] uPC=01 CR=010000b8
+  ACC=          0 IP=00000017 SP=00000ffc
+  AR=00000017 Z=1 N=0
+  -----------------------------
+  Tick: [110] uPC=02 CR=010000b8
+  ACC=          0 IP=00000018 SP=00000ffc
+  AR=00000017 Z=1 N=0
+  -----------------------------
+  Tick: [111] uPC=12 CR=040000ba
+  ACC=          0 IP=00000018 SP=00000ffc
+  AR=00000017 Z=1 N=0
+  -----------------------------
+  Tick: [112] uPC=13 CR=040000ba
+  ACC=          0 IP=00000018 SP=00000ffc
+  AR=000000ba Z=1 N=0
+  -----------------------------
+  Tick: [113] uPC=00 CR=040000ba
+  ACC=          0 IP=00000018 SP=00000ffc
+  AR=000000ba Z=1 N=0
+  -----------------------------
+  Tick: [114] uPC=01 CR=040000ba
+  ACC=          0 IP=00000018 SP=00000ffc
+  AR=00000018 Z=1 N=0
+  -----------------------------
+  Tick: [115] uPC=02 CR=040000ba
+  ACC=          0 IP=00000019 SP=00000ffc
+  AR=00000018 Z=1 N=0
+  -----------------------------
+  Tick: [116] uPC=49 CR=41000000
+  ACC=          0 IP=00000019 SP=00000ffc
+  AR=00000018 Z=1 N=0
+  -----------------------------
+  Tick: [117] uPC=50 CR=41000000
+  ACC=          0 IP=00000019 SP=00000ffd
+  AR=00000018 Z=1 N=0
+  -----------------------------
+  Tick: [118] uPC=51 CR=41000000
+  ACC=          0 IP=00000019 SP=00000ffd
+  AR=00000ffd Z=1 N=0
+  -----------------------------
+  Tick: [119] uPC=52 CR=41000000
+  ACC=          0 IP=00000019 SP=00000ffd
+  AR=00000ffd Z=1 N=0
+  -----------------------------
+  Tick: [120] uPC=00 CR=41000000
+  ACC=        200 IP=00000019 SP=00000ffd
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [121] uPC=01 CR=41000000
+  ACC=        200 IP=00000019 SP=00000ffd
+  AR=00000019 Z=0 N=0
+  -----------------------------
+  Tick: [122] uPC=02 CR=41000000
+  ACC=        200 IP=0000001a SP=00000ffd
+  AR=00000019 Z=0 N=0
+  -----------------------------
+  Tick: [123] uPC=14 CR=100000ba
+  ACC=        200 IP=0000001a SP=00000ffd
+  AR=00000019 Z=0 N=0
+  -----------------------------
+  Tick: [124] uPC=15 CR=100000ba
+  ACC=        200 IP=0000001a SP=00000ffd
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [125] uPC=16 CR=100000ba
+  ACC=        200 IP=0000001a SP=00000ffd
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [126] uPC=00 CR=100000ba
+  ACC=        200 IP=0000001a SP=00000ffd
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [127] uPC=01 CR=100000ba
+  ACC=        200 IP=0000001a SP=00000ffd
+  AR=0000001a Z=0 N=0
+  -----------------------------
+  Tick: [128] uPC=02 CR=100000ba
+  ACC=        200 IP=0000001b SP=00000ffd
+  AR=0000001a Z=0 N=0
+  -----------------------------
+  Tick: [129] uPC=12 CR=040000bc
+  ACC=        200 IP=0000001b SP=00000ffd
+  AR=0000001a Z=0 N=0
+  -----------------------------
+  Tick: [130] uPC=13 CR=040000bc
+  ACC=        200 IP=0000001b SP=00000ffd
+  AR=000000bc Z=0 N=0
+  -----------------------------
+  Tick: [131] uPC=00 CR=040000bc
+  ACC=        200 IP=0000001b SP=00000ffd
+  AR=000000bc Z=0 N=0
+  -----------------------------
+  Tick: [132] uPC=01 CR=040000bc
+  ACC=        200 IP=0000001b SP=00000ffd
+  AR=0000001b Z=0 N=0
+  -----------------------------
+  Tick: [133] uPC=02 CR=040000bc
+  ACC=        200 IP=0000001c SP=00000ffd
+  AR=0000001b Z=0 N=0
+  -----------------------------
+  Tick: [134] uPC=03 CR=010000bb
+  ACC=        200 IP=0000001c SP=00000ffd
+  AR=0000001b Z=0 N=0
+  -----------------------------
+  Tick: [135] uPC=04 CR=010000bb
+  ACC=        200 IP=0000001c SP=00000ffd
+  AR=000000bb Z=0 N=0
+  -----------------------------
+  Tick: [136] uPC=05 CR=010000bb
+  ACC=        200 IP=0000001c SP=00000ffd
+  AR=000000bb Z=0 N=0
+  -----------------------------
+  Tick: [137] uPC=00 CR=010000bb
+  ACC=        101 IP=0000001c SP=00000ffd
+  AR=000000bb Z=0 N=0
+  -----------------------------
+  Tick: [138] uPC=01 CR=010000bb
+  ACC=        101 IP=0000001c SP=00000ffd
+  AR=0000001c Z=0 N=0
+  -----------------------------
+  Tick: [139] uPC=02 CR=010000bb
+  ACC=        101 IP=0000001d SP=00000ffd
+  AR=0000001c Z=0 N=0
+  -----------------------------
+  Tick: [140] uPC=64 CR=050000bc
+  ACC=        101 IP=0000001d SP=00000ffd
+  AR=0000001c Z=0 N=0
+  -----------------------------
+  Tick: [141] uPC=65 CR=050000bc
+  ACC=        101 IP=0000001d SP=00000ffd
+  AR=000000bc Z=0 N=0
+  -----------------------------
+  Tick: [142] uPC=66 CR=050000bc
+  ACC=        101 IP=0000001d SP=00000ffd
+  AR=000000bc Z=0 N=0
+  -----------------------------
+  Tick: [143] uPC=67 CR=050000bc
+  ACC=        101 IP=0000001d SP=00000ffd
+  AR=000000c8 Z=0 N=0
+  -----------------------------
+  Tick: [144] uPC=00 CR=050000bc
+  ACC=        101 IP=0000001d SP=00000ffd
+  AR=000000c8 Z=0 N=0
+  -----------------------------
+  Tick: [145] uPC=01 CR=050000bc
+  ACC=        101 IP=0000001d SP=00000ffd
+  AR=0000001d Z=0 N=0
+  -----------------------------
+  Tick: [146] uPC=02 CR=050000bc
+  ACC=        101 IP=0000001e SP=00000ffd
+  AR=0000001d Z=0 N=0
+  -----------------------------
+  Tick: [147] uPC=03 CR=010000b8
+  ACC=        101 IP=0000001e SP=00000ffd
+  AR=0000001d Z=0 N=0
+  -----------------------------
+  Tick: [148] uPC=04 CR=010000b8
+  ACC=        101 IP=0000001e SP=00000ffd
+  AR=000000b8 Z=0 N=0
+  -----------------------------
+  Tick: [149] uPC=05 CR=010000b8
+  ACC=        101 IP=0000001e SP=00000ffd
+  AR=000000b8 Z=0 N=0
+  -----------------------------
+  Tick: [150] uPC=00 CR=010000b8
+  ACC=          0 IP=0000001e SP=00000ffd
+  AR=000000b8 Z=1 N=0
+  -----------------------------
+  Tick: [151] uPC=01 CR=010000b8
+  ACC=          0 IP=0000001e SP=00000ffd
+  AR=0000001e Z=1 N=0
+  -----------------------------
+  Tick: [152] uPC=02 CR=010000b8
+  ACC=          0 IP=0000001f SP=00000ffd
+  AR=0000001e Z=1 N=0
+  -----------------------------
+  Tick: [153] uPC=47 CR=40000000
+  ACC=          0 IP=0000001f SP=00000ffd
+  AR=0000001e Z=1 N=0
+  -----------------------------
+  Tick: [154] uPC=48 CR=40000000
+  ACC=          0 IP=0000001f SP=00000ffd
+  AR=00000ffd Z=1 N=0
+  -----------------------------
+  Tick: [155] uPC=00 CR=40000000
+  ACC=          0 IP=0000001f SP=00000ffc
+  AR=00000ffd Z=1 N=0
+  -----------------------------
+  Tick: [156] uPC=01 CR=40000000
+  ACC=          0 IP=0000001f SP=00000ffc
+  AR=0000001f Z=1 N=0
+  -----------------------------
+  Tick: [157] uPC=02 CR=40000000
+  ACC=          0 IP=00000020 SP=00000ffc
+  AR=0000001f Z=1 N=0
+  -----------------------------
+  Tick: [158] uPC=11 CR=03000001
+  ACC=          0 IP=00000020 SP=00000ffc
+  AR=0000001f Z=1 N=0
+  -----------------------------
+  Tick: [159] uPC=00 CR=03000001
+  ACC=          1 IP=00000020 SP=00000ffc
+  AR=0000001f Z=0 N=0
+  -----------------------------
+  Tick: [160] uPC=01 CR=03000001
+  ACC=          1 IP=00000020 SP=00000ffc
+  AR=00000020 Z=0 N=0
+  -----------------------------
+  Tick: [161] uPC=02 CR=03000001
+  ACC=          1 IP=00000021 SP=00000ffc
+  AR=00000020 Z=0 N=0
+  -----------------------------
+  Tick: [162] uPC=12 CR=040000ba
+  ACC=          1 IP=00000021 SP=00000ffc
+  AR=00000020 Z=0 N=0
+  -----------------------------
+  Tick: [163] uPC=13 CR=040000ba
+  ACC=          1 IP=00000021 SP=00000ffc
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [164] uPC=00 CR=040000ba
+  ACC=          1 IP=00000021 SP=00000ffc
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [165] uPC=01 CR=040000ba
+  ACC=          1 IP=00000021 SP=00000ffc
+  AR=00000021 Z=0 N=0
+  -----------------------------
+  Tick: [166] uPC=02 CR=040000ba
+  ACC=          1 IP=00000022 SP=00000ffc
+  AR=00000021 Z=0 N=0
+  -----------------------------
+  Tick: [167] uPC=49 CR=41000000
+  ACC=          1 IP=00000022 SP=00000ffc
+  AR=00000021 Z=0 N=0
+  -----------------------------
+  Tick: [168] uPC=50 CR=41000000
+  ACC=          1 IP=00000022 SP=00000ffd
+  AR=00000021 Z=0 N=0
+  -----------------------------
+  Tick: [169] uPC=51 CR=41000000
+  ACC=          1 IP=00000022 SP=00000ffd
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [170] uPC=52 CR=41000000
+  ACC=          1 IP=00000022 SP=00000ffd
+  AR=00000ffd Z=0 N=0
+  -----------------------------
+  Tick: [171] uPC=00 CR=41000000
+  ACC=          0 IP=00000022 SP=00000ffd
+  AR=00000ffd Z=1 N=0
+  -----------------------------
+  Tick: [172] uPC=01 CR=41000000
+  ACC=          0 IP=00000022 SP=00000ffd
+  AR=00000022 Z=1 N=0
+  -----------------------------
+  Tick: [173] uPC=02 CR=41000000
+  ACC=          0 IP=00000023 SP=00000ffd
+  AR=00000022 Z=1 N=0
+  -----------------------------
+  Tick: [174] uPC=14 CR=100000ba
+  ACC=          0 IP=00000023 SP=00000ffd
+  AR=00000022 Z=1 N=0
+  -----------------------------
+  Tick: [175] uPC=15 CR=100000ba
+  ACC=          0 IP=00000023 SP=00000ffd
+  AR=000000ba Z=1 N=0
+  -----------------------------
+  Tick: [176] uPC=16 CR=100000ba
+  ACC=          0 IP=00000023 SP=00000ffd
+  AR=000000ba Z=1 N=0
+  -----------------------------
+  Tick: [177] uPC=00 CR=100000ba
+  ACC=          1 IP=00000023 SP=00000ffd
+  AR=000000ba Z=0 N=0
+  -----------------------------
+  Tick: [178] uPC=01 CR=100000ba
+  ACC=          1 IP=00000023 SP=00000ffd
+  AR=00000023 Z=0 N=0
+  -----------------------------
+  Tick: [179] uPC=02 CR=100000ba
+  ACC=          1 IP=00000024 SP=00000ffd
+  AR=00000023 Z=0 N=0
+  -----------------------------
+  Tick: [180] uPC=12 CR=040000b8
+  ACC=          1 IP=00000024 SP=00000ffd
+  AR=00000023 Z=0 N=0
+  -----------------------------
+  Tick: [181] uPC=13 CR=040000b8
+  ACC=          1 IP=00000024 SP=00000ffd
+  AR=000000b8 Z=0 N=0
+  -----------------------------
+  Tick: [182] uPC=00 CR=040000b8
+  ACC=          1 IP=00000024 SP=00000ffd
+  AR=000000b8 Z=0 N=0
+  -----------------------------
+  Tick: [183] uPC=01 CR=040000b8
+  ACC=          1 IP=00000024 SP=00000ffd
+  AR=00000024 Z=0 N=0
+  -----------------------------
+  Tick: [184] uPC=02 CR=040000b8
+  ACC=          1 IP=00000025 SP=00000ffd
+  AR=00000024 Z=0 N=0
+  -----------------------------
+  Tick: [185] uPC=03 CR=01000ffe
+  ACC=          1 IP=00000025 SP=00000ffd
+  AR=00000024 Z=0 N=0
+  -----------------------------
+  Tick: [186] uPC=04 CR=01000ffe
+  ACC=          1 IP=00000025 SP=00000ffd
+  AR=00000ffe Z=0 N=0
+  -----------------------------
+  Tick: [187] uPC=05 CR=01000ffe
+  ACC=          1 IP=00000025 SP=00000ffd
+  AR=00000ffe Z=0 N=0
+  -----------------------------
+  Tick: [188] uPC=00 CR=01000ffe
+  ACC=        100 IP=00000025 SP=00000ffd
+  AR=00000ffe Z=0 N=0
+  -----------------------------
+  Tick: [189] uPC=01 CR=01000ffe
+  ACC=        100 IP=00000025 SP=00000ffd
+  AR=00000025 Z=0 N=0
+  -----------------------------
+  Tick: [190] uPC=02 CR=01000ffe
+  ACC=        100 IP=00000026 SP=00000ffd
+  AR=00000025 Z=0 N=0
+  -----------------------------
+  Tick: [191] uPC=12 CR=040000b9
+  ACC=        100 IP=00000026 SP=00000ffd
+  AR=00000025 Z=0 N=0
+  -----------------------------
+  Tick: [192] uPC=13 CR=040000b9
+  ACC=        100 IP=00000026 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [193] uPC=00 CR=040000b9
+  ACC=        100 IP=00000026 SP=00000ffd
+  AR=000000b9 Z=0 N=0
+  -----------------------------
+  Tick: [194] uPC=01 CR=040000b9
+  ACC=        100 IP=00000026 SP=00000ffd
+  AR=00000026 Z=0 N=0
+  -----------------------------
+  Tick: [195] uPC=02 CR=040000b9
+  ACC=        100 IP=00000027 SP=00000ffd
+  AR=00000026 Z=0 N=0
+  -----------------------------
+  Tick: [196] uPC=32 CR=30000007
+  ACC=        100 IP=00000027 SP=00000ffd
+  AR=00000026 Z=0 N=0
+  -----------------------------
+  Tick: [197] uPC=00 CR=30000007
+  ACC=        100 IP=00000007 SP=00000ffd
+  AR=00000026 Z=0 N=0
+  -----------------------------
+  Tick: [198] uPC=01 CR=30000007
+  ACC=        100 IP=00000007 SP=00000ffd
+  AR=00000007 Z=0 N=0
+  -----------------------------
+  Tick: [199] uPC=02 CR=30000007
+  ACC=        100 IP=00000008 SP=00000ffd
+  AR=00000007 Z=0 N=0
+  -----------------------------
+  Tick: [200] uPC=03 CR=010000b9
+  ACC=        100 IP=00000008 SP=00000ffd
+  AR=00000007 Z=0 N=0
+  -----------------------------

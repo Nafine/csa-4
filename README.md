@@ -189,12 +189,14 @@ ID ::= [a-zA-Z_][a-zA-Z0-9_]*
 | **JMP**  | 0x30  | 1     | IP <- arg                              |
 | **BEQ**  | 0x31  | 2     | IP <- arg if Z = 1 else IP + 1         |
 | **BNE**  | 0x32  | 2     | IP <- arg if Z = 0 else IP + 1         |
-| **BGT**  | 0x33  | 2     | IP <- arg if AC > Mem[arg] else IP + 1 |
-| **BLT**  | 0x34  | 2     | IP <- arg if AC < Mem[arg] else IP + 1 |
-| **CALL** | 0x40  | 3     | PUSH(IP); IP <- arg                    |
-| **RET**  | 0x41  | 4     | IP <- Mem[++SP]                        |
-| **PUSH** | 0x42  | 2     | MEM[SP] <- AC; SP--                    |
-| **POP**  | 0x43  | 4     | SP++; AC <- Mem[SP]                    |
+| **BGE**  | 0x33  | 2     | IP <- arg if N = 0 else IP + 1         |
+| **BGT**  | 0x34  | 3     | IP <- arg if N = 0 && Z = 0 else IP + 1|
+| **BLE**  | 0x35  | 3     | IP <- arg if N = 1 \|\| Z = 1 else IP + 1|
+| **BLT**  | 0x36  | 2     | IP <- arg if N = 1 else IP + 1         |
+| **PUSH** | 0x40  | 2     | MEM[SP] <- AC; SP--                    |
+| **POP**  | 0x41  | 4     | SP++; AC <- Mem[SP]                    |
+| **CALL** | 0x50  | 3     | PUSH(IP); IP <- arg                    |
+| **RET**  | 0x51  | 4     | IP <- Mem[++SP]                        |
 | **HALT** | 0xFF  | 1     | 💀                                     |
 
 ### Способ кодирования инструкций
@@ -263,7 +265,7 @@ python3 cli.py <input.tw> <output.bin>
 | 20    | ar_l      | 1 = замкнуть ar                                               |
 | 19    | mem_src   | 0 = acc, 1 = ip                                               |
 | 18    | mem_w     | 1 = защелкнуть данные в память по адресу                      |
-| 16    | ar_sel    | 00 = ip, 10 = cr, 10 = sp, 11 = dr                            |
+| 17-16 | ar_sel    | 00 = ip, 01 = cr, 10 = sp, 11 = dr                            |
 | 15-14 | alu_left  | 00 = 0, 01 = ac, 10 = sp                                      |
 | 13-12 | alu_right | 00 = 0, 01 = cr, 10 = ip, 11 = mem                            |
 | 11-9  | alu       | 000 ADD, 001 SUB, 010 MUL, 011 DIV, 100 INC, 101 DEC, 111 NOT |

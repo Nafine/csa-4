@@ -1,12 +1,44 @@
+from collections import deque
 from dataclasses import dataclass
 
-from microcode import DECODER, MROM, Alu, AluLeft, AluRight, ArSel, Cond, MemSrc
+from microcode import DECODER, MROM, Cond
+
+MASK_32 = (1 << 32) - 1
+MASK_24 = (1 << 24) - 1
+BIT_31 = 1 << 31
+
+EOF_WORD = MASK_32
 
 
-def to_signed32(val):
-    if val & (1 << 31):
+def to_signed32(val: int) -> int:
+    if val & BIT_31:
         return val - (1 << 32)
     return val
+
+
+def _predecode(mc: int) -> tuple:
+    return (
+        (mc >> 27) & 1,  # 0  halted
+        (mc >> 26) & 1,  # 1  flag_l
+        (mc >> 25) & 1,  # 2  acc_l
+        (mc >> 24) & 1,  # 3  dr_l
+        (mc >> 23) & 1,  # 4  sp_l
+        (mc >> 22) & 1,  # 5  ip_l
+        (mc >> 21) & 1,  # 6  cr_l
+        (mc >> 20) & 1,  # 7  ar_l
+        (mc >> 19) & 1,  # 8  mem_src (0 = ACC, 1 = IP)
+        (mc >> 18) & 1,  # 9  mem_w
+        (mc >> 16) & 0b11,  # 10 ar_sel
+        (mc >> 14) & 0b11,  # 11 alu_left
+        (mc >> 12) & 0b11,  # 12 alu_right
+        (mc >> 9) & 0b111,  # 13 alu
+        (mc >> 6) & 0b111,  # 14 cond
+        mc & 0b111111,  # 15 next_addr
+    )
+
+
+# optimization costil' in order to finish prob1 not in 5 hours 😢
+DECODED_MROM = tuple(_predecode(word) for word in MROM)
 
 
 @dataclass(frozen=True)
@@ -24,38 +56,46 @@ class CpuState:
 
 
 class DataPath:
+    __slots__ = (
+        'data_mem', 'input_buffer', 'output_buffer',
+        'acc', 'dr', 'ip', 'sp', 'ar', 'cr', 'Z', 'N',
+    )
+
     MEM_SIZE = 2 ** 12
     OUTPUT_ADDR = MEM_SIZE - 1
     INPUT_ADDR = MEM_SIZE - 2
-    MASK_32 = (1 << 32) - 1
-    MASK_24 = (1 << 24) - 1
-    BIT_31 = (1 << 31)
+    MASK_32 = MASK_32
+    MASK_24 = MASK_24
+    BIT_31 = BIT_31
 
     def __init__(self, input_buffer):
         self.data_mem = [0] * self.MEM_SIZE
-
-        self.input_buffer = input_buffer
-        self.output_buffer = []
-
+        if input_buffer is None:
+            self.input_buffer = deque()
+        elif isinstance(input_buffer, deque):
+            self.input_buffer = input_buffer
+        else:
+            self.input_buffer = deque(input_buffer)
+        self.output_buffer: list[int] = []
 
         self.acc = 0
         self.dr = 0
         self.ip = 0
-        self.sp = (self.INPUT_ADDR - 1) & self.MASK_32
+        self.sp = (self.INPUT_ADDR - 1) & MASK_32
         self.ar = 0
         self.cr = 0
 
         self.Z = 0
         self.N = 0
 
-    def read_memory(self):
+    def read_memory(self) -> int:
         if self.ar == self.INPUT_ADDR:
             if self.input_buffer:
-                return self.input_buffer.pop(0)
-            return -1 & self.MASK_32
+                return self.input_buffer.popleft()
+            return EOF_WORD
         return self.data_mem[self.ar]
 
-    def write_memory(self, value):
+    def write_memory(self, value: int) -> None:
         if self.ar == self.OUTPUT_ADDR:
             self.output_buffer.append(value)
         else:
@@ -63,148 +103,123 @@ class DataPath:
 
 
 class ControlUnit:
-    def __init__(self, input_buffer: list[int] | None =None):
-        if input_buffer is None:
-            input_buffer = []
+    __slots__ = ('dp', 'mp', 'tick', 'halted')
+
+    def __init__(self, input_buffer: list[int] | None = None):
         self.dp = DataPath(input_buffer)
-
-        self.MROM = MROM
         self.mp = 0
-
         self.tick = 0
-        self.halted = 0
+        self.halted = False
 
     def snapshot(self) -> CpuState:
+        dp = self.dp
         return CpuState(
             tick=self.tick,
             mp=self.mp,
-            cr=self.dp.cr,
-            acc=self.dp.acc,
-            ip=self.dp.ip,
-            sp=self.dp.sp,
-            ar=self.dp.ar,
-            dr=self.dp.dr,
-            Z=self.dp.Z,
-            N=self.dp.N,
+            cr=dp.cr,
+            acc=dp.acc,
+            ip=dp.ip,
+            sp=dp.sp,
+            ar=dp.ar,
+            dr=dp.dr,
+            Z=dp.Z,
+            N=dp.N,
         )
 
     def step(self) -> None:
-        mc = self.MROM[self.mp]
+        dp = self.dp
+        mp = self.mp
+        (halted, flag_l, acc_l, dr_l, sp_l, ip_l, cr_l, ar_l,
+         mem_src, mem_w, ar_sel, alu_left, alu_right, alu, cond,
+         next_addr) = DECODED_MROM[mp]
         self.tick += 1
 
-        signals = self._decode_mc(mc)
-        alu = self._execute_alu(signals)
-        self._latch_registers(signals, alu)
-        self._update_flags_and_branch(signals)
-
-    def _decode_mc(self, mc):
-        return {
-            'halted': (mc >> 27) & 1,
-            'flag_l': (mc >> 26) & 1,
-            'acc_l': (mc >> 25) & 1,
-            'dr_l': (mc >> 24) & 1,
-            'sp_l': (mc >> 23) & 1,
-            'ip_l': (mc >> 22) & 1,
-            'cr_l': (mc >> 21) & 1,
-            'ar_l': (mc >> 20) & 1,
-            'mem_src': (mc >> 19) & 1,
-            'mem_w': (mc >> 18) & 1,
-            'ar_sel': (mc >> 16) & 0b11,
-            'alu_left': (mc >> 14) & 0b11,
-            'alu_right': (mc >> 12) & 0b11,
-            'alu': (mc >> 9) & 0b111,
-            'cond': (mc >> 6) & 0b111,
-            'next_addr': mc & 0b111111
-        }
-
-    def _execute_alu(self, signals):
-        dp = self.dp
-
-        left = {AluLeft.ZERO: 0, AluLeft.ACC: dp.acc, AluLeft.SP: dp.sp}[signals['alu_left']]
-        right = {AluRight.ZERO: 0, AluRight.CR_ARG: dp.cr & dp.MASK_24, AluRight.IP: dp.ip, AluRight.DR: dp.dr}[
-            signals['alu_right']]
-
-        alu_ops = {
-            Alu.ADD: to_signed32(left + right) & dp.MASK_32,
-            Alu.SUB: to_signed32(left - right) & dp.MASK_32,
-            Alu.MUL: to_signed32(left * right) & dp.MASK_32,
-            Alu.DIV: to_signed32(left // right) if right != 0 else 0 & dp.MASK_32,
-            Alu.REM: to_signed32(left % right) if right != 0 else 0 & dp.MASK_32,
-            Alu.INC: to_signed32(left + right + 1) & dp.MASK_32,
-            Alu.DEC: to_signed32(left + right - 1) & dp.MASK_32,
-            Alu.NOT: to_signed32(~(left + right)) & dp.MASK_32
-        }
-
-        result = alu_ops[signals['alu']]
-
-        if signals['flag_l']:
-            self.dp.N = 1 if (result & self.dp.BIT_31) else 0
-            self.dp.Z = 1 if result == 0 else 0
-
-        return result
-
-    def _latch_registers(self, signals, alu_result):
-        if signals['mem_w']:
-            value = self.dp.ip if signals['mem_src'] == MemSrc.IP else self.dp.acc
-            self.dp.write_memory(value)
-        self._latch_ip(signals, alu_result)
-        self._latch_dr(signals)
-        self._latch_sp(signals, alu_result)
-        self._latch_cr(signals, alu_result)
-        self._latch_ar(signals)
-        self._latch_acc(signals, alu_result)
-
-    def _latch_acc(self, signals, alu_result):
-        if not signals['acc_l']:
-            return
-        self.dp.acc = alu_result
-
-    def _latch_dr(self, signals, ):
-        if not signals['dr_l']:
-            return
-        self.dp.dr = self.dp.read_memory()
-
-    def _latch_ip(self, signals, alu_result):
-        if not signals['ip_l']:
-            return
-        self.dp.ip = alu_result
-
-    def _latch_sp(self, signals, alu_result):
-        if not signals['sp_l']:
-            return
-        self.dp.sp = alu_result
-
-    def _latch_cr(self, signals, alu_result):
-        if not signals['cr_l']:
-            return
-        self.dp.cr = alu_result
-
-    def _latch_ar(self, signals):
-        if not signals['ar_l']:
-            return
-        sources = {
-            ArSel.IP: self.dp.ip,
-            ArSel.CR_ARG: self.dp.cr & 0xFFFFFF,
-            ArSel.SP: self.dp.sp,
-            ArSel.DR: self.dp.dr,
-        }
-        self.dp.ar = sources[signals['ar_sel']]
-
-    def _update_flags_and_branch(self, signals):
-        cond = signals['cond']
-        cond_true = (
-                (cond == Cond.ALWAYS) or
-                (cond == Cond.EQ and self.dp.Z == 1) or
-                (cond == Cond.GE and self.dp.N == 0) or
-                (cond == Cond.NE and self.dp.Z == 0) or
-                (cond == Cond.LT and self.dp.N == 1)
-        )
-
-        if cond == Cond.DECODE:
-            opcode = (self.dp.cr >> 24) & 0xFF
-            self.mp = DECODER[opcode]
+        if alu_left == 0:
+            left = 0
+        elif alu_left == 1:
+            left = dp.acc
         else:
-            self.mp = signals['next_addr'] if cond_true else (self.mp + 1) & 0x3F
+            left = dp.sp
 
-        if signals['halted']:
+        if alu_right == 0:
+            right = 0
+        elif alu_right == 1:
+            right = dp.cr & MASK_24
+        elif alu_right == 2:
+            right = dp.ip
+        else:
+            right = dp.dr
+
+        if alu == 0:
+            result = (left + right) & MASK_32
+        elif alu == 1:
+            result = (left - right) & MASK_32
+        elif alu == 2:
+            result = (left * right) & MASK_32
+        elif alu == 3:
+            result = ((left // right) & MASK_32) if right != 0 else 0
+        elif alu == 4:
+            result = ((left % right) & MASK_32) if right != 0 else 0
+        elif alu == 5:
+            result = (left + right + 1) & MASK_32
+        elif alu == 6:
+            result = (left + right - 1) & MASK_32
+        else:
+            result = (~(left + right)) & MASK_32
+
+        if flag_l:
+            dp.N = 1 if (result & BIT_31) else 0
+            dp.Z = 1 if result == 0 else 0
+
+        if mem_w:
+            value = dp.ip if mem_src == 1 else dp.acc
+            ar = dp.ar
+            if ar == DataPath.OUTPUT_ADDR:
+                dp.output_buffer.append(value)
+            else:
+                dp.data_mem[ar] = value
+
+        if ip_l:
+            dp.ip = result
+        if dr_l:
+            ar = dp.ar
+            if ar == DataPath.INPUT_ADDR:
+                if dp.input_buffer:
+                    dp.dr = dp.input_buffer.popleft()
+                else:
+                    dp.dr = EOF_WORD
+            else:
+                dp.dr = dp.data_mem[ar]
+        if sp_l:
+            dp.sp = result
+        if cr_l:
+            dp.cr = result
+        if ar_l:
+            if ar_sel == 0:
+                dp.ar = dp.ip
+            elif ar_sel == 1:
+                dp.ar = dp.cr & MASK_24
+            elif ar_sel == 2:
+                dp.ar = dp.sp
+            else:
+                dp.ar = dp.dr
+        if acc_l:
+            dp.acc = result
+
+        if cond == Cond.NONE:
+            self.mp = (mp + 1) & 0x7F
+        elif cond == Cond.ALWAYS:
+            self.mp = next_addr
+        elif cond == Cond.EQ:
+            self.mp = next_addr if dp.Z == 1 else (mp + 1) & 0x7F
+        elif cond == Cond.GE:
+            self.mp = next_addr if dp.N == 0 else (mp + 1) & 0x7F
+        elif cond == Cond.NE:
+            self.mp = next_addr if dp.Z == 0 else (mp + 1) & 0x7F
+        elif cond == Cond.LT:
+            self.mp = next_addr if dp.N == 1 else (mp + 1) & 0x7F
+        elif cond == Cond.DECODE:
+            self.mp = DECODER[(dp.cr >> 24) & 0xFF]
+
+        if halted:
             self.halted = True

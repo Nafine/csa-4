@@ -1,8 +1,0 @@
-def main() void {
-    char := read();
-
-    while (char != -1) {
-        char = read();
-        print(char);
-    }
-}

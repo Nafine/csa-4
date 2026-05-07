@@ -9,10 +9,11 @@ class Token(NamedTuple):
 
 def tokenize(code: str) -> list[Token]:
     token_specification = [
+        ('COMMENT', r'//[^\n]*'),
         ('INT_LIT', r'\d+'),
         ('STRING_LIT', r'"(?:\\.|[^"\\])*"'),
         ('BOOL_LIT', r'\b(?:true|false)\b'),
-        ('KEYWORD', r'\b(?:def|var|if|else|while|return|print|read|int|float|bool|string|void)\b'),
+        ('KEYWORD', r'\b(?:def|var|if|else|while|return|print|read|peek|poke|int|float|bool|string|void)\b'),
         ('ID', r'[a-zA-Z_][a-zA-Z0-9_]*'),
         ('OP', r':=|\|\||&&|==|!=|<=|>=|[+\-*/%<>=!]'),
         ('PUNCT', r'[(){},;]'),
@@ -33,6 +34,8 @@ def tokenize(code: str) -> list[Token]:
         if kind == 'WS':
             if '\n' in value:
                 line_num += value.count('\n')
+            continue
+        elif kind == 'COMMENT':
             continue
 
         elif kind == 'MISMATCH':

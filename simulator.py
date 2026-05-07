@@ -1,5 +1,7 @@
 from machine import ControlUnit, CpuState
 
+TRACE_BATCH = 4096
+
 
 def format_state(state: CpuState) -> str:
     return (
@@ -16,11 +18,23 @@ class Simulator:
         self.trace_path = trace_path
 
     def run(self) -> None:
+        cu = self.cu
+        step = cu.step
+
         if self.trace_path is None:
-            while not self.cu.halted:
-                self.cu.step()
+            while not cu.halted:
+                step()
             return
+
+        snapshot = cu.snapshot
         with open(self.trace_path, 'w', encoding='utf-8') as trace:
-            while not self.cu.halted:
-                self.cu.step()
-                trace.write(format_state(self.cu.snapshot()))
+            buf: list[str] = []
+            append = buf.append
+            while not cu.halted:
+                step()
+                append(format_state(snapshot()))
+                if len(buf) >= TRACE_BATCH:
+                    trace.write(''.join(buf))
+                    buf.clear()
+            if buf:
+                trace.write(''.join(buf))

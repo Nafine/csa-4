@@ -2,7 +2,7 @@ import argparse
 import sys
 import time
 
-from isa import Instruction, read_file, write_file
+from isa import Instruction, read_file, write_debug, write_file
 from machine import ControlUnit, DataPath
 from simulator import Simulator
 from translator.codegen import CodeGenerator
@@ -22,6 +22,7 @@ def compile_file(input_file: str, output_file: str) -> None:
     with open(input_file) as f:
         instructions, data = compile_source(f.read())
     write_file(output_file, instructions, data)
+    write_debug(output_file + '.txt', instructions, data)
 
 
 def file_to_buf(path: str) -> list[int]:
@@ -37,12 +38,13 @@ def file_to_buf(path: str) -> list[int]:
     return words
 
 def buf_to_str(buf: list[int]) -> str:
-    out = ''
+    eof = (-1) & DataPath.MASK_32
+    out = []
     for char in buf:
-        if char == -1 & DataPath.MASK_32:
+        if char == eof:
             break
-        out += chr(char)
-    return out
+        out.append(chr(char))
+    return ''.join(out)
 
 def run_file(machine_file: str, input_file: str | None = None, trace_file: str | None = None) -> None:
     data = read_file(machine_file)
@@ -57,7 +59,6 @@ def run_file(machine_file: str, input_file: str | None = None, trace_file: str |
     Simulator(cu, trace_file).run()
     end_time = time.time_ns()
     print(f'Time in ms: {(end_time - begin_time) // 1_000_000}')
-    print([f'{word:#x}' for word in cu.dp.output_buffer])
     print(buf_to_str(cu.dp.output_buffer))
 
 

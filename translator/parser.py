@@ -412,8 +412,13 @@ class Parser:
             self.consume('PUNCT', ')')
             return expr
 
-        # Обработка встроенных функций (print, read) или ID / вызова функции
-        is_builtin = self.match('KEYWORD', 'print') or self.match('KEYWORD', 'read')
+        # builtins (print, read, peek, poke) or ID / function call
+        is_builtin = (
+            self.match('KEYWORD', 'print')
+            or self.match('KEYWORD', 'read')
+            or self.match('KEYWORD', 'peek')
+            or self.match('KEYWORD', 'poke')
+        )
         is_id = self.match('ID')
 
         if is_builtin or is_id:

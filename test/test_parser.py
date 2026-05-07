@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from translator.parser import (
@@ -160,21 +158,5 @@ def test_func_call_with_args():
 
 
 def test_builtin_must_be_called():
-    """`print` без скобок должен дать ParserError."""
     with pytest.raises(ParserError):
         _parse('def main() void { x := print; }')
-
-
-EXAMPLES = Path(__file__).resolve().parent.parent / 'examples'
-
-
-def test_example_tw_parses():
-    prog = _parse((EXAMPLES / 'example.tw').read_text())
-    assert any(isinstance(n, FuncDecl) and n.name == 'main' for n in prog.top_levels)
-
-
-def test_while_tw_parses():
-    prog = _parse((EXAMPLES / 'while.tw').read_text())
-    assert any(isinstance(n, FuncDecl) and n.name == 'main' for n in prog.top_levels)
-
-

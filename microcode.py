@@ -75,7 +75,7 @@ def encode_signals(halted=0,
     )
 
 
-MROM = [0] * 64
+MROM = [0] * 128
 
 # FETCH
 MROM[0] = encode_signals(ar_l=1, ar_sel=ArSel.IP)  # AR <- IP
@@ -204,6 +204,12 @@ MROM[62] = encode_signals(flag_l=1, acc_l=1, alu_left=AluLeft.ACC, alu=Alu.INC, 
 # HALT
 MROM[63] = encode_signals(halted=1)
 
+# STR: Mem[Mem[arg]] <- ACC
+MROM[64] = encode_signals(ar_l=1, ar_sel=ArSel.CR_ARG)  # AR <- CR.arg
+MROM[65] = encode_signals(dr_l=1)  # DR <- Mem[AR]
+MROM[66] = encode_signals(ar_l=1, ar_sel=ArSel.DR)  # AR <- DR
+MROM[67] = encode_signals(mem_w=1, cond=Cond.ALWAYS, next_addr=0)  # Mem[AR] <- ACC; -> FETCH
+
 # DECODER[opcode] = адрес первого uop команды.
 # Неизвестный опкод ведёт на 0 (FETCH) -- по сути пропуск.
 
@@ -212,6 +218,7 @@ DECODER[Opcode.LD] = 3
 DECODER[Opcode.LDR] = 6
 DECODER[Opcode.LDI] = 11
 DECODER[Opcode.ST] = 12
+DECODER[Opcode.STR] = 64
 DECODER[Opcode.ADD] = 14
 DECODER[Opcode.SUB] = 17
 DECODER[Opcode.MUL] = 20
