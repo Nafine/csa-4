@@ -1,0 +1,29 @@
+stages:
+  - test
+
+variables:
+  UV_CACHE_DIR: ".uv-cache"
+
+
+test:
+  stage: test
+  image: python:3.12-slim
+  cache:
+    key:
+      files:
+        - uv.lock
+    paths:
+      - .uv-cache
+  before_script:
+    - apt-get update && apt-get install -y curl
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - export PATH="/root/.local/bin:$PATH"
+    - uv --version
+  script:
+    - uv sync --all-extras
+    - uv run ruff check .
+    - uv run mypy .
+    - uv run pytest -q
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
