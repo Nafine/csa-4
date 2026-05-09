@@ -12,7 +12,16 @@ from isa import Instruction, write_debug
 from machine import ControlUnit
 from simulator import format_state
 from translator.parser import Parser
+from translator.semantic import SemanticAnalyzer
 from translator.tokenizer import tokenize
+
+
+class FlowList(list):
+    """list subclass that yaml.safe_dump emits as flow style."""
+
+
+def _flow_list_repr(dumper, data):
+    return dumper.represent_sequence('tag:yaml.org,2002:seq', data, flow_style=True)
 
 
 class LiteralStr(str):
@@ -23,6 +32,7 @@ def _literal_repr(dumper, data):
     return dumper.represent_scalar('tag:yaml.org,2002:str', str(data), style='|')
 
 
+yaml.add_representer(FlowList, _flow_list_repr, Dumper=yaml.SafeDumper)
 yaml.add_representer(LiteralStr, _literal_repr, Dumper=yaml.SafeDumper)
 
 GOLDEN_DIR = Path(__file__).resolve().parent / 'golden'
@@ -31,12 +41,12 @@ REGEN = os.environ.get('REGEN') == '1'
 
 SLOW_CASES = {'prob1'}
 
-EOF_WORD = 0xFFFFFFFF
 TRACE_HEAD_TICKS = 200
 
 
 def _format_ast(src: str) -> str:
     program = Parser(tokenize(src)).parse()
+    SemanticAnalyzer().analyze(program)
     return pprint.pformat(program, width=80, indent=2, sort_dicts=False)
 
 
@@ -57,11 +67,8 @@ def _disasm(instructions: list[Instruction], data: list[int]) -> str:
 
 
 def _output_words(buf: list[int]) -> list[int]:
-    """Trim the trailing EOF sentinel (-1) some programs echo on exhaustion."""
     out: list[int] = []
     for word in buf:
-        if word == EOF_WORD:
-            break
         out.append(word)
     return out
 
@@ -84,8 +91,7 @@ def _format_stdout(cu: ControlUnit) -> str:
     )
 
 
-def _make_cu(code_words: list[int], stdin: str | None) -> ControlUnit:
-    input_buf = list(stdin.encode('utf-8')) + [0] if stdin else None
+def _make_cu(code_words: list[int], input_buf: list[int] | None) -> ControlUnit:
     cu = ControlUnit(input_buf)
     for i, w in enumerate(code_words):
         cu.dp.data_mem[i] = w
@@ -117,7 +123,7 @@ def test_golden(case: str) -> None:
     spec = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
 
     src = spec['in_source']
-    stdin = spec.get('in_stdin') or ''
+    in_buffer = [ord(token) if isinstance(token, str) else token for token in spec.get('in_buffer')] or ''
     limit = int(spec.get('in_limit', 100_000))
 
     out_ast = _format_ast(src)
@@ -128,24 +134,24 @@ def test_golden(case: str) -> None:
     out_code = _format_code(code_words)
     out_code_hex = _disasm(instructions, data)
 
-    cu = _make_cu(code_words, stdin)
+    cu = _make_cu(code_words, in_buffer)
     while not cu.halted and cu.tick < limit:
         cu.step()
     if not cu.halted:
         raise AssertionError(f'{case}: did not halt within {limit} ticks (last={cu.tick})')
 
     out_stdout = _format_stdout(cu)
-    out_log = _trace_head(code_words, stdin, limit)
+    out_log = _trace_head(code_words, in_buffer, limit)
 
     if REGEN:
         new_spec = {
             'in_source': LiteralStr(src.rstrip('\n')),
-            'in_stdin': stdin,
             'in_limit': limit,
+            'in_buffer': FlowList(in_buffer),
+            'out_stdout': LiteralStr(out_stdout),
             'out_ast': LiteralStr(out_ast.rstrip('\n')),
             'out_code': out_code,
             'out_code_hex': LiteralStr(out_code_hex.rstrip('\n')),
-            'out_stdout': LiteralStr(out_stdout),
             'out_log': LiteralStr(out_log.rstrip('\n')),
         }
         with path.open('w', encoding='utf-8') as f:
@@ -157,6 +163,6 @@ def test_golden(case: str) -> None:
 
     assert _norm(spec.get('out_ast')) == _norm(out_ast), f'{case}: out_ast mismatch'
     assert _norm(spec.get('out_code')) == _norm(out_code), f'{case}: out_code mismatch'
-    assert _norm(spec.get('out_code_hex')) == _norm(out_code_hex), f'{case}: out_code_hex mismatch'
     assert _norm(spec.get('out_stdout')) == _norm(out_stdout), f'{case}: out_stdout mismatch'
+    assert _norm(spec.get('out_code_hex')) == _norm(out_code_hex), f'{case}: out_code_hex mismatch'
     assert _norm(spec.get('out_log')) == _norm(out_log), f'{case}: out_log mismatch'

@@ -7,8 +7,6 @@ MASK_32 = (1 << 32) - 1
 MASK_24 = (1 << 24) - 1
 BIT_31 = 1 << 31
 
-EOF_WORD = MASK_32
-
 
 def to_signed32(val: int) -> int:
     if val & BIT_31:
@@ -16,7 +14,7 @@ def to_signed32(val: int) -> int:
     return val
 
 
-def _predecode(mc: int) -> tuple:
+def _predecode(mc: int) -> tuple[int, ...]:
     return (
         (mc >> 27) & 1,  # 0  halted
         (mc >> 26) & 1,  # 1  flag_l
@@ -55,23 +53,30 @@ class CpuState:
     N: int
 
 
+class DataPathException(Exception):
+    pass
+
+
 class DataPath:
+    # another optimization costil' 🙏
     __slots__ = (
         'data_mem', 'input_buffer', 'output_buffer',
         'acc', 'dr', 'ip', 'sp', 'ar', 'cr', 'Z', 'N',
     )
 
-    MEM_SIZE = 2 ** 12
+    MEM_SIZE = 2 ** 24
     OUTPUT_ADDR = MEM_SIZE - 1
     INPUT_ADDR = MEM_SIZE - 2
     MASK_32 = MASK_32
     MASK_24 = MASK_24
     BIT_31 = BIT_31
 
-    def __init__(self, input_buffer):
-        self.data_mem = [0] * self.MEM_SIZE
+    def __init__(self, input_buffer: list[int] | deque[int] | None) -> None:
+        self.data_mem: list[int] = [0] * self.MEM_SIZE
+
+        # and another one (pop in deque is o(1))
         if input_buffer is None:
-            self.input_buffer = deque()
+            self.input_buffer: deque[int] = deque()
         elif isinstance(input_buffer, deque):
             self.input_buffer = input_buffer
         else:
@@ -81,28 +86,16 @@ class DataPath:
         self.acc = 0
         self.dr = 0
         self.ip = 0
-        self.sp = (self.INPUT_ADDR - 1) & MASK_32
+        self.sp = (self.INPUT_ADDR - 1) & MASK_24
         self.ar = 0
         self.cr = 0
 
         self.Z = 0
         self.N = 0
 
-    def read_memory(self) -> int:
-        if self.ar == self.INPUT_ADDR:
-            if self.input_buffer:
-                return self.input_buffer.popleft()
-            return EOF_WORD
-        return self.data_mem[self.ar]
-
-    def write_memory(self, value: int) -> None:
-        if self.ar == self.OUTPUT_ADDR:
-            self.output_buffer.append(value)
-        else:
-            self.data_mem[self.ar] = value
-
 
 class ControlUnit:
+    # 🙏🙏🙏
     __slots__ = ('dp', 'mp', 'tick', 'halted')
 
     def __init__(self, input_buffer: list[int] | None = None):
@@ -133,6 +126,10 @@ class ControlUnit:
          mem_src, mem_w, ar_sel, alu_left, alu_right, alu, cond,
          next_addr) = DECODED_MROM[mp]
         self.tick += 1
+
+        decode_input = dp.dr
+        z_old = dp.Z
+        n_old = dp.N
 
         if alu_left == 0:
             left = 0
@@ -180,18 +177,18 @@ class ControlUnit:
                 dp.data_mem[ar] = value
 
         if ip_l:
-            dp.ip = result
+            dp.ip = result & MASK_24
         if dr_l:
             ar = dp.ar
             if ar == DataPath.INPUT_ADDR:
                 if dp.input_buffer:
-                    dp.dr = dp.input_buffer.popleft()
+                    dp.dr = dp.input_buffer.popleft() & MASK_32
                 else:
-                    dp.dr = EOF_WORD
+                    raise DataPathException('input_buffer is empty')
             else:
                 dp.dr = dp.data_mem[ar]
         if sp_l:
-            dp.sp = result
+            dp.sp = result & MASK_24
         if cr_l:
             dp.cr = result
         if ar_l:
@@ -202,7 +199,7 @@ class ControlUnit:
             elif ar_sel == 2:
                 dp.ar = dp.sp
             else:
-                dp.ar = dp.dr
+                dp.ar = dp.dr & MASK_24
         if acc_l:
             dp.acc = result
 
@@ -211,15 +208,15 @@ class ControlUnit:
         elif cond == Cond.ALWAYS:
             self.mp = next_addr
         elif cond == Cond.EQ:
-            self.mp = next_addr if dp.Z == 1 else (mp + 1) & 0x7F
+            self.mp = next_addr if z_old == 1 else (mp + 1) & 0x7F
         elif cond == Cond.GE:
-            self.mp = next_addr if dp.N == 0 else (mp + 1) & 0x7F
+            self.mp = next_addr if n_old == 0 else (mp + 1) & 0x7F
         elif cond == Cond.NE:
-            self.mp = next_addr if dp.Z == 0 else (mp + 1) & 0x7F
+            self.mp = next_addr if z_old == 0 else (mp + 1) & 0x7F
         elif cond == Cond.LT:
-            self.mp = next_addr if dp.N == 1 else (mp + 1) & 0x7F
+            self.mp = next_addr if n_old == 1 else (mp + 1) & 0x7F
         elif cond == Cond.DECODE:
-            self.mp = DECODER[(dp.cr >> 24) & 0xFF]
+            self.mp = DECODER[(decode_input >> 24) & 0xFF]
 
         if halted:
             self.halted = True

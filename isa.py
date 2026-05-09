@@ -12,10 +12,12 @@ class Opcode(IntEnum):
     STR = 0x05
 
     ADD = 0x10
-    SUB = 0x11
-    MUL = 0x12
-    DIV = 0x13
-    REM = 0x14
+    ADDI = 0x11
+    SUB = 0x12
+    SUBI = 0x13
+    MUL = 0x14
+    DIV = 0x15
+    REM = 0x16
 
     CMP = 0x20
     NOT = 0x21
@@ -47,11 +49,11 @@ class Instruction:
         return struct.pack(">I", self.encode())
 
     @staticmethod
-    def from_bytes(data) -> 'Instruction':
+    def from_bytes(data: bytes) -> 'Instruction':
         (word,) = struct.unpack('>I', data)
         return Instruction.decode(word)
 
-    def encode(self):
+    def encode(self) -> int:
         mask = (1 << 24) - 1
         op = self.operand & mask
         return (self.opcode.value << 24) | op
@@ -65,7 +67,7 @@ class Instruction:
         opcode = Opcode(opcode_value)
         return Instruction(opcode, operand)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.opcode.name} {self.operand:#04x}"
 
 

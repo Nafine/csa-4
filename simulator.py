@@ -7,7 +7,7 @@ def format_state(state: CpuState) -> str:
     return (
         f'Tick: [{state.tick}] uPC={state.mp:02} CR={state.cr:08x}\n'
         f'ACC={state.acc:11} IP={state.ip:08x} SP={state.sp:08x}\n'
-        f'AR={state.ar:08x} Z={state.Z} N={state.N}\n'
+        f'AR={state.ar:08x} DR={state.dr:08x} Z={state.Z} N={state.N}\n'
         '-----------------------------\n'
     )
 

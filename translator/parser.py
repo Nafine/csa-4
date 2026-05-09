@@ -13,6 +13,11 @@ class Program(ASTNode):
 
 
 @dataclass
+class Identifier(ASTNode):
+    name: str
+
+
+@dataclass
 class Param(ASTNode):
     name: str
     param_type: str
@@ -41,6 +46,19 @@ class VarDecl(ASTNode):
 @dataclass
 class AssignStmt(ASTNode):
     name: str
+    expr: ASTNode
+
+
+@dataclass
+class IndexExpr(ASTNode):
+    target: ASTNode
+    index: ASTNode
+
+
+@dataclass
+class IndexAssign(ASTNode):
+    name: str
+    index: ASTNode
     expr: ASTNode
 
 
@@ -91,11 +109,6 @@ class UnaryExpr(ASTNode):
 class Literal(ASTNode):
     value: str | int | bool
     literal_type: str
-
-
-@dataclass
-class Identifier(ASTNode):
-    name: str
 
 
 @dataclass
@@ -179,7 +192,7 @@ class Parser:
             return self.parse_func_decl()
         elif self.match('KEYWORD', 'var'):
             return self.parse_var_decl()
-        elif self.match('ID') and self.peek_next() and self.peek_next().value == ':=':
+        elif self.match('ID') and (nxt := self.peek_next()) is not None and nxt.value == ':=':
             return self.parse_short_var_decl()
         else:
             raise ParserError(f"Expected function or variable declaration at top level, got {self.peek()}")
@@ -210,7 +223,16 @@ class Parser:
         token = self.consume('KEYWORD')
         if token.value not in ['int', 'bool', 'string', 'void']:
             raise ParserError(f"Expected type, got {token.value}")
-        return token.value
+        base = token.value
+        if self.match('PUNCT', '['):
+            self.consume('PUNCT', '[')
+            size_token = self.consume('INT_LIT')
+            self.consume('PUNCT', ']')
+            size = int(size_token.value)
+            if size <= 0:
+                raise ParserError(f"array size must be positive, got {size}")
+            return f'{base}[{size}]'
+        return base
 
     def parse_block(self) -> Block:
         self.consume('PUNCT', '{')
@@ -230,13 +252,30 @@ class Parser:
         elif self.match('KEYWORD', 'return'):
             return self.parse_return_stmt()
 
-        if self.match('ID') and self.peek_next():
-            next_val = self.peek_next().value
+        if self.match('ID') and (nxt := self.peek_next()) is not None:
+            next_val = nxt.value
             if next_val == '=':
                 return self.parse_assign_stmt()
             elif next_val == ':=':
                 return self.parse_short_var_decl()
+            elif next_val == '[':
+                return self.parse_index_or_expr_stmt()
 
+        return self.parse_expr_stmt()
+
+    def parse_index_or_expr_stmt(self) -> ASTNode:
+        start = self.pos
+        name = self.consume('ID').value
+        self.consume('PUNCT', '[')
+        index = self.parse_expr()
+        self.consume('PUNCT', ']')
+        if self.match('OP', '='):
+            self.consume('OP', '=')
+            rhs = self.parse_expr()
+            self.consume('PUNCT', ';')
+            return IndexAssign(name, index, rhs)
+        # not an assignment — rewind and parse as expression statement
+        self.pos = start
         return self.parse_expr_stmt()
 
     def parse_var_decl(self) -> VarDecl:
@@ -247,6 +286,10 @@ class Parser:
         expr = None
 
         if self.match('OP', '='):
+            if v_type.endswith(']'):
+                raise ParserError(
+                    f"array variable '{name}' cannot have an initializer"
+                )
             self.consume('OP', '=')
             expr = self.parse_expr()
 
@@ -299,7 +342,7 @@ class Parser:
         then_block = self.parse_block()
 
         elifs = []
-        while self.match('KEYWORD', 'else') and self.peek_next() and self.peek_next().value == 'if':
+        while self.match('KEYWORD', 'else') and (nxt := self.peek_next()) is not None and nxt.value == 'if':
             self.consume('KEYWORD', 'else')
             self.consume('KEYWORD', 'if')
             self.consume('PUNCT', '(')
@@ -393,6 +436,10 @@ class Parser:
             op = self.advance().value
             expr = self.parse_unary()
             return UnaryExpr(op, expr)
+        elif self.match('OP', '++') or self.match('OP', '--'):
+            op = self.advance().value
+            idt = self.parse_unary()
+            return UnaryExpr(op, idt)
         return self.parse_primary()
 
     def parse_primary(self) -> ASTNode:
@@ -401,38 +448,39 @@ class Parser:
         if self.match('INT_LIT'):
             return Literal(int(self.advance().value), 'INT_LIT')
         elif self.match('BOOL_LIT'):
-            val = True if self.advance().value == 'true' else False
-            return Literal(val, 'BOOL_LIT')
+            bool_val = self.advance().value == 'true'
+            return Literal(bool_val, 'BOOL_LIT')
         elif self.match('STRING_LIT'):
-            val = _decode_escapes(self.advance().value[1:-1])
-            return Literal(val, 'STRING_LIT')
+            str_val = _decode_escapes(self.advance().value[1:-1])
+            return Literal(str_val, 'STRING_LIT')
         elif self.match('PUNCT', '('):
             self.consume('PUNCT', '(')
             expr = self.parse_expr()
             self.consume('PUNCT', ')')
             return expr
 
-        # builtins (print, read, peek, poke) or ID / function call
         is_builtin = (
-            self.match('KEYWORD', 'print')
-            or self.match('KEYWORD', 'read')
-            or self.match('KEYWORD', 'peek')
-            or self.match('KEYWORD', 'poke')
+                self.match('KEYWORD', 'print')
+                or self.match('KEYWORD', 'read')
         )
         is_id = self.match('ID')
 
         if is_builtin or is_id:
             name_token = self.advance()
-            # Проверка на вызов функции
             if self.match('PUNCT', '('):
                 self.consume('PUNCT', '(')
                 args = self.parse_args() if not self.match('PUNCT', ')') else []
                 self.consume('PUNCT', ')')
                 return FuncCall(name_token.value, args)
-            else:
-                if is_builtin:
-                    raise ParserError(f"Built-in keyword {name_token.value} must be called as a function")
-                return Identifier(name_token.value)
+            if is_builtin:
+                raise ParserError(f"Built-in keyword {name_token.value} must be called as a function")
+            node: ASTNode = Identifier(name_token.value)
+            while self.match('PUNCT', '['):
+                self.consume('PUNCT', '[')
+                index = self.parse_expr()
+                self.consume('PUNCT', ']')
+                node = IndexExpr(node, index)
+            return node
 
         raise ParserError(f"Unexpected token in expression: {token}")
 

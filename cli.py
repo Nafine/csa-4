@@ -7,13 +7,14 @@ from machine import ControlUnit, DataPath
 from simulator import Simulator
 from translator.codegen import CodeGenerator
 from translator.parser import Parser
+from translator.semantic import SemanticAnalyzer
 from translator.tokenizer import tokenize
 
 
 def compile_source(source: str) -> tuple[list[Instruction], list[int]]:
     tokens = tokenize(source)
     ast_tree = Parser(tokens).parse()
-    # pprint(ast_tree)
+    SemanticAnalyzer().analyze(ast_tree)
     generator = CodeGenerator()
     return generator.generate(ast_tree)
 

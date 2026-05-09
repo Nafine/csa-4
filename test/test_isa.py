@@ -43,7 +43,7 @@ def test_load():
 
 def test_ldi():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x03000040  # LDI #0x40
+    cu.dp.data_mem[0] = 0x03000040  # LDI #0x03
     for _ in range(4):  # FETCH 3 + LDI 1
         cu.step()
     assert cu.dp.acc == 0x40, f'ACC={cu.dp.acc:#x}'
@@ -52,7 +52,7 @@ def test_ldi():
 
 def test_store():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x04000020  # ST 0x20
+    cu.dp.data_mem[0] = 0x04000020  # ST 0x04
     cu.dp.acc = 0xBEEF
     for _ in range(5):  # FETCH 3 + STORE 2
         cu.step()
@@ -63,7 +63,7 @@ def test_store():
 
 def test_add():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x10000020  # ADD 0x20
+    cu.dp.data_mem[0] = 0x10000020  # ADD 0x10
     cu.dp.data_mem[0x20] = 0xBEEF
     cu.dp.acc = 0
     for _ in range(6):  # FETCH 3 + ADD 3
@@ -74,7 +74,7 @@ def test_add():
 
 def test_sub():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x11000020  # SUB 0x20
+    cu.dp.data_mem[0] = 0x12000020  # SUB 0x12
     cu.dp.data_mem[0x20] = 15
     cu.dp.acc = 0
     for _ in range(6):  # FETCH 3 + SUB 3
@@ -85,7 +85,7 @@ def test_sub():
 
 def test_mul():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x12000020  # MUL 0x20
+    cu.dp.data_mem[0] = 0x14000020  # MUL 0x14
     cu.dp.data_mem[0x20] = 45
     cu.dp.acc = 3
     for _ in range(6):  # FETCH 3 + MUL 3
@@ -96,7 +96,7 @@ def test_mul():
 
 def test_div():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x13000020  # DIV 0x20
+    cu.dp.data_mem[0] = 0x15000020  # DIV 0x15
     cu.dp.data_mem[0x20] = 4
     cu.dp.acc = 20
     for _ in range(6):  # FETCH 3 + DIV 3
@@ -107,7 +107,7 @@ def test_div():
 
 def test_rem():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x14000020  # REM 0x20
+    cu.dp.data_mem[0] = 0x16000020  # REM 0x16
     cu.dp.data_mem[0x20] = 3
     cu.dp.acc = 20
     for _ in range(6):  # FETCH 3 + REM 3

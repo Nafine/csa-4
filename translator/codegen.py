@@ -4,12 +4,16 @@ from isa import Instruction, Opcode
 from machine import DataPath
 from translator.parser import (
     AssignStmt,
+    ASTNode,
     BinaryExpr,
+    Block,
     ExprStmt,
     FuncCall,
     FuncDecl,
     Identifier,
     IfStmt,
+    IndexAssign,
+    IndexExpr,
     Literal,
     Program,
     ReturnStmt,
@@ -17,6 +21,7 @@ from translator.parser import (
     VarDecl,
     WhileStmt,
 )
+from translator.semantic import parse_array_type
 
 
 class CodegenError(Exception):
@@ -36,7 +41,7 @@ class _Symbol:
 
 
 class CodeGenerator:
-    def __init__(self):
+    def __init__(self) -> None:
         self.instructions: list[Instruction] = []
         self.data: list[int] = []
         self.symbols: dict[str, _Symbol] = {}
@@ -146,7 +151,7 @@ class CodeGenerator:
             else:
                 raise CodegenError(f'unknown symbol kind: {sym.kind}')
 
-    def _enter_scope(self, name: str | None = None):
+    def _enter_scope(self, name: str | None = None) -> None:
         if name is None:
             name = f'scope_{self.scope_counter}'
             self.scope_counter += 1
@@ -155,18 +160,21 @@ class CodeGenerator:
     def _exit_scope(self) -> None:
         self.scope_stack.pop()
 
-    def _compile_block(self, block):
+    def _compile_block(self, block: Block) -> None:
         self._enter_scope()
         for stmt in block.stmts:
             self._compile_stmt(stmt)
         self._exit_scope()
 
-    def _compile_stmt(self, stmt) -> None:
+    def _compile_stmt(self, stmt: ASTNode) -> None:
         if isinstance(stmt, VarDecl):
             self._compile_var_decl(stmt)
             return
         if isinstance(stmt, AssignStmt):
             self._compile_assign(stmt)
+            return
+        if isinstance(stmt, IndexAssign):
+            self._compile_index_assign(stmt)
             return
         if isinstance(stmt, ExprStmt):
             self._compile_expression(stmt.expr)
@@ -183,7 +191,7 @@ class CodeGenerator:
             self._compile_primary(Instruction(Opcode.RET))
             return
 
-    def _compile_if(self, stmt: IfStmt):
+    def _compile_if(self, stmt: IfStmt) -> None:
         self._compile_expression(stmt.condition)
         jz_else = self._compile_branch(Opcode.BEQ)
 
@@ -198,7 +206,7 @@ class CodeGenerator:
         self._compile_block(stmt.else_block)
         self._patch_branch(jmp_end, self._ip())
 
-    def _compile_while(self, stmt: WhileStmt):
+    def _compile_while(self, stmt: WhileStmt) -> None:
         loop_start = self._ip()
         self._compile_expression(stmt.condition)
         jz_end = self._compile_branch(Opcode.BEQ)
@@ -208,7 +216,7 @@ class CodeGenerator:
         self._patch_branch(jz_end, self._ip())
         self._patch_branch(jz_while, loop_start)
 
-    def _compile_assign(self, assign: AssignStmt):
+    def _compile_assign(self, assign: AssignStmt) -> None:
         resolved = self._resolve(assign.name)
         if resolved not in self.symbols:
             raise CodegenError(f'assignment to undeclared variable: {assign.name}')
@@ -216,6 +224,9 @@ class CodeGenerator:
         self._emit_symbol_ref(Opcode.ST, resolved)
 
     def _compile_top_var_decl(self, decl: VarDecl) -> None:
+        if parse_array_type(decl.var_type) is not None:
+            self._allocate_array(decl.name, decl.var_type)
+            return
         if decl.expr is None:
             self._allocate(decl.name)
             self._tag_if_string(decl)
@@ -226,6 +237,10 @@ class CodeGenerator:
         self._compile_var_decl(decl)
 
     def _compile_var_decl(self, decl: VarDecl) -> None:
+        if parse_array_type(decl.var_type) is not None:
+            qualified = self._qualify(decl.name)
+            self._allocate_array(qualified, decl.var_type)
+            return
         qualified = self._qualify(decl.name)
         self._allocate(qualified)
         self._tag_if_string(decl)
@@ -233,6 +248,18 @@ class CodeGenerator:
             return
         self._compile_expression(decl.expr)
         self._emit_symbol_ref(Opcode.ST, qualified)
+
+    def _allocate_array(self, name: str, type_str: str) -> int:
+        info = parse_array_type(type_str)
+        assert info is not None
+        _, size = info
+        if name in self.symbols:
+            return self.symbols[name].offset
+        offset = len(self.data)
+        for _ in range(size):
+            self.data.append(0)
+        self.symbols[name] = _Symbol('data', offset)
+        return offset
 
     def _tag_if_string(self, decl: VarDecl) -> None:
         is_string = decl.var_type == 'string'
@@ -263,12 +290,6 @@ class CodeGenerator:
             self._allocate(name)
         return name
 
-    def _one_name(self) -> str:
-        name = '$one'
-        if name not in self.symbols:
-            self._allocate(name, value=1)
-        return name
-
     def _peek_tmp_name(self) -> str:
         name = '$peek_tmp'
         if name not in self.symbols:
@@ -289,20 +310,19 @@ class CodeGenerator:
 
     def _emit_print_string_loop(self) -> None:
         ptr = self._print_ptr_name()
-        one = self._one_name()
         self._emit_symbol_ref(Opcode.ST, ptr)
         loop_start = self._ip()
         self._emit_symbol_ref(Opcode.LDR, ptr)
         jz_end = self._compile_branch(Opcode.BEQ)
         self._compile_primary(Instruction(Opcode.ST, DataPath.OUTPUT_ADDR))
         self._emit_symbol_ref(Opcode.LD, ptr)
-        self._emit_symbol_ref(Opcode.ADD, one)
+        self._compile_primary(Instruction(Opcode.ADDI, 1))
         self._emit_symbol_ref(Opcode.ST, ptr)
         back = self._compile_branch(Opcode.JMP)
         self._patch_branch(back, loop_start)
         self._patch_branch(jz_end, self._ip())
 
-    def _compile_expression(self, expr) -> None:
+    def _compile_expression(self, expr: ASTNode) -> None:
         if isinstance(expr, Literal):
             self._compile_lit(expr)
             return
@@ -318,13 +338,45 @@ class CodeGenerator:
         if isinstance(expr, FuncCall):
             self._compile_call(expr)
             return
+        if isinstance(expr, IndexExpr):
+            self._compile_index_load(expr)
+            return
 
-    def _compile_call(self, call: FuncCall):
+    def _compile_index_load(self, expr: IndexExpr) -> None:
+        assert isinstance(expr.target, Identifier)
+        name = self._resolve(expr.target.name)
+        addr_slot = self._peek_tmp_name()
+        self._compile_index_address(name, expr.index, addr_slot)
+        self._emit_symbol_ref(Opcode.LDR, addr_slot)
+
+    def _compile_index_assign(self, stmt: IndexAssign) -> None:
+        name = self._resolve(stmt.name)
+        val_slot = self._poke_val_name()
+        addr_slot = self._poke_addr_name()
+        self._compile_expression(stmt.expr)
+        self._emit_symbol_ref(Opcode.ST, val_slot)
+        self._compile_index_address(name, stmt.index, addr_slot)
+        self._emit_symbol_ref(Opcode.LD, val_slot)
+        self._emit_symbol_ref(Opcode.STR, addr_slot)
+
+    def _compile_index_address(self, array_symbol: str, index_expr: ASTNode, addr_slot: str) -> None:
+        """Computes base + index into ACC, then stores it at addr_slot."""
+        tmp_name = self._tmp_name()
+        self._emit_symbol_ref(Opcode.LDI, array_symbol)
+        self._compile_primary(Instruction(Opcode.PUSH))
+        self._compile_expression(index_expr)
+        self._emit_symbol_ref(Opcode.ST, tmp_name)
+        self._compile_primary(Instruction(Opcode.POP))
+        self._emit_symbol_ref(Opcode.ADD, tmp_name)
+        self._emit_symbol_ref(Opcode.ST, addr_slot)
+
+    def _compile_call(self, call: FuncCall) -> None:
         if call.name == 'print':
             if len(call.args) != 1:
                 raise CodegenError('print() expects exactly one argument')
             arg = call.args[0]
             if isinstance(arg, Literal) and arg.literal_type == 'STRING_LIT':
+                assert isinstance(arg.value, str)
                 name = self._allocate_cstr(arg.value)
                 self._emit_symbol_ref(Opcode.LDI, name)
                 self._emit_print_string_loop()
@@ -340,26 +392,6 @@ class CodeGenerator:
             if call.args:
                 raise CodegenError('read() expects zero arguments')
             self._compile_primary(Instruction(Opcode.LD, DataPath.INPUT_ADDR))
-            return
-        elif call.name == 'peek':
-            if len(call.args) != 1:
-                raise CodegenError('peek() expects exactly one argument')
-            tmp = self._peek_tmp_name()
-            self._compile_expression(call.args[0])
-            self._emit_symbol_ref(Opcode.ST, tmp)
-            self._emit_symbol_ref(Opcode.LDR, tmp)
-            return
-        elif call.name == 'poke':
-            if len(call.args) != 2:
-                raise CodegenError('poke() expects exactly two arguments')
-            val_slot = self._poke_val_name()
-            addr_slot = self._poke_addr_name()
-            self._compile_expression(call.args[1])
-            self._emit_symbol_ref(Opcode.ST, val_slot)
-            self._compile_expression(call.args[0])
-            self._emit_symbol_ref(Opcode.ST, addr_slot)
-            self._emit_symbol_ref(Opcode.LD, val_slot)
-            self._emit_symbol_ref(Opcode.STR, addr_slot)
             return
 
         func = self.function_decls.get(call.name)
@@ -455,24 +487,15 @@ class CodeGenerator:
         self._patch_branch(sc_true_right, true_label)
         self._patch_branch(end, self._ip())
 
-    def _patch_branch(self, index: int, target: int):
+    def _patch_branch(self, index: int, target: int) -> None:
         self.instructions[index].operand = target
 
-    def _compile_branch(self, branch) -> int:
+    def _compile_branch(self, branch: Opcode) -> int:
         return self._compile_primary(Instruction(branch, 0))
 
-    def _compile_unary(self, expr: UnaryExpr):
+    def _compile_unary(self, expr: UnaryExpr) -> None:
         if expr.op in ('++', '--'):
-            if not isinstance(expr.expr, Identifier):
-                raise CodegenError('increment/decrement supports only variables')
-            name = self._resolve(expr.expr.name)
-            tmp_name = self._tmp_name()
-            self._compile_primary(Instruction(Opcode.LDI, 1))
-            self._emit_symbol_ref(Opcode.ST, tmp_name)
-            self._emit_symbol_ref(Opcode.LD, name)
-            opcode = Opcode.ADD if expr.op == '++' else Opcode.SUB
-            self._emit_symbol_ref(opcode, tmp_name)
-            self._emit_symbol_ref(Opcode.ST, name)
+            self._compile_prefix(expr)
             return
 
         self._compile_expression(expr.expr)
@@ -484,13 +507,24 @@ class CodeGenerator:
             return
         raise CodegenError(f'unsupported unary op: {expr.op}')
 
-    def _compile_lit(self, lit):
+    def _compile_prefix(self, expr: UnaryExpr) -> None:
+        if not isinstance(expr.expr, Identifier):
+            raise CodegenError('increment/decrement supports only variables')
+        name = self._resolve(expr.expr.name)
+        self._emit_symbol_ref(Opcode.LD, name)
+        opcode = Opcode.ADDI if expr.op == '++' else Opcode.SUBI
+        self._compile_primary(Instruction(opcode, 1))
+        self._emit_symbol_ref(Opcode.ST, name)
+        return
+
+    def _compile_lit(self, lit: Literal) -> None:
         match lit.literal_type:
             case 'INT_LIT':
                 self._compile_int(int(lit.value))
             case 'BOOL_LIT':
                 self._compile_primary(Instruction(Opcode.LDI, 1 if lit.value else 0))
             case 'STRING_LIT':
+                assert isinstance(lit.value, str)
                 name = self._allocate_cstr(lit.value)
                 self._emit_symbol_ref(Opcode.LDI, name)
 
@@ -507,6 +541,6 @@ class CodeGenerator:
             self._allocate(name, value & 0xFFFFFFFF)
         return name
 
-    def _compile_primary(self, instruction) -> int:
+    def _compile_primary(self, instruction: Instruction) -> int:
         self.instructions.append(instruction)
         return len(self.instructions) - 1

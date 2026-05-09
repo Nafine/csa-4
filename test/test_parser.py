@@ -10,6 +10,8 @@ from translator.parser import (
     FuncDecl,
     Identifier,
     IfStmt,
+    IndexAssign,
+    IndexExpr,
     Literal,
     Parser,
     ParserError,
@@ -101,6 +103,29 @@ def test_unary_minus_and_not():
     assert isinstance(b.expr, UnaryExpr) and b.expr.op == '!'
 
 
+def test_prefix():
+    prog = _parse('def main() void { a := ++x; b := --x; }')
+    [a, b] = prog.top_levels[0].body.stmts
+    assert isinstance(a.expr, UnaryExpr) and a.expr.op == '++'
+    assert isinstance(b.expr, UnaryExpr) and b.expr.op == '--'
+
+
+def test_prefix_and_binary():
+    prog = _parse('def main() void { a := (++x) + (--x); }')
+    [a] = prog.top_levels[0].body.stmts
+    assert isinstance(a.expr, BinaryExpr) and a.expr.op == '+'
+    assert isinstance(a.expr.left, UnaryExpr) and a.expr.left.op == '++'
+    assert isinstance(a.expr.right, UnaryExpr) and a.expr.right.op == '--'
+
+
+def test_prefix_and_unary():
+    prog = _parse('def main() void { a := -(++x); b := !(--x); }')
+    [a, b] = prog.top_levels[0].body.stmts
+    assert isinstance(a.expr, UnaryExpr) and a.expr.op == '-'
+    assert isinstance(a.expr.expr, UnaryExpr) and a.expr.expr.op == '++'
+    assert isinstance(b.expr, UnaryExpr) and b.expr.op == '!'
+    assert isinstance(b.expr.expr, UnaryExpr) and b.expr.expr.op == '--'
+
 def test_logical_chain():
     """a && b || c => (a && b) || c"""
     prog = _parse('def main() void { x := a && b || c; }')
@@ -160,3 +185,53 @@ def test_func_call_with_args():
 def test_builtin_must_be_called():
     with pytest.raises(ParserError):
         _parse('def main() void { x := print; }')
+
+
+def test_array_decl():
+    prog = _parse('def main() void { var arr int[10]; }')
+    decl = prog.top_levels[0].body.stmts[0]
+    assert isinstance(decl, VarDecl)
+    assert decl.var_type == 'int[10]'
+    assert decl.expr is None
+
+
+def test_array_decl_with_initializer_rejected():
+    with pytest.raises(ParserError, match='cannot have an initializer'):
+        _parse('def main() void { var arr int[3] = 1; }')
+
+
+def test_array_decl_zero_size_rejected():
+    with pytest.raises(ParserError, match='positive'):
+        _parse('def main() void { var arr int[0]; }')
+
+
+def test_index_expr_in_expression():
+    prog = _parse('def main() void { var arr int[3]; var x int = arr[0]; }')
+    decl = prog.top_levels[0].body.stmts[1]
+    assert isinstance(decl.expr, IndexExpr)
+    assert isinstance(decl.expr.target, Identifier) and decl.expr.target.name == 'arr'
+    assert isinstance(decl.expr.index, Literal) and decl.expr.index.value == 0
+
+
+def test_index_assign():
+    prog = _parse('def main() void { var arr int[3]; arr[1] = 42; }')
+    stmt = prog.top_levels[0].body.stmts[1]
+    assert isinstance(stmt, IndexAssign)
+    assert stmt.name == 'arr'
+    assert isinstance(stmt.index, Literal) and stmt.index.value == 1
+    assert isinstance(stmt.expr, Literal) and stmt.expr.value == 42
+
+
+def test_index_in_expression_stmt():
+    prog = _parse('def main() void { var arr int[3]; print(arr[2]); }')
+    stmt = prog.top_levels[0].body.stmts[1]
+    assert isinstance(stmt, ExprStmt)
+    call = stmt.expr
+    assert isinstance(call, FuncCall) and call.name == 'print'
+    assert isinstance(call.args[0], IndexExpr)
+
+
+def test_bool_array_decl():
+    prog = _parse('def main() void { var flags bool[4]; }')
+    decl = prog.top_levels[0].body.stmts[0]
+    assert decl.var_type == 'bool[4]'

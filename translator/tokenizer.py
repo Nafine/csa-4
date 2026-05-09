@@ -13,10 +13,10 @@ def tokenize(code: str) -> list[Token]:
         ('INT_LIT', r'\d+'),
         ('STRING_LIT', r'"(?:\\.|[^"\\])*"'),
         ('BOOL_LIT', r'\b(?:true|false)\b'),
-        ('KEYWORD', r'\b(?:def|var|if|else|while|return|print|read|peek|poke|int|float|bool|string|void)\b'),
+        ('KEYWORD', r'\b(?:def|var|if|else|while|return|print|read|int|float|bool|string|void)\b'),
         ('ID', r'[a-zA-Z_][a-zA-Z0-9_]*'),
-        ('OP', r':=|\|\||&&|==|!=|<=|>=|[+\-*/%<>=!]'),
-        ('PUNCT', r'[(){},;]'),
+        ('OP', r':=|\|\||&&|==|!=|<=|>=|\+\+|\-\-|[+\-*/%<>=!]'),
+        ('PUNCT', r'[(){}\[\],;]'),
         ('WS', r'\s+'),
         ('MISMATCH', r'.'),
     ]
@@ -24,7 +24,7 @@ def tokenize(code: str) -> list[Token]:
     tok_regex = '|'.join(f'(?P<{pair[0]}>{pair[1]})' for pair in token_specification)
     get_token = re.compile(tok_regex).finditer
 
-    tokens = []
+    tokens: list[Token] = []
     line_num = 1
 
     for mo in get_token(code):
@@ -41,6 +41,7 @@ def tokenize(code: str) -> list[Token]:
         elif kind == 'MISMATCH':
             raise RuntimeError(f'Unexpected symbol {value!r} at line {line_num}')
 
+        assert kind is not None
         tokens.append(Token(kind, value))
 
     return tokens
