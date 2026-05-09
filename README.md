@@ -167,7 +167,9 @@ ID ::= [a-zA-Z_][a-zA-Z0-9_]*
 
 #### Литералы
 
-- **Целые `0 ≤ N < 2^24`** уезжают в операнд через immediate-формы инструкций (`LDI`, `ADDI`, `SUBI`).
+- **Целые `0 ≤ N < 2^24`** уезжают в операнд через immediate-формы инструкций (`LDI`, `ADDI`, `SUBI`,
+  `MULI`, `DIVI`, `REMI`, `CMPI`). Это покрывает все арифметические операции и сравнения с правым
+  литералом — кодоген применяет immediate-форму автоматически, без обёртки через стек и временный слот.
 - **Целые, не помещающиеся в 24 бита**, помещаются в статическую память и
   загружаются обычным `LD addr`.
 - **Булевы литералы** транслируются в `LDI 0` или `LDI 1`.
@@ -244,11 +246,15 @@ ID ::= [a-zA-Z_][a-zA-Z0-9_]*
 | **SUB**  | 0x12  | 3     | AC <- AC - Mem[arg]                       |
 | **SUBI** | 0x13  | 1     | AC <- AC - arg                            |
 | **MUL**  | 0x14  | 3     | AC <- AC * Mem[arg]                       |
-| **DIV**  | 0x15  | 3     | AC <- AC / Mem[arg]                       |
-| **REM**  | 0x16  | 3     | AC <- AC % Mem[arg]                       |
-| **CMP**  | 0x20  | 3     | Set NZ From AC - Mem[arg]                 |
-| **NOT**  | 0x21  | 1     | AC <- ~AC                                 |
-| **NEG**  | 0x22  | 2     | AC <- -AC (через ~AC + 1)                 |
+| **MULI** | 0x15  | 1     | AC <- AC * arg                            |
+| **DIV**  | 0x16  | 3     | AC <- AC / Mem[arg]                       |
+| **DIVI** | 0x17  | 1     | AC <- AC / arg                            |
+| **REM**  | 0x18  | 3     | AC <- AC % Mem[arg]                       |
+| **REMI** | 0x19  | 1     | AC <- AC % arg                            |
+| **CMP**  | 0x20  | 3     | Set NZ from AC - Mem[arg]                 |
+| **CMPI** | 0x21  | 1     | Set NZ from AC - arg                      |
+| **NOT**  | 0x22  | 1     | AC <- ~AC                                 |
+| **NEG**  | 0x23  | 2     | AC <- -AC (через ~AC + 1)                 |
 | **JMP**  | 0x30  | 1     | IP <- arg                                 |
 | **BEQ**  | 0x31  | 2     | IP <- arg if Z = 1 else IP + 1            |
 | **BNE**  | 0x32  | 2     | IP <- arg if Z = 0 else IP + 1            |

@@ -16,12 +16,16 @@ class Opcode(IntEnum):
     SUB = 0x12
     SUBI = 0x13
     MUL = 0x14
-    DIV = 0x15
-    REM = 0x16
+    MULI = 0x15
+    DIV = 0x16
+    DIVI = 0x17
+    REM = 0x18
+    REMI = 0x19
 
     CMP = 0x20
-    NOT = 0x21
-    NEG = 0x22
+    CMPI = 0x21
+    NOT = 0x22
+    NEG = 0x23
 
     JMP = 0x30  # unconditional jump
     BEQ = 0x31  # branch if equal (Z = 1)

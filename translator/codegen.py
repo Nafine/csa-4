@@ -28,6 +28,23 @@ class CodegenError(Exception):
     pass
 
 
+_ARITH_MEM: dict[str, Opcode] = {
+    '+': Opcode.ADD,
+    '-': Opcode.SUB,
+    '*': Opcode.MUL,
+    '/': Opcode.DIV,
+    '%': Opcode.REM,
+}
+_ARITH_IMM: dict[str, Opcode] = {
+    '+': Opcode.ADDI,
+    '-': Opcode.SUBI,
+    '*': Opcode.MULI,
+    '/': Opcode.DIVI,
+    '%': Opcode.REMI,
+}
+_COMPARES: set[str] = {'==', '!=', '<', '<=', '>', '>='}
+
+
 @dataclass
 class _Patch:
     index: int
@@ -416,6 +433,16 @@ class CodeGenerator:
             self._compile_logical_or(expr)
             return
 
+        rhs_imm = self._immediate_int(expr.right)
+        if rhs_imm is not None and (expr.op in _ARITH_IMM or expr.op in _COMPARES):
+            self._compile_expression(expr.left)
+            if expr.op in _ARITH_IMM:
+                self._compile_primary(Instruction(_ARITH_IMM[expr.op], rhs_imm))
+                return
+            self._compile_primary(Instruction(Opcode.CMPI, rhs_imm))
+            self._materialize_cmp_bool(expr.op)
+            return
+
         tmp_name = self._tmp_name()
         self._compile_expression(expr.left)
         self._compile_primary(Instruction(Opcode.PUSH))
@@ -423,33 +450,33 @@ class CodeGenerator:
         self._emit_symbol_ref(Opcode.ST, tmp_name)
         self._compile_primary(Instruction(Opcode.POP))
 
-        operations: dict[str, Opcode] = {
-            '+': Opcode.ADD,
-            '-': Opcode.SUB,
-            '*': Opcode.MUL,
-            '/': Opcode.DIV,
-            '%': Opcode.REM,
-        }
-
-        if expr.op in operations:
-            self._emit_symbol_ref(operations[expr.op], tmp_name)
+        if expr.op in _ARITH_MEM:
+            self._emit_symbol_ref(_ARITH_MEM[expr.op], tmp_name)
             return
 
-        compares = {'==', '!=', '<', '<=', '>', '>='}
-
-        if expr.op not in compares:
+        if expr.op not in _COMPARES:
             raise CodegenError(f'unsupported binary op: {expr.op}')
 
         self._emit_symbol_ref(Opcode.CMP, tmp_name)
-        if expr.op == '==':
+        self._materialize_cmp_bool(expr.op)
+
+    @staticmethod
+    def _immediate_int(expr: ASTNode) -> int | None:
+        if isinstance(expr, Literal) and expr.literal_type == 'INT_LIT':
+            if isinstance(expr.value, int) and 0 <= expr.value < (1 << 24):
+                return expr.value
+        return None
+
+    def _materialize_cmp_bool(self, op: str) -> None:
+        if op == '==':
             branch = Opcode.BEQ
-        elif expr.op == '!=':
+        elif op == '!=':
             branch = Opcode.BNE
-        elif expr.op == '<':
+        elif op == '<':
             branch = Opcode.BLT
-        elif expr.op == '<=':
+        elif op == '<=':
             branch = Opcode.BLE
-        elif expr.op == '>':
+        elif op == '>':
             branch = Opcode.BGT
         else:
             branch = Opcode.BGE

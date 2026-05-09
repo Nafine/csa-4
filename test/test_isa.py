@@ -96,7 +96,7 @@ def test_mul():
 
 def test_div():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x15000020  # DIV 0x15
+    cu.dp.data_mem[0] = 0x16000020  # DIV 0x16
     cu.dp.data_mem[0x20] = 4
     cu.dp.acc = 20
     for _ in range(6):  # FETCH 3 + DIV 3
@@ -107,7 +107,7 @@ def test_div():
 
 def test_rem():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x16000020  # REM 0x16
+    cu.dp.data_mem[0] = 0x18000020  # REM 0x18
     cu.dp.data_mem[0x20] = 3
     cu.dp.acc = 20
     for _ in range(6):  # FETCH 3 + REM 3
@@ -130,7 +130,7 @@ def test_cmp_eq():
 
 def test_not():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x21000000  # NOT: ACC <- ~ACC
+    cu.dp.data_mem[0] = 0x22000000  # NOT: ACC <- ~ACC
     cu.dp.acc = 0x0
     for _ in range(4):  # FETCH 3 + CMP 1
         cu.step()
@@ -139,7 +139,7 @@ def test_not():
 
 def test_neg():
     cu = ControlUnit()
-    cu.dp.data_mem[0] = 0x22000000  # NEG: ACC <- -ACC
+    cu.dp.data_mem[0] = 0x23000000  # NEG: ACC <- -ACC
     cu.dp.acc = 0x1
     for _ in range(5):  # FETCH 3 + NEG 2
         cu.step()
