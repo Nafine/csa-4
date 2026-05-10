@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Computer Systems Architecture Lab 4: acc/neum/mc/tick simulator and alg-language compiler"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "requests>=2.33.1",
+]
 
 [dependency-groups]
 dev = [
@@ -12,6 +14,7 @@ dev = [
     "pyyaml>=6",
     "ruff>=0.15.11",
     "mypy>=1.11",
+    "types-requests>=2.33.0.20260508",
 ]
 
 [tool.pytest.ini_options]

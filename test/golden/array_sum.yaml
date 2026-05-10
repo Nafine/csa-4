@@ -21,45 +21,78 @@ out_stdout: |
   output_num: [30]
   output_text: '\x1e'
 out_ast: |-
-  Program(top_levels=[ FuncDecl(name='main',
-                                params=[],
-                                return_type='void',
-                                body=Block(stmts=[ VarDecl(name='arr',
-                                                           var_type='int[5]',
-                                                           expr=None),
-                                                   VarDecl(name='i',
-                                                           var_type='int',
-                                                           expr=Literal(value=0,
-                                                                        literal_type='INT_LIT')),
-                                                   WhileStmt(condition=BinaryExpr(left=UnaryExpr(op='++',
-                                                                                                 expr=Identifier(name='i')),
-                                                                                  op='<',
-                                                                                  right=Literal(value=5,
-                                                                                                literal_type='INT_LIT')),
-                                                             body=Block(stmts=[ IndexAssign(name='arr',
-                                                                                            index=Identifier(name='i'),
-                                                                                            expr=BinaryExpr(left=Identifier(name='i'),
-                                                                                                            op='*',
-                                                                                                            right=Identifier(name='i')))])),
-                                                   VarDecl(name='sum',
-                                                           var_type='int',
-                                                           expr=Literal(value=0,
-                                                                        literal_type='INT_LIT')),
-                                                   AssignStmt(name='i',
-                                                              expr=Literal(value=0,
-                                                                           literal_type='INT_LIT')),
-                                                   WhileStmt(condition=BinaryExpr(left=UnaryExpr(op='++',
-                                                                                                 expr=Identifier(name='i')),
-                                                                                  op='<',
-                                                                                  right=Literal(value=5,
-                                                                                                literal_type='INT_LIT')),
-                                                             body=Block(stmts=[ AssignStmt(name='sum',
-                                                                                           expr=BinaryExpr(left=Identifier(name='sum'),
-                                                                                                           op='+',
-                                                                                                           right=IndexExpr(target=Identifier(name='arr'),
-                                                                                                                           index=Identifier(name='i'))))])),
-                                                   ExprStmt(expr=FuncCall(name='print',
-                                                                          args=[ Identifier(name='sum')]))]))])
+  graph TD
+      node1["<b>Program</b>"]
+      node2["<b>FuncDecl</b><br>name=main<br>return_type=void"]
+      node1 -- "top_levels[0]" --> node2
+      node3["<b>Block</b>"]
+      node2 -- "body" --> node3
+      node4["<b>VarDecl</b><br>name=arr<br>var_type=int[5]"]
+      node3 -- "stmts[0]" --> node4
+      node5["<b>VarDecl</b><br>name=i<br>var_type=int"]
+      node3 -- "stmts[1]" --> node5
+      node6["<b>Literal</b><br>value=0<br>literal_type=INT_LIT"]
+      node5 -- "expr" --> node6
+      node7["<b>WhileStmt</b>"]
+      node3 -- "stmts[2]" --> node7
+      node8["<b>BinaryExpr</b><br>op=<"]
+      node7 -- "condition" --> node8
+      node9["<b>UnaryExpr</b><br>op=++"]
+      node8 -- "left" --> node9
+      node10["<b>Identifier</b><br>name=i"]
+      node9 -- "expr" --> node10
+      node11["<b>Literal</b><br>value=5<br>literal_type=INT_LIT"]
+      node8 -- "right" --> node11
+      node12["<b>Block</b>"]
+      node7 -- "body" --> node12
+      node13["<b>IndexAssign</b><br>name=arr"]
+      node12 -- "stmts[0]" --> node13
+      node14["<b>Identifier</b><br>name=i"]
+      node13 -- "index" --> node14
+      node15["<b>BinaryExpr</b><br>op=*"]
+      node13 -- "expr" --> node15
+      node16["<b>Identifier</b><br>name=i"]
+      node15 -- "left" --> node16
+      node17["<b>Identifier</b><br>name=i"]
+      node15 -- "right" --> node17
+      node18["<b>VarDecl</b><br>name=sum<br>var_type=int"]
+      node3 -- "stmts[3]" --> node18
+      node19["<b>Literal</b><br>value=0<br>literal_type=INT_LIT"]
+      node18 -- "expr" --> node19
+      node20["<b>AssignStmt</b><br>name=i"]
+      node3 -- "stmts[4]" --> node20
+      node21["<b>Literal</b><br>value=0<br>literal_type=INT_LIT"]
+      node20 -- "expr" --> node21
+      node22["<b>WhileStmt</b>"]
+      node3 -- "stmts[5]" --> node22
+      node23["<b>BinaryExpr</b><br>op=<"]
+      node22 -- "condition" --> node23
+      node24["<b>UnaryExpr</b><br>op=++"]
+      node23 -- "left" --> node24
+      node25["<b>Identifier</b><br>name=i"]
+      node24 -- "expr" --> node25
+      node26["<b>Literal</b><br>value=5<br>literal_type=INT_LIT"]
+      node23 -- "right" --> node26
+      node27["<b>Block</b>"]
+      node22 -- "body" --> node27
+      node28["<b>AssignStmt</b><br>name=sum"]
+      node27 -- "stmts[0]" --> node28
+      node29["<b>BinaryExpr</b><br>op=+"]
+      node28 -- "expr" --> node29
+      node30["<b>Identifier</b><br>name=sum"]
+      node29 -- "left" --> node30
+      node31["<b>IndexExpr</b>"]
+      node29 -- "right" --> node31
+      node32["<b>Identifier</b><br>name=arr"]
+      node31 -- "target" --> node32
+      node33["<b>Identifier</b><br>name=i"]
+      node31 -- "index" --> node33
+      node34["<b>ExprStmt</b>"]
+      node3 -- "stmts[6]" --> node34
+      node35["<b>FuncCall</b><br>name=print"]
+      node34 -- "expr" --> node35
+      node36["<b>Identifier</b><br>name=sum"]
+      node35 -- "args[0]" --> node36
 out_code: 30 00 00 01 03 00 00 00 04 00 00 41 01 00 00 41 11 00 00 01 04 00 00 41
   21 00 00 05 36 00 00 0A 03 00 00 00 30 00 00 0B 03 00 00 01 31 00 00 1D 01 00
   00 41 40 00 00 00 01 00 00 41 04 00 00 44 41 00 00 00 14 00 00 44 04 00 00 42

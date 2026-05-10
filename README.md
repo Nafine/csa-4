@@ -74,8 +74,6 @@ unary_expr ::= "!" expr
     | "-" expr
     | "++" expr
     | "--" expr
-    | expr "++"
-    | expr "--"
 
 prefix_expr ::= ("++" | "--") ID
 

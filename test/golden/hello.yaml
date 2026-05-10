@@ -11,13 +11,19 @@ out_stdout: |
   output_num: [104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 10]
   output_text: 'hello world\n'
 out_ast: |-
-  Program(top_levels=[ FuncDecl(name='main',
-                                params=[],
-                                return_type='void',
-                                body=Block(stmts=[ ExprStmt(expr=FuncCall(name='print',
-                                                                          args=[ Literal(value='hello '
-                                                                                               'world\n',
-                                                                                         literal_type='STRING_LIT')]))]))])
+  graph TD
+      node1["<b>Program</b>"]
+      node2["<b>FuncDecl</b><br>name=main<br>return_type=void"]
+      node1 -- "top_levels[0]" --> node2
+      node3["<b>Block</b>"]
+      node2 -- "body" --> node3
+      node4["<b>ExprStmt</b>"]
+      node3 -- "stmts[0]" --> node4
+      node5["<b>FuncCall</b><br>name=print"]
+      node4 -- "expr" --> node5
+      node6["<b>Literal</b><br>value=hello world
+  <br>literal_type=STRING_LIT"]
+      node5 -- "args[0]" --> node6
 out_code: 30 00 00 01 03 00 00 0B 04 00 00 18 02 00 00 18 31 00 00 0A 04 FF FF FF
   01 00 00 18 11 00 00 01 04 00 00 18 30 00 00 03 FF 00 00 00 00 00 00 68 00 00
   00 65 00 00 00 6C 00 00 00 6C 00 00 00 6F 00 00 00 20 00 00 00 77 00 00 00 6F
