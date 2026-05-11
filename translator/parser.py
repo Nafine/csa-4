@@ -274,7 +274,7 @@ class Parser:
             rhs = self.parse_expr()
             self.consume('PUNCT', ';')
             return IndexAssign(name, index, rhs)
-        # not an assignment — rewind and parse as expression statement
+        # not an assignment - rewind and parse as expression statement
         self.pos = start
         return self.parse_expr_stmt()
 

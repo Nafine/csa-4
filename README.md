@@ -69,11 +69,12 @@ expr ::= expr "||" expr
     | expr ("+" | "-") expr
     | expr ("*" | "/" | "%") expr
     | unary_expr
+    | primary_expr
 
 unary_expr ::= "!" expr 
     | "-" expr
-    | "++" expr
-    | "--" expr
+    | "++" ID
+    | "--" ID
 
 prefix_expr ::= ("++" | "--") ID
 
