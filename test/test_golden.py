@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 import yaml
 
+from ast_translate import format_ast
 from cli import compile_source
 from isa import Instruction, write_debug
 from machine import ControlUnit
-from mrm_translate import generate_mermaid_ast, save_ast_to_png
 from simulator import format_state
 from translator.parser import Parser
 from translator.semantic import SemanticAnalyzer
@@ -45,7 +45,7 @@ TRACE_HEAD_TICKS = 200
 def _format_ast(src: str) -> str:
     program = Parser(tokenize(src)).parse()
     SemanticAnalyzer().analyze(program)
-    return generate_mermaid_ast(program)
+    return format_ast(program)
 
 
 def _format_code(words: list[int]) -> str:
@@ -149,7 +149,6 @@ def test_golden(case: str) -> None:
             'out_code_hex': LiteralStr(out_code_hex.rstrip('\n')),
             'out_log': LiteralStr(out_log.rstrip('\n')),
         }
-        save_ast_to_png(out_ast, GOLDEN_DIR / f'{case}.svg')
         with path.open('w', encoding='utf-8') as f:
             yaml.safe_dump(new_spec, f, sort_keys=False, allow_unicode=True, width=78)
         return

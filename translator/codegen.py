@@ -377,7 +377,6 @@ class CodeGenerator:
         self._emit_symbol_ref(Opcode.STR, addr_slot)
 
     def _compile_index_address(self, array_symbol: str, index_expr: ASTNode, addr_slot: str) -> None:
-        """Computes base + index into ACC, then stores it at addr_slot."""
         tmp_name = self._tmp_name()
         self._emit_symbol_ref(Opcode.LDI, array_symbol)
         self._compile_primary(Instruction(Opcode.PUSH))

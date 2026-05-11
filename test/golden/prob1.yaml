@@ -45,170 +45,88 @@ out_stdout: |
   output_num: [906609]
   output_text: ''
 out_ast: |-
-  graph TD
-      node1["<b>Program</b>"]
-      node2["<b>FuncDecl</b><br>name=is_palindrome<br>return_type=bool"]
-      node1 -- "top_levels[0]" --> node2
-      node3["<b>Param</b><br>name=n<br>param_type=int"]
-      node2 -- "params[0]" --> node3
-      node4["<b>Block</b>"]
-      node2 -- "body" --> node4
-      node5["<b>VarDecl</b><br>name=original<br>var_type=int"]
-      node4 -- "stmts[0]" --> node5
-      node6["<b>Identifier</b><br>name=n"]
-      node5 -- "expr" --> node6
-      node7["<b>VarDecl</b><br>name=reversed<br>var_type=int"]
-      node4 -- "stmts[1]" --> node7
-      node8["<b>Literal</b><br>value=0<br>literal_type=INT_LIT"]
-      node7 -- "expr" --> node8
-      node9["<b>WhileStmt</b>"]
-      node4 -- "stmts[2]" --> node9
-      node10["<b>BinaryExpr</b><br>op=>"]
-      node9 -- "condition" --> node10
-      node11["<b>Identifier</b><br>name=n"]
-      node10 -- "left" --> node11
-      node12["<b>Literal</b><br>value=0<br>literal_type=INT_LIT"]
-      node10 -- "right" --> node12
-      node13["<b>Block</b>"]
-      node9 -- "body" --> node13
-      node14["<b>VarDecl</b><br>name=rem<br>var_type=int"]
-      node13 -- "stmts[0]" --> node14
-      node15["<b>BinaryExpr</b><br>op=%"]
-      node14 -- "expr" --> node15
-      node16["<b>Identifier</b><br>name=n"]
-      node15 -- "left" --> node16
-      node17["<b>Literal</b><br>value=10<br>literal_type=INT_LIT"]
-      node15 -- "right" --> node17
-      node18["<b>AssignStmt</b><br>name=reversed"]
-      node13 -- "stmts[1]" --> node18
-      node19["<b>BinaryExpr</b><br>op=+"]
-      node18 -- "expr" --> node19
-      node20["<b>BinaryExpr</b><br>op=*"]
-      node19 -- "left" --> node20
-      node21["<b>Identifier</b><br>name=reversed"]
-      node20 -- "left" --> node21
-      node22["<b>Literal</b><br>value=10<br>literal_type=INT_LIT"]
-      node20 -- "right" --> node22
-      node23["<b>Identifier</b><br>name=rem"]
-      node19 -- "right" --> node23
-      node24["<b>AssignStmt</b><br>name=n"]
-      node13 -- "stmts[2]" --> node24
-      node25["<b>BinaryExpr</b><br>op=/"]
-      node24 -- "expr" --> node25
-      node26["<b>Identifier</b><br>name=n"]
-      node25 -- "left" --> node26
-      node27["<b>Literal</b><br>value=10<br>literal_type=INT_LIT"]
-      node25 -- "right" --> node27
-      node28["<b>ReturnStmt</b>"]
-      node4 -- "stmts[3]" --> node28
-      node29["<b>BinaryExpr</b><br>op==="]
-      node28 -- "expr" --> node29
-      node30["<b>Identifier</b><br>name=original"]
-      node29 -- "left" --> node30
-      node31["<b>Identifier</b><br>name=reversed"]
-      node29 -- "right" --> node31
-      node32["<b>FuncDecl</b><br>name=main<br>return_type=void"]
-      node1 -- "top_levels[1]" --> node32
-      node33["<b>Block</b>"]
-      node32 -- "body" --> node33
-      node34["<b>VarDecl</b><br>name=max_pal<br>var_type=int"]
-      node33 -- "stmts[0]" --> node34
-      node35["<b>Literal</b><br>value=0<br>literal_type=INT_LIT"]
-      node34 -- "expr" --> node35
-      node36["<b>VarDecl</b><br>name=i<br>var_type=int"]
-      node33 -- "stmts[1]" --> node36
-      node37["<b>Literal</b><br>value=1000<br>literal_type=INT_LIT"]
-      node36 -- "expr" --> node37
-      node38["<b>WhileStmt</b>"]
-      node33 -- "stmts[2]" --> node38
-      node39["<b>BinaryExpr</b><br>op=>="]
-      node38 -- "condition" --> node39
-      node40["<b>UnaryExpr</b><br>op=--"]
-      node39 -- "left" --> node40
-      node41["<b>Identifier</b><br>name=i"]
-      node40 -- "expr" --> node41
-      node42["<b>Literal</b><br>value=100<br>literal_type=INT_LIT"]
-      node39 -- "right" --> node42
-      node43["<b>Block</b>"]
-      node38 -- "body" --> node43
-      node44["<b>IfStmt</b>"]
-      node43 -- "stmts[0]" --> node44
-      node45["<b>BinaryExpr</b><br>op=<="]
-      node44 -- "condition" --> node45
-      node46["<b>BinaryExpr</b><br>op=*"]
-      node45 -- "left" --> node46
-      node47["<b>Identifier</b><br>name=i"]
-      node46 -- "left" --> node47
-      node48["<b>Literal</b><br>value=999<br>literal_type=INT_LIT"]
-      node46 -- "right" --> node48
-      node49["<b>Identifier</b><br>name=max_pal"]
-      node45 -- "right" --> node49
-      node50["<b>Block</b>"]
-      node44 -- "then_block" --> node50
-      node51["<b>AssignStmt</b><br>name=i"]
-      node50 -- "stmts[0]" --> node51
-      node52["<b>Literal</b><br>value=100<br>literal_type=INT_LIT"]
-      node51 -- "expr" --> node52
-      node53["<b>Block</b>"]
-      node44 -- "else_block" --> node53
-      node54["<b>VarDecl</b><br>name=j<br>var_type=int"]
-      node53 -- "stmts[0]" --> node54
-      node55["<b>Literal</b><br>value=1000<br>literal_type=INT_LIT"]
-      node54 -- "expr" --> node55
-      node56["<b>WhileStmt</b>"]
-      node53 -- "stmts[1]" --> node56
-      node57["<b>BinaryExpr</b><br>op=>="]
-      node56 -- "condition" --> node57
-      node58["<b>UnaryExpr</b><br>op=--"]
-      node57 -- "left" --> node58
-      node59["<b>Identifier</b><br>name=j"]
-      node58 -- "expr" --> node59
-      node60["<b>Identifier</b><br>name=i"]
-      node57 -- "right" --> node60
-      node61["<b>Block</b>"]
-      node56 -- "body" --> node61
-      node62["<b>VarDecl</b><br>name=prod<br>var_type=int"]
-      node61 -- "stmts[0]" --> node62
-      node63["<b>BinaryExpr</b><br>op=*"]
-      node62 -- "expr" --> node63
-      node64["<b>Identifier</b><br>name=i"]
-      node63 -- "left" --> node64
-      node65["<b>Identifier</b><br>name=j"]
-      node63 -- "right" --> node65
-      node66["<b>IfStmt</b>"]
-      node61 -- "stmts[1]" --> node66
-      node67["<b>BinaryExpr</b><br>op=<="]
-      node66 -- "condition" --> node67
-      node68["<b>Identifier</b><br>name=prod"]
-      node67 -- "left" --> node68
-      node69["<b>Identifier</b><br>name=max_pal"]
-      node67 -- "right" --> node69
-      node70["<b>Block</b>"]
-      node66 -- "then_block" --> node70
-      node71["<b>AssignStmt</b><br>name=j"]
-      node70 -- "stmts[0]" --> node71
-      node72["<b>Identifier</b><br>name=i"]
-      node71 -- "expr" --> node72
-      node73["<b>Block</b>"]
-      node66 -- "else_block" --> node73
-      node74["<b>IfStmt</b>"]
-      node73 -- "stmts[0]" --> node74
-      node75["<b>FuncCall</b><br>name=is_palindrome"]
-      node74 -- "condition" --> node75
-      node76["<b>Identifier</b><br>name=prod"]
-      node75 -- "args[0]" --> node76
-      node77["<b>Block</b>"]
-      node74 -- "then_block" --> node77
-      node78["<b>AssignStmt</b><br>name=max_pal"]
-      node77 -- "stmts[0]" --> node78
-      node79["<b>Identifier</b><br>name=prod"]
-      node78 -- "expr" --> node79
-      node80["<b>ExprStmt</b>"]
-      node33 -- "stmts[3]" --> node80
-      node81["<b>FuncCall</b><br>name=print"]
-      node80 -- "expr" --> node81
-      node82["<b>Identifier</b><br>name=max_pal"]
-      node81 -- "args[0]" --> node82
+  Program
+  ├─ top_levels[0]: FuncDecl  name='is_palindrome' return_type='bool'
+  │  ├─ params[0]: Param  name='n' param_type='int'
+  │  └─ body: Block
+  │     ├─ stmts[0]: VarDecl  name='original' var_type='int'
+  │     │  └─ expr: Identifier  name='n'
+  │     ├─ stmts[1]: VarDecl  name='reversed' var_type='int'
+  │     │  └─ expr: Literal  value=0 literal_type='INT_LIT'
+  │     ├─ stmts[2]: WhileStmt
+  │     │  ├─ condition: BinaryExpr  op='>'
+  │     │  │  ├─ left: Identifier  name='n'
+  │     │  │  └─ right: Literal  value=0 literal_type='INT_LIT'
+  │     │  └─ body: Block
+  │     │     ├─ stmts[0]: VarDecl  name='rem' var_type='int'
+  │     │     │  └─ expr: BinaryExpr  op='%'
+  │     │     │     ├─ left: Identifier  name='n'
+  │     │     │     └─ right: Literal  value=10 literal_type='INT_LIT'
+  │     │     ├─ stmts[1]: AssignStmt  name='reversed'
+  │     │     │  └─ expr: BinaryExpr  op='+'
+  │     │     │     ├─ left: BinaryExpr  op='*'
+  │     │     │     │  ├─ left: Identifier  name='reversed'
+  │     │     │     │  └─ right: Literal  value=10 literal_type='INT_LIT'
+  │     │     │     └─ right: Identifier  name='rem'
+  │     │     └─ stmts[2]: AssignStmt  name='n'
+  │     │        └─ expr: BinaryExpr  op='/'
+  │     │           ├─ left: Identifier  name='n'
+  │     │           └─ right: Literal  value=10 literal_type='INT_LIT'
+  │     └─ stmts[3]: ReturnStmt
+  │        └─ expr: BinaryExpr  op='=='
+  │           ├─ left: Identifier  name='original'
+  │           └─ right: Identifier  name='reversed'
+  └─ top_levels[1]: FuncDecl  name='main' return_type='void'
+     └─ body: Block
+        ├─ stmts[0]: VarDecl  name='max_pal' var_type='int'
+        │  └─ expr: Literal  value=0 literal_type='INT_LIT'
+        ├─ stmts[1]: VarDecl  name='i' var_type='int'
+        │  └─ expr: Literal  value=1000 literal_type='INT_LIT'
+        ├─ stmts[2]: WhileStmt
+        │  ├─ condition: BinaryExpr  op='>='
+        │  │  ├─ left: UnaryExpr  op='--'
+        │  │  │  └─ expr: Identifier  name='i'
+        │  │  └─ right: Literal  value=100 literal_type='INT_LIT'
+        │  └─ body: Block
+        │     └─ stmts[0]: IfStmt
+        │        ├─ condition: BinaryExpr  op='<='
+        │        │  ├─ left: BinaryExpr  op='*'
+        │        │  │  ├─ left: Identifier  name='i'
+        │        │  │  └─ right: Literal  value=999 literal_type='INT_LIT'
+        │        │  └─ right: Identifier  name='max_pal'
+        │        ├─ then_block: Block
+        │        │  └─ stmts[0]: AssignStmt  name='i'
+        │        │     └─ expr: Literal  value=100 literal_type='INT_LIT'
+        │        └─ else_block: Block
+        │           ├─ stmts[0]: VarDecl  name='j' var_type='int'
+        │           │  └─ expr: Literal  value=1000 literal_type='INT_LIT'
+        │           └─ stmts[1]: WhileStmt
+        │              ├─ condition: BinaryExpr  op='>='
+        │              │  ├─ left: UnaryExpr  op='--'
+        │              │  │  └─ expr: Identifier  name='j'
+        │              │  └─ right: Identifier  name='i'
+        │              └─ body: Block
+        │                 ├─ stmts[0]: VarDecl  name='prod' var_type='int'
+        │                 │  └─ expr: BinaryExpr  op='*'
+        │                 │     ├─ left: Identifier  name='i'
+        │                 │     └─ right: Identifier  name='j'
+        │                 └─ stmts[1]: IfStmt
+        │                    ├─ condition: BinaryExpr  op='<='
+        │                    │  ├─ left: Identifier  name='prod'
+        │                    │  └─ right: Identifier  name='max_pal'
+        │                    ├─ then_block: Block
+        │                    │  └─ stmts[0]: AssignStmt  name='j'
+        │                    │     └─ expr: Identifier  name='i'
+        │                    └─ else_block: Block
+        │                       └─ stmts[0]: IfStmt
+        │                          ├─ condition: FuncCall  name='is_palindrome'
+        │                          │  └─ args[0]: Identifier  name='prod'
+        │                          └─ then_block: Block
+        │                             └─ stmts[0]: AssignStmt  name='max_pal'
+        │                                └─ expr: Identifier  name='prod'
+        └─ stmts[3]: ExprStmt
+           └─ expr: FuncCall  name='print'
+              └─ args[0]: Identifier  name='max_pal'
 out_code: 30 00 00 27 01 00 00 72 04 00 00 73 03 00 00 00 04 00 00 74 01 00 00 72
   21 00 00 00 34 00 00 0A 03 00 00 00 30 00 00 0B 03 00 00 01 31 00 00 1B 01 00
   00 72 19 00 00 0A 04 00 00 75 01 00 00 74 15 00 00 0A 40 00 00 00 01 00 00 75

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from .tokenizer import Token
 
 
+@dataclass
 class ASTNode:
     pass
 

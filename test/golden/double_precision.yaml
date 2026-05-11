@@ -50,222 +50,114 @@ out_stdout: |
   output_num: [0, 0, 0, 2, 0, 0, 0, 3]
   output_text: '\x00\x00\x00\x02\x00\x00\x00\x03'
 out_ast: |-
-  graph TD
-      node1["<b>Program</b>"]
-      node2["<b>FuncDecl</b><br>name=emit_word<br>return_type=void"]
-      node1 -- "top_levels[0]" --> node2
-      node3["<b>Param</b><br>name=w<br>param_type=int"]
-      node2 -- "params[0]" --> node3
-      node4["<b>Block</b>"]
-      node2 -- "body" --> node4
-      node5["<b>VarDecl</b><br>name=b3<br>var_type=int"]
-      node4 -- "stmts[0]" --> node5
-      node6["<b>BinaryExpr</b><br>op=%"]
-      node5 -- "expr" --> node6
-      node7["<b>BinaryExpr</b><br>op=/"]
-      node6 -- "left" --> node7
-      node8["<b>Identifier</b><br>name=w"]
-      node7 -- "left" --> node8
-      node9["<b>Literal</b><br>value=16777216<br>literal_type=INT_LIT"]
-      node7 -- "right" --> node9
-      node10["<b>Literal</b><br>value=256<br>literal_type=INT_LIT"]
-      node6 -- "right" --> node10
-      node11["<b>VarDecl</b><br>name=b2<br>var_type=int"]
-      node4 -- "stmts[1]" --> node11
-      node12["<b>BinaryExpr</b><br>op=%"]
-      node11 -- "expr" --> node12
-      node13["<b>BinaryExpr</b><br>op=/"]
-      node12 -- "left" --> node13
-      node14["<b>Identifier</b><br>name=w"]
-      node13 -- "left" --> node14
-      node15["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node13 -- "right" --> node15
-      node16["<b>Literal</b><br>value=256<br>literal_type=INT_LIT"]
-      node12 -- "right" --> node16
-      node17["<b>VarDecl</b><br>name=b1<br>var_type=int"]
-      node4 -- "stmts[2]" --> node17
-      node18["<b>BinaryExpr</b><br>op=%"]
-      node17 -- "expr" --> node18
-      node19["<b>BinaryExpr</b><br>op=/"]
-      node18 -- "left" --> node19
-      node20["<b>Identifier</b><br>name=w"]
-      node19 -- "left" --> node20
-      node21["<b>Literal</b><br>value=256<br>literal_type=INT_LIT"]
-      node19 -- "right" --> node21
-      node22["<b>Literal</b><br>value=256<br>literal_type=INT_LIT"]
-      node18 -- "right" --> node22
-      node23["<b>VarDecl</b><br>name=b0<br>var_type=int"]
-      node4 -- "stmts[3]" --> node23
-      node24["<b>BinaryExpr</b><br>op=%"]
-      node23 -- "expr" --> node24
-      node25["<b>Identifier</b><br>name=w"]
-      node24 -- "left" --> node25
-      node26["<b>Literal</b><br>value=256<br>literal_type=INT_LIT"]
-      node24 -- "right" --> node26
-      node27["<b>ExprStmt</b>"]
-      node4 -- "stmts[4]" --> node27
-      node28["<b>FuncCall</b><br>name=print"]
-      node27 -- "expr" --> node28
-      node29["<b>Identifier</b><br>name=b3"]
-      node28 -- "args[0]" --> node29
-      node30["<b>ExprStmt</b>"]
-      node4 -- "stmts[5]" --> node30
-      node31["<b>FuncCall</b><br>name=print"]
-      node30 -- "expr" --> node31
-      node32["<b>Identifier</b><br>name=b2"]
-      node31 -- "args[0]" --> node32
-      node33["<b>ExprStmt</b>"]
-      node4 -- "stmts[6]" --> node33
-      node34["<b>FuncCall</b><br>name=print"]
-      node33 -- "expr" --> node34
-      node35["<b>Identifier</b><br>name=b1"]
-      node34 -- "args[0]" --> node35
-      node36["<b>ExprStmt</b>"]
-      node4 -- "stmts[7]" --> node36
-      node37["<b>FuncCall</b><br>name=print"]
-      node36 -- "expr" --> node37
-      node38["<b>Identifier</b><br>name=b0"]
-      node37 -- "args[0]" --> node38
-      node39["<b>FuncDecl</b><br>name=main<br>return_type=void"]
-      node1 -- "top_levels[1]" --> node39
-      node40["<b>Block</b>"]
-      node39 -- "body" --> node40
-      node41["<b>VarDecl</b><br>name=a_hi<br>var_type=int"]
-      node40 -- "stmts[0]" --> node41
-      node42["<b>Literal</b><br>value=1<br>literal_type=INT_LIT"]
-      node41 -- "expr" --> node42
-      node43["<b>VarDecl</b><br>name=a_lo<br>var_type=int"]
-      node40 -- "stmts[1]" --> node43
-      node44["<b>Literal</b><br>value=4294967294<br>literal_type=INT_LIT"]
-      node43 -- "expr" --> node44
-      node45["<b>VarDecl</b><br>name=b_hi<br>var_type=int"]
-      node40 -- "stmts[2]" --> node45
-      node46["<b>Literal</b><br>value=0<br>literal_type=INT_LIT"]
-      node45 -- "expr" --> node46
-      node47["<b>VarDecl</b><br>name=b_lo<br>var_type=int"]
-      node40 -- "stmts[3]" --> node47
-      node48["<b>Literal</b><br>value=5<br>literal_type=INT_LIT"]
-      node47 -- "expr" --> node48
-      node49["<b>VarDecl</b><br>name=a_lo_hi<br>var_type=int"]
-      node40 -- "stmts[4]" --> node49
-      node50["<b>BinaryExpr</b><br>op=/"]
-      node49 -- "expr" --> node50
-      node51["<b>Identifier</b><br>name=a_lo"]
-      node50 -- "left" --> node51
-      node52["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node50 -- "right" --> node52
-      node53["<b>VarDecl</b><br>name=a_lo_lo<br>var_type=int"]
-      node40 -- "stmts[5]" --> node53
-      node54["<b>BinaryExpr</b><br>op=%"]
-      node53 -- "expr" --> node54
-      node55["<b>Identifier</b><br>name=a_lo"]
-      node54 -- "left" --> node55
-      node56["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node54 -- "right" --> node56
-      node57["<b>VarDecl</b><br>name=b_lo_hi<br>var_type=int"]
-      node40 -- "stmts[6]" --> node57
-      node58["<b>BinaryExpr</b><br>op=/"]
-      node57 -- "expr" --> node58
-      node59["<b>Identifier</b><br>name=b_lo"]
-      node58 -- "left" --> node59
-      node60["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node58 -- "right" --> node60
-      node61["<b>VarDecl</b><br>name=b_lo_lo<br>var_type=int"]
-      node40 -- "stmts[7]" --> node61
-      node62["<b>BinaryExpr</b><br>op=%"]
-      node61 -- "expr" --> node62
-      node63["<b>Identifier</b><br>name=b_lo"]
-      node62 -- "left" --> node63
-      node64["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node62 -- "right" --> node64
-      node65["<b>VarDecl</b><br>name=sum_lo<br>var_type=int"]
-      node40 -- "stmts[8]" --> node65
-      node66["<b>BinaryExpr</b><br>op=+"]
-      node65 -- "expr" --> node66
-      node67["<b>Identifier</b><br>name=a_lo_lo"]
-      node66 -- "left" --> node67
-      node68["<b>Identifier</b><br>name=b_lo_lo"]
-      node66 -- "right" --> node68
-      node69["<b>VarDecl</b><br>name=carry1<br>var_type=int"]
-      node40 -- "stmts[9]" --> node69
-      node70["<b>BinaryExpr</b><br>op=/"]
-      node69 -- "expr" --> node70
-      node71["<b>Identifier</b><br>name=sum_lo"]
-      node70 -- "left" --> node71
-      node72["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node70 -- "right" --> node72
-      node73["<b>VarDecl</b><br>name=part_lo<br>var_type=int"]
-      node40 -- "stmts[10]" --> node73
-      node74["<b>BinaryExpr</b><br>op=%"]
-      node73 -- "expr" --> node74
-      node75["<b>Identifier</b><br>name=sum_lo"]
-      node74 -- "left" --> node75
-      node76["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node74 -- "right" --> node76
-      node77["<b>VarDecl</b><br>name=sum_hi<br>var_type=int"]
-      node40 -- "stmts[11]" --> node77
-      node78["<b>BinaryExpr</b><br>op=+"]
-      node77 -- "expr" --> node78
-      node79["<b>BinaryExpr</b><br>op=+"]
-      node78 -- "left" --> node79
-      node80["<b>Identifier</b><br>name=a_lo_hi"]
-      node79 -- "left" --> node80
-      node81["<b>Identifier</b><br>name=b_lo_hi"]
-      node79 -- "right" --> node81
-      node82["<b>Identifier</b><br>name=carry1"]
-      node78 -- "right" --> node82
-      node83["<b>VarDecl</b><br>name=carry2<br>var_type=int"]
-      node40 -- "stmts[12]" --> node83
-      node84["<b>BinaryExpr</b><br>op=/"]
-      node83 -- "expr" --> node84
-      node85["<b>Identifier</b><br>name=sum_hi"]
-      node84 -- "left" --> node85
-      node86["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node84 -- "right" --> node86
-      node87["<b>VarDecl</b><br>name=part_hi<br>var_type=int"]
-      node40 -- "stmts[13]" --> node87
-      node88["<b>BinaryExpr</b><br>op=%"]
-      node87 -- "expr" --> node88
-      node89["<b>Identifier</b><br>name=sum_hi"]
-      node88 -- "left" --> node89
-      node90["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node88 -- "right" --> node90
-      node91["<b>VarDecl</b><br>name=result_lo<br>var_type=int"]
-      node40 -- "stmts[14]" --> node91
-      node92["<b>BinaryExpr</b><br>op=+"]
-      node91 -- "expr" --> node92
-      node93["<b>BinaryExpr</b><br>op=*"]
-      node92 -- "left" --> node93
-      node94["<b>Identifier</b><br>name=part_hi"]
-      node93 -- "left" --> node94
-      node95["<b>Literal</b><br>value=65536<br>literal_type=INT_LIT"]
-      node93 -- "right" --> node95
-      node96["<b>Identifier</b><br>name=part_lo"]
-      node92 -- "right" --> node96
-      node97["<b>VarDecl</b><br>name=result_hi<br>var_type=int"]
-      node40 -- "stmts[15]" --> node97
-      node98["<b>BinaryExpr</b><br>op=+"]
-      node97 -- "expr" --> node98
-      node99["<b>BinaryExpr</b><br>op=+"]
-      node98 -- "left" --> node99
-      node100["<b>Identifier</b><br>name=a_hi"]
-      node99 -- "left" --> node100
-      node101["<b>Identifier</b><br>name=b_hi"]
-      node99 -- "right" --> node101
-      node102["<b>Identifier</b><br>name=carry2"]
-      node98 -- "right" --> node102
-      node103["<b>ExprStmt</b>"]
-      node40 -- "stmts[16]" --> node103
-      node104["<b>FuncCall</b><br>name=emit_word"]
-      node103 -- "expr" --> node104
-      node105["<b>Identifier</b><br>name=result_hi"]
-      node104 -- "args[0]" --> node105
-      node106["<b>ExprStmt</b>"]
-      node40 -- "stmts[17]" --> node106
-      node107["<b>FuncCall</b><br>name=emit_word"]
-      node106 -- "expr" --> node107
-      node108["<b>Identifier</b><br>name=result_lo"]
-      node107 -- "args[0]" --> node108
+  Program
+  ├─ top_levels[0]: FuncDecl  name='emit_word' return_type='void'
+  │  ├─ params[0]: Param  name='w' param_type='int'
+  │  └─ body: Block
+  │     ├─ stmts[0]: VarDecl  name='b3' var_type='int'
+  │     │  └─ expr: BinaryExpr  op='%'
+  │     │     ├─ left: BinaryExpr  op='/'
+  │     │     │  ├─ left: Identifier  name='w'
+  │     │     │  └─ right: Literal  value=16777216 literal_type='INT_LIT'
+  │     │     └─ right: Literal  value=256 literal_type='INT_LIT'
+  │     ├─ stmts[1]: VarDecl  name='b2' var_type='int'
+  │     │  └─ expr: BinaryExpr  op='%'
+  │     │     ├─ left: BinaryExpr  op='/'
+  │     │     │  ├─ left: Identifier  name='w'
+  │     │     │  └─ right: Literal  value=65536 literal_type='INT_LIT'
+  │     │     └─ right: Literal  value=256 literal_type='INT_LIT'
+  │     ├─ stmts[2]: VarDecl  name='b1' var_type='int'
+  │     │  └─ expr: BinaryExpr  op='%'
+  │     │     ├─ left: BinaryExpr  op='/'
+  │     │     │  ├─ left: Identifier  name='w'
+  │     │     │  └─ right: Literal  value=256 literal_type='INT_LIT'
+  │     │     └─ right: Literal  value=256 literal_type='INT_LIT'
+  │     ├─ stmts[3]: VarDecl  name='b0' var_type='int'
+  │     │  └─ expr: BinaryExpr  op='%'
+  │     │     ├─ left: Identifier  name='w'
+  │     │     └─ right: Literal  value=256 literal_type='INT_LIT'
+  │     ├─ stmts[4]: ExprStmt
+  │     │  └─ expr: FuncCall  name='print'
+  │     │     └─ args[0]: Identifier  name='b3'
+  │     ├─ stmts[5]: ExprStmt
+  │     │  └─ expr: FuncCall  name='print'
+  │     │     └─ args[0]: Identifier  name='b2'
+  │     ├─ stmts[6]: ExprStmt
+  │     │  └─ expr: FuncCall  name='print'
+  │     │     └─ args[0]: Identifier  name='b1'
+  │     └─ stmts[7]: ExprStmt
+  │        └─ expr: FuncCall  name='print'
+  │           └─ args[0]: Identifier  name='b0'
+  └─ top_levels[1]: FuncDecl  name='main' return_type='void'
+     └─ body: Block
+        ├─ stmts[0]: VarDecl  name='a_hi' var_type='int'
+        │  └─ expr: Literal  value=1 literal_type='INT_LIT'
+        ├─ stmts[1]: VarDecl  name='a_lo' var_type='int'
+        │  └─ expr: Literal  value=4294967294 literal_type='INT_LIT'
+        ├─ stmts[2]: VarDecl  name='b_hi' var_type='int'
+        │  └─ expr: Literal  value=0 literal_type='INT_LIT'
+        ├─ stmts[3]: VarDecl  name='b_lo' var_type='int'
+        │  └─ expr: Literal  value=5 literal_type='INT_LIT'
+        ├─ stmts[4]: VarDecl  name='a_lo_hi' var_type='int'
+        │  └─ expr: BinaryExpr  op='/'
+        │     ├─ left: Identifier  name='a_lo'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[5]: VarDecl  name='a_lo_lo' var_type='int'
+        │  └─ expr: BinaryExpr  op='%'
+        │     ├─ left: Identifier  name='a_lo'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[6]: VarDecl  name='b_lo_hi' var_type='int'
+        │  └─ expr: BinaryExpr  op='/'
+        │     ├─ left: Identifier  name='b_lo'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[7]: VarDecl  name='b_lo_lo' var_type='int'
+        │  └─ expr: BinaryExpr  op='%'
+        │     ├─ left: Identifier  name='b_lo'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[8]: VarDecl  name='sum_lo' var_type='int'
+        │  └─ expr: BinaryExpr  op='+'
+        │     ├─ left: Identifier  name='a_lo_lo'
+        │     └─ right: Identifier  name='b_lo_lo'
+        ├─ stmts[9]: VarDecl  name='carry1' var_type='int'
+        │  └─ expr: BinaryExpr  op='/'
+        │     ├─ left: Identifier  name='sum_lo'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[10]: VarDecl  name='part_lo' var_type='int'
+        │  └─ expr: BinaryExpr  op='%'
+        │     ├─ left: Identifier  name='sum_lo'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[11]: VarDecl  name='sum_hi' var_type='int'
+        │  └─ expr: BinaryExpr  op='+'
+        │     ├─ left: BinaryExpr  op='+'
+        │     │  ├─ left: Identifier  name='a_lo_hi'
+        │     │  └─ right: Identifier  name='b_lo_hi'
+        │     └─ right: Identifier  name='carry1'
+        ├─ stmts[12]: VarDecl  name='carry2' var_type='int'
+        │  └─ expr: BinaryExpr  op='/'
+        │     ├─ left: Identifier  name='sum_hi'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[13]: VarDecl  name='part_hi' var_type='int'
+        │  └─ expr: BinaryExpr  op='%'
+        │     ├─ left: Identifier  name='sum_hi'
+        │     └─ right: Literal  value=65536 literal_type='INT_LIT'
+        ├─ stmts[14]: VarDecl  name='result_lo' var_type='int'
+        │  └─ expr: BinaryExpr  op='+'
+        │     ├─ left: BinaryExpr  op='*'
+        │     │  ├─ left: Identifier  name='part_hi'
+        │     │  └─ right: Literal  value=65536 literal_type='INT_LIT'
+        │     └─ right: Identifier  name='part_lo'
+        ├─ stmts[15]: VarDecl  name='result_hi' var_type='int'
+        │  └─ expr: BinaryExpr  op='+'
+        │     ├─ left: BinaryExpr  op='+'
+        │     │  ├─ left: Identifier  name='a_hi'
+        │     │  └─ right: Identifier  name='b_hi'
+        │     └─ right: Identifier  name='carry2'
+        ├─ stmts[16]: ExprStmt
+        │  └─ expr: FuncCall  name='emit_word'
+        │     └─ args[0]: Identifier  name='result_hi'
+        └─ stmts[17]: ExprStmt
+           └─ expr: FuncCall  name='emit_word'
+              └─ args[0]: Identifier  name='result_lo'
 out_code: 30 00 00 1D 01 00 00 6B 40 00 00 00 01 00 00 6E 04 00 00 6D 41 00 00 00
   16 00 00 6D 19 00 01 00 04 00 00 6C 01 00 00 6B 17 01 00 00 19 00 01 00 04 00
   00 6F 01 00 00 6B 17 00 01 00 19 00 01 00 04 00 00 70 01 00 00 6B 19 00 01 00
