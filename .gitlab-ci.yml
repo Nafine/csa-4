@@ -37,4 +37,4 @@ pytest:
   stage: test
   <<: *uv_setup
   script:
-    - uv run pytest -q
+    - uv run pytest -v
