@@ -39,8 +39,6 @@ GOLDEN_DIR = Path(__file__).resolve().parent / 'golden'
 CASES = sorted(p.stem for p in GOLDEN_DIR.glob('*.yaml'))
 REGEN = os.environ.get('REGEN') == '1'
 
-SLOW_CASES = {'prob1'}
-
 TRACE_HEAD_TICKS = 200
 
 
@@ -110,10 +108,7 @@ def _trace_head(code_words: list[int], stdin: str | None, limit: int) -> str:
 def _params() -> list:
     out = []
     for case in CASES:
-        if case in SLOW_CASES:
-            out.append(pytest.param(case, marks=pytest.mark.slow))
-        else:
-            out.append(case)
+        out.append(case)
     return out
 
 

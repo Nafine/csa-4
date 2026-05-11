@@ -76,8 +76,6 @@ unary_expr ::= "!" expr
     | "++" ID
     | "--" ID
 
-prefix_expr ::= ("++" | "--") ID
-
 primary_expr ::= ID
     | INT_LIT
     | BOOL_LIT
@@ -334,7 +332,12 @@ src → tokenize → parse → analyze → codegen → (instructions, data) → 
 - Memory-mapped I/O.
 - Microcode control unit (отдельная память микрокоманд `MROM`).
 
+### Data Path
+
 ![Data Path](/docs/CSA%204%20DP.png)
+
+### Control Unit
+
 ![Control Unit](/docs/CSA%204%20CU.png)
 
 ### Data Path
@@ -373,7 +376,7 @@ src → tokenize → parse → analyze → codegen → (instructions, data) → 
       CR и mp срабатывают на одном фронте.
 
 Реализация условных команд (`BEQ`, `BNE`, `BGE`, `BGT`, `BLE`, `BLT`) - это именно конструкции из
-2–3 микрокоманд: по флагам выбирается либо ветка тела `JMP` (адрес `41`), либо возврат на `FETCH`.
+2–3 микрокоманд: по флагам выбирается либо ветка тела `JMP`, либо возврат на `FETCH`.
 
 ### I/O
 
@@ -411,8 +414,8 @@ src → tokenize → parse → analyze → codegen → (instructions, data) → 
 | 8-6   | `cond`      | `000 NONE, 001 ALWAYS, 010 EQ, 011 GE, 100 NE, 101 LT, 111 DECODE`       |
 | 5-0   | `next_addr` | адрес следующей микрокоманды (если активирован условием)                 |
 
-Цикл `FETCH` занимает 3 такта (микрокоманды 0–2): `AR <- IP`; `DR <- Mem[AR]`, `IP <- IP + 1`;
-`CR <- DR`, `mp <- DECODER[CR.opcode]`. Дальше выполняется обработчик инструкции и в финальной
+Цикл `FETCH` занимает 3 такта: `AR <- IP`; `DR <- Mem[AR]`, `IP <- IP + 1`;
+`CR <- DR`, `mp <- DECODER[DR]`. Дальше выполняется обработчик инструкции и в финальной
 микрокоманде каждой инструкции стоит `cond = ALWAYS, next_addr = 0` - возврат к началу `FETCH`.
 
 ## Тестирование
@@ -453,40 +456,39 @@ def main() void {
 ```bash
 $ uv run python cli.py compile hello.tw hello.bin
 $ cat hello.bin.txt | head
-0000 - 30000010 - JMP 0x10
-0001 - 03000022 - LDI 0x22
-0002 - 04000022 - ST 0x22
+0000 - 30000001 - JMP 0x01
+0001 - 0300000b - LDI 0x0b
+0002 - 04000018 - ST 0x18
 ...
 
 $ printf "" > empty.in
 $ uv run python cli.py run hello.bin empty.in hello.trace
-Time in ms: 12
+Time in ms: 3
 hello world
 ```
 
 Фрагмент `hello.trace`:
 
 ```text
-Tick: [1]  uPC=01 CR=00000000
-ACC=          0 IP=00000000 SP=00000ffd
-AR=00000000 Z=0 N=0
+Tick: [1] uPC=01 CR=00000000
+ACC=          0 IP=00000000 SP=00fffffd
+AR=00000000 DR=00000000 Z=0 N=0
 -----------------------------
-Tick: [2]  uPC=02 CR=00000000
-ACC=          0 IP=00000001 SP=00000ffd
-AR=00000000 Z=0 N=0
+Tick: [2] uPC=02 CR=00000000
+ACC=          0 IP=00000001 SP=00fffffd
+AR=00000000 DR=30000001 Z=0 N=0
 -----------------------------
+
 ```
 
 Поля: `Tick` - счётчик тактов; `uPC` - адрес микрокоманды в `MROM`; `CR` - текущая инструкция
-(`opcode | operand`); `ACC`, `IP`, `SP`, `AR` - регистры; `Z`, `N` - флаги.
+(`opcode | operand`); `ACC`, `DR`, `IP`, `SP`, `AR` - регистры; `Z`, `N` - флаги.
 
 ### Запуск тестов
 
 ```bash
 uv run pytest -q                  # все тесты
-uv run pytest -q -m "not slow"    # без prob1 (быстрые ~0.5 c)
 REGEN=1 uv run pytest -q          # перегенерировать эталоны golden-тестов
 ```
 
-CI запускает `ruff check`, `mypy` (strict) и `pytest -q` на каждый push в `main` и pull request
-(см. `.github/workflows/ci.yml`).
+CI запускает `ruff check`, `mypy` (strict) и `pytest -v` на каждый push в `main` и merge request
