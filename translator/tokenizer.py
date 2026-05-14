@@ -13,7 +13,7 @@ def tokenize(code: str) -> list[Token]:
         ('INT_LIT', r'\d+'),
         ('STRING_LIT', r'"(?:\\.|[^"\\])*"'),
         ('BOOL_LIT', r'\b(?:true|false)\b'),
-        ('KEYWORD', r'\b(?:def|var|if|else|while|return|print|read|int|float|bool|string|void)\b'),
+        ('KEYWORD', r'\b(?:def|var|if|else|while|return|print|read|int|bool|string|void)\b'),
         ('ID', r'[a-zA-Z_][a-zA-Z0-9_]*'),
         ('OP', r':=|\|\||&&|==|!=|<=|>=|\+\+|\-\-|[+\-*/%<>=!]'),
         ('PUNCT', r'[(){}\[\],;]'),

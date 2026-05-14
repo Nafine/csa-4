@@ -289,8 +289,6 @@ class CodeGenerator:
     def _literal_to_int(lit: Literal) -> int:
         if lit.literal_type == 'INT_LIT':
             return int(lit.value)
-        if lit.literal_type == 'FLOAT_LIT':
-            return int(lit.value)
         if lit.literal_type == 'BOOL_LIT':
             return 1 if lit.value else 0
         raise CodegenError(f'cannot statically materialize literal type: {lit.literal_type}')
