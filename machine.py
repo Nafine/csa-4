@@ -1,7 +1,7 @@
 from collections import deque
 from dataclasses import dataclass
 
-from microcode import DECODER, MROM, Cond, MemInAddress, IpSel, ArSel
+from microcode import DECODER, MROM, ArSel, Cond, MemInAddress, PcSel
 
 MASK_32 = (1 << 32) - 1
 MASK_24 = (1 << 24) - 1
@@ -21,14 +21,14 @@ def _predecode(mc: int) -> tuple[int, ...]:
         (mc >> 27) & 1,  # 2  acc_l
         (mc >> 26) & 1,  # 3  dr_l
         (mc >> 25) & 1,  # 4  sp_l
-        (mc >> 24) & 1,  # 5  ip_l
+        (mc >> 24) & 1,  # 5  pc_l
         (mc >> 23) & 1,  # 6  cr_l
         (mc >> 22) & 1,  # 7  ar_l
-        (mc >> 21) & 1,  # 8  mem_src (0 = ACC, 1 = IP)
-        (mc >> 20) & 1,  # 9  mem_in_addr (0 = IP, 1 = AR)
+        (mc >> 21) & 1,  # 8  mem_src (0 = ACC, 1 = PC)
+        (mc >> 20) & 1,  # 9  mem_in_addr (0 = PC, 1 = AR)
         (mc >> 19) & 1,  # 10  mem_w
         (mc >> 17) & 0b11,  # 11 ar_sel
-        (mc >> 16) & 1,  # 12 ip_sel
+        (mc >> 16) & 1,  # 12 pc_sel
         (mc >> 14) & 0b11,  # 13 alu_left
         (mc >> 12) & 0b11,  # 14 alu_right
         (mc >> 9) & 0b111,  # 15 alu
@@ -44,10 +44,11 @@ DECODED_MROM = tuple(_predecode(word) for word in MROM)
 @dataclass(frozen=True)
 class CpuState:
     tick: int
-    mp: int
+    mpc: int
+    executed_mpc: int
     cr: int
     acc: int
-    ip: int
+    pc: int
     sp: int
     ar: int
     dr: int
@@ -63,7 +64,7 @@ class DataPath:
     # another optimization costil' 🙏
     __slots__ = (
         'data_mem', 'input_buffer', 'output_buffer',
-        'acc', 'dr', 'ip', 'sp', 'ar', 'cr', 'Z', 'N',
+        'acc', 'dr', 'pc', 'sp', 'ar', 'cr', 'Z', 'N',
     )
 
     MEM_SIZE = 2 ** 24
@@ -87,7 +88,7 @@ class DataPath:
 
         self.acc = 0
         self.dr = 0
-        self.ip = 0
+        self.pc = 0
         self.sp = (self.INPUT_ADDR - 1) & MASK_24
         self.ar = 0
         self.cr = 0
@@ -98,11 +99,12 @@ class DataPath:
 
 class ControlUnit:
     # 🙏🙏🙏
-    __slots__ = ('dp', 'mp', 'tick', 'halted')
+    __slots__ = ('dp', 'mpc', 'executed_mpc', 'tick', 'halted')
 
     def __init__(self, input_buffer: list[int] | None = None):
         self.dp = DataPath(input_buffer)
-        self.mp = 0
+        self.mpc = 0
+        self.executed_mpc = 0
         self.tick = 0
         self.halted = False
 
@@ -110,10 +112,11 @@ class ControlUnit:
         dp = self.dp
         return CpuState(
             tick=self.tick,
-            mp=self.mp,
+            mpc=self.mpc,
+            executed_mpc=self.executed_mpc,
             cr=dp.cr,
             acc=dp.acc,
-            ip=dp.ip,
+            pc=dp.pc,
             sp=dp.sp,
             ar=dp.ar,
             dr=dp.dr,
@@ -123,10 +126,11 @@ class ControlUnit:
 
     def step(self) -> None:
         dp = self.dp
-        mp = self.mp
-        (halted, flag_l, acc_l, dr_l, sp_l, ip_l, cr_l, ar_l,
-         mem_src, mem_in_addr, mem_w, ar_sel, ip_sel, alu_left, alu_right, alu, cond,
-         next_addr) = DECODED_MROM[mp]
+        mpc = self.mpc
+        self.executed_mpc = mpc
+        (halted, flag_l, acc_l, dr_l, sp_l, pc_l, cr_l, ar_l,
+         mem_src, mem_in_addr, mem_w, ar_sel, pc_sel, alu_left, alu_right, alu, cond,
+         next_addr) = DECODED_MROM[mpc]
         self.tick += 1
 
         decode_input = dp.dr
@@ -145,7 +149,7 @@ class ControlUnit:
         elif alu_right == 1:
             right = dp.cr & MASK_24
         elif alu_right == 2:
-            right = dp.ip
+            right = dp.pc
         else:
             right = dp.dr
 
@@ -171,7 +175,7 @@ class ControlUnit:
             dp.Z = 1 if result == 0 else 0
 
         if mem_w:
-            value = dp.ip if mem_src == 1 else dp.acc
+            value = dp.pc if mem_src == 1 else dp.acc
             ar = dp.ar
             if ar == DataPath.OUTPUT_ADDR:
                 dp.output_buffer.append(value)
@@ -186,9 +190,9 @@ class ControlUnit:
                 else:
                     raise DataPathException('input_buffer is empty')
             else:
-                dp.dr = dp.data_mem[ar if mem_in_addr == MemInAddress.AR else dp.ip]
-        if ip_l:
-            dp.ip = result if ip_sel == IpSel.ALU & MASK_24 else dp.ip + 1
+                dp.dr = dp.data_mem[ar if mem_in_addr == MemInAddress.AR else dp.pc]
+        if pc_l:
+            dp.pc = result if pc_sel == PcSel.ALU & MASK_24 else dp.pc + 1
         if sp_l:
             dp.sp = result & MASK_24
         if cr_l:
@@ -204,20 +208,19 @@ class ControlUnit:
             dp.acc = result
 
         if cond == Cond.NONE:
-            self.mp = (mp + 1) & 0x7F
+            self.mpc = (mpc + 1) & 0x7F
         elif cond == Cond.ALWAYS:
-            self.mp = next_addr
+            self.mpc = next_addr
         elif cond == Cond.EQ:
-            self.mp = next_addr if z_old == 1 else (mp + 1) & 0x7F
+            self.mpc = next_addr if z_old == 1 else (mpc + 1) & 0x7F
         elif cond == Cond.GE:
-            self.mp = next_addr if n_old == 0 else (mp + 1) & 0x7F
+            self.mpc = next_addr if n_old == 0 else (mpc + 1) & 0x7F
         elif cond == Cond.NE:
-            self.mp = next_addr if z_old == 0 else (mp + 1) & 0x7F
+            self.mpc = next_addr if z_old == 0 else (mpc + 1) & 0x7F
         elif cond == Cond.LT:
-            self.mp = next_addr if n_old == 1 else (mp + 1) & 0x7F
+            self.mpc = next_addr if n_old == 1 else (mpc + 1) & 0x7F
         elif cond == Cond.DECODE:
-            print(f'decode: {decode_input >> 24}: {DECODER[(decode_input >> 24) & 0xFF]}')
-            self.mp = DECODER[(decode_input >> 24) & 0xFF]
+            self.mpc = DECODER[(decode_input >> 24) & 0xFF]
 
         if halted:
             self.halted = True

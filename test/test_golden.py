@@ -10,7 +10,7 @@ from ast_translate import format_ast
 from cli import compile_source
 from isa import Instruction, write_debug
 from machine import ControlUnit
-from simulator import format_state
+from simulator import format_microcode, format_state
 from translator.parser import Parser
 from translator.semantic import SemanticAnalyzer
 from translator.tokenizer import tokenize
@@ -105,6 +105,15 @@ def _trace_head(code_words: list[int], stdin: str | None, limit: int) -> str:
     return '\n'.join(lines)
 
 
+def _microcode_head(code_words: list[int], stdin: str | None, limit: int) -> str:
+    cu = _make_cu(code_words, stdin)
+    lines: list[str] = []
+    while not cu.halted and cu.tick < limit and len(lines) < TRACE_HEAD_TICKS:
+        cu.step()
+        lines.append(format_microcode(cu.snapshot()).rstrip('\n'))
+    return '\n'.join(lines)
+
+
 def _params() -> list:
     out = []
     for case in CASES:
@@ -137,6 +146,7 @@ def test_golden(case: str) -> None:
 
     out_stdout = _format_stdout(cu)
     out_log = _trace_head(code_words, in_buffer, limit)
+    out_microcode = _microcode_head(code_words, in_buffer, limit)
 
     if REGEN:
         new_spec = {
@@ -148,6 +158,7 @@ def test_golden(case: str) -> None:
             'out_code': out_code,
             'out_code_hex': LiteralStr(out_code_hex.rstrip('\n')),
             'out_log': LiteralStr(out_log.rstrip('\n')),
+            'out_microcode': LiteralStr(out_microcode.rstrip('\n')),
         }
         with path.open('w', encoding='utf-8') as f:
             yaml.safe_dump(new_spec, f, sort_keys=False, allow_unicode=True, width=78)
@@ -161,3 +172,4 @@ def test_golden(case: str) -> None:
     assert _norm(spec.get('out_stdout')) == _norm(out_stdout), f'{case}: out_stdout mismatch'
     assert _norm(spec.get('out_code_hex')) == _norm(out_code_hex), f'{case}: out_code_hex mismatch'
     assert _norm(spec.get('out_log')) == _norm(out_log), f'{case}: out_log mismatch'
+    assert _norm(spec.get('out_microcode')) == _norm(out_microcode), f'{case}: out_microcode mismatch'

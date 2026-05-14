@@ -9,7 +9,7 @@ in_source: |-
 in_limit: 5000
 in_buffer: [97, 98, 99, 100, 0]
 out_stdout: |
-  ticks: 247
+  ticks: 173
   output_words: 4
   output_hex: ['0x61', '0x62', '0x63', '0x64']
   output_num: [97, 98, 99, 100]
@@ -52,803 +52,350 @@ out_code_hex: |-
   000f - ff000000 - HALT 0x00
   0010 - 00000000 - .word 0x0
 out_log: |-
-  Tick: [1] uPC=01 CR=00000000
-  ACC=          0 IP=00000000 SP=00fffffd
-  AR=00000000 DR=00000000 Z=0 N=0
-  -----------------------------
-  Tick: [2] uPC=02 CR=00000000
-  ACC=          0 IP=00000001 SP=00fffffd
-  AR=00000000 DR=30000001 Z=0 N=0
-  -----------------------------
-  Tick: [3] uPC=45 CR=30000001
-  ACC=          0 IP=00000001 SP=00fffffd
-  AR=00000000 DR=30000001 Z=0 N=0
-  -----------------------------
-  Tick: [4] uPC=00 CR=30000001
-  ACC=          0 IP=00000001 SP=00fffffd
-  AR=00000000 DR=30000001 Z=0 N=0
-  -----------------------------
-  Tick: [5] uPC=01 CR=30000001
-  ACC=          0 IP=00000001 SP=00fffffd
-  AR=00000001 DR=30000001 Z=0 N=0
-  -----------------------------
-  Tick: [6] uPC=02 CR=30000001
-  ACC=          0 IP=00000002 SP=00fffffd
-  AR=00000001 DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [7] uPC=03 CR=01fffffe
-  ACC=          0 IP=00000002 SP=00fffffd
-  AR=00000001 DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [8] uPC=04 CR=01fffffe
-  ACC=          0 IP=00000002 SP=00fffffd
-  AR=00fffffe DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [9] uPC=05 CR=01fffffe
-  ACC=          0 IP=00000002 SP=00fffffd
-  AR=00fffffe DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [10] uPC=00 CR=01fffffe
-  ACC=         97 IP=00000002 SP=00fffffd
-  AR=00fffffe DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [11] uPC=01 CR=01fffffe
-  ACC=         97 IP=00000002 SP=00fffffd
-  AR=00000002 DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [12] uPC=02 CR=01fffffe
-  ACC=         97 IP=00000003 SP=00fffffd
-  AR=00000002 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [13] uPC=12 CR=04000010
-  ACC=         97 IP=00000003 SP=00fffffd
-  AR=00000002 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [14] uPC=13 CR=04000010
-  ACC=         97 IP=00000003 SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [15] uPC=00 CR=04000010
-  ACC=         97 IP=00000003 SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [16] uPC=01 CR=04000010
-  ACC=         97 IP=00000003 SP=00fffffd
-  AR=00000003 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [17] uPC=02 CR=04000010
-  ACC=         97 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [18] uPC=03 CR=01000010
-  ACC=         97 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [19] uPC=04 CR=01000010
-  ACC=         97 IP=00000004 SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [20] uPC=05 CR=01000010
-  ACC=         97 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [21] uPC=00 CR=01000010
-  ACC=         97 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [22] uPC=01 CR=01000010
-  ACC=         97 IP=00000004 SP=00fffffd
-  AR=00000004 DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [23] uPC=02 CR=01000010
-  ACC=         97 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [24] uPC=41 CR=21000000
-  ACC=         97 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [25] uPC=00 CR=21000000
-  ACC=         97 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [26] uPC=01 CR=21000000
-  ACC=         97 IP=00000005 SP=00fffffd
-  AR=00000005 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [27] uPC=02 CR=21000000
-  ACC=         97 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [28] uPC=48 CR=32000008
-  ACC=         97 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [29] uPC=45 CR=32000008
-  ACC=         97 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [30] uPC=00 CR=32000008
-  ACC=         97 IP=00000008 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [31] uPC=01 CR=32000008
-  ACC=         97 IP=00000008 SP=00fffffd
-  AR=00000008 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [32] uPC=02 CR=32000008
-  ACC=         97 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [33] uPC=11 CR=03000001
-  ACC=         97 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [34] uPC=00 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [35] uPC=01 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000009 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [36] uPC=02 CR=03000001
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [37] uPC=46 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [38] uPC=47 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [39] uPC=00 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [40] uPC=01 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=0000000a DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [41] uPC=02 CR=3100000f
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [42] uPC=03 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [43] uPC=04 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [44] uPC=05 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [45] uPC=00 CR=01000010
-  ACC=         97 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [46] uPC=01 CR=01000010
-  ACC=         97 IP=0000000b SP=00fffffd
-  AR=0000000b DR=00000061 Z=0 N=0
-  -----------------------------
-  Tick: [47] uPC=02 CR=01000010
-  ACC=         97 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [48] uPC=12 CR=04ffffff
-  ACC=         97 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [49] uPC=13 CR=04ffffff
-  ACC=         97 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [50] uPC=00 CR=04ffffff
-  ACC=         97 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [51] uPC=01 CR=04ffffff
-  ACC=         97 IP=0000000c SP=00fffffd
-  AR=0000000c DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [52] uPC=02 CR=04ffffff
-  ACC=         97 IP=0000000d SP=00fffffd
-  AR=0000000c DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [53] uPC=03 CR=01fffffe
-  ACC=         97 IP=0000000d SP=00fffffd
-  AR=0000000c DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [54] uPC=04 CR=01fffffe
-  ACC=         97 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [55] uPC=05 CR=01fffffe
-  ACC=         97 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [56] uPC=00 CR=01fffffe
-  ACC=         98 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [57] uPC=01 CR=01fffffe
-  ACC=         98 IP=0000000d SP=00fffffd
-  AR=0000000d DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [58] uPC=02 CR=01fffffe
-  ACC=         98 IP=0000000e SP=00fffffd
-  AR=0000000d DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [59] uPC=12 CR=04000010
-  ACC=         98 IP=0000000e SP=00fffffd
-  AR=0000000d DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [60] uPC=13 CR=04000010
-  ACC=         98 IP=0000000e SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [61] uPC=00 CR=04000010
-  ACC=         98 IP=0000000e SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [62] uPC=01 CR=04000010
-  ACC=         98 IP=0000000e SP=00fffffd
-  AR=0000000e DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [63] uPC=02 CR=04000010
-  ACC=         98 IP=0000000f SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [64] uPC=45 CR=30000003
-  ACC=         98 IP=0000000f SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [65] uPC=00 CR=30000003
-  ACC=         98 IP=00000003 SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [66] uPC=01 CR=30000003
-  ACC=         98 IP=00000003 SP=00fffffd
-  AR=00000003 DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [67] uPC=02 CR=30000003
-  ACC=         98 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [68] uPC=03 CR=01000010
-  ACC=         98 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [69] uPC=04 CR=01000010
-  ACC=         98 IP=00000004 SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [70] uPC=05 CR=01000010
-  ACC=         98 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [71] uPC=00 CR=01000010
-  ACC=         98 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [72] uPC=01 CR=01000010
-  ACC=         98 IP=00000004 SP=00fffffd
-  AR=00000004 DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [73] uPC=02 CR=01000010
-  ACC=         98 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [74] uPC=41 CR=21000000
-  ACC=         98 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [75] uPC=00 CR=21000000
-  ACC=         98 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [76] uPC=01 CR=21000000
-  ACC=         98 IP=00000005 SP=00fffffd
-  AR=00000005 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [77] uPC=02 CR=21000000
-  ACC=         98 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [78] uPC=48 CR=32000008
-  ACC=         98 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [79] uPC=45 CR=32000008
-  ACC=         98 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [80] uPC=00 CR=32000008
-  ACC=         98 IP=00000008 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [81] uPC=01 CR=32000008
-  ACC=         98 IP=00000008 SP=00fffffd
-  AR=00000008 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [82] uPC=02 CR=32000008
-  ACC=         98 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [83] uPC=11 CR=03000001
-  ACC=         98 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [84] uPC=00 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [85] uPC=01 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000009 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [86] uPC=02 CR=03000001
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [87] uPC=46 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [88] uPC=47 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [89] uPC=00 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [90] uPC=01 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=0000000a DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [91] uPC=02 CR=3100000f
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [92] uPC=03 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [93] uPC=04 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [94] uPC=05 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [95] uPC=00 CR=01000010
-  ACC=         98 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [96] uPC=01 CR=01000010
-  ACC=         98 IP=0000000b SP=00fffffd
-  AR=0000000b DR=00000062 Z=0 N=0
-  -----------------------------
-  Tick: [97] uPC=02 CR=01000010
-  ACC=         98 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [98] uPC=12 CR=04ffffff
-  ACC=         98 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [99] uPC=13 CR=04ffffff
-  ACC=         98 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [100] uPC=00 CR=04ffffff
-  ACC=         98 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [101] uPC=01 CR=04ffffff
-  ACC=         98 IP=0000000c SP=00fffffd
-  AR=0000000c DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [102] uPC=02 CR=04ffffff
-  ACC=         98 IP=0000000d SP=00fffffd
-  AR=0000000c DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [103] uPC=03 CR=01fffffe
-  ACC=         98 IP=0000000d SP=00fffffd
-  AR=0000000c DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [104] uPC=04 CR=01fffffe
-  ACC=         98 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [105] uPC=05 CR=01fffffe
-  ACC=         98 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [106] uPC=00 CR=01fffffe
-  ACC=         99 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [107] uPC=01 CR=01fffffe
-  ACC=         99 IP=0000000d SP=00fffffd
-  AR=0000000d DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [108] uPC=02 CR=01fffffe
-  ACC=         99 IP=0000000e SP=00fffffd
-  AR=0000000d DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [109] uPC=12 CR=04000010
-  ACC=         99 IP=0000000e SP=00fffffd
-  AR=0000000d DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [110] uPC=13 CR=04000010
-  ACC=         99 IP=0000000e SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [111] uPC=00 CR=04000010
-  ACC=         99 IP=0000000e SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [112] uPC=01 CR=04000010
-  ACC=         99 IP=0000000e SP=00fffffd
-  AR=0000000e DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [113] uPC=02 CR=04000010
-  ACC=         99 IP=0000000f SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [114] uPC=45 CR=30000003
-  ACC=         99 IP=0000000f SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [115] uPC=00 CR=30000003
-  ACC=         99 IP=00000003 SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [116] uPC=01 CR=30000003
-  ACC=         99 IP=00000003 SP=00fffffd
-  AR=00000003 DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [117] uPC=02 CR=30000003
-  ACC=         99 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [118] uPC=03 CR=01000010
-  ACC=         99 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [119] uPC=04 CR=01000010
-  ACC=         99 IP=00000004 SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [120] uPC=05 CR=01000010
-  ACC=         99 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [121] uPC=00 CR=01000010
-  ACC=         99 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [122] uPC=01 CR=01000010
-  ACC=         99 IP=00000004 SP=00fffffd
-  AR=00000004 DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [123] uPC=02 CR=01000010
-  ACC=         99 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [124] uPC=41 CR=21000000
-  ACC=         99 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [125] uPC=00 CR=21000000
-  ACC=         99 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [126] uPC=01 CR=21000000
-  ACC=         99 IP=00000005 SP=00fffffd
-  AR=00000005 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [127] uPC=02 CR=21000000
-  ACC=         99 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [128] uPC=48 CR=32000008
-  ACC=         99 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [129] uPC=45 CR=32000008
-  ACC=         99 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [130] uPC=00 CR=32000008
-  ACC=         99 IP=00000008 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [131] uPC=01 CR=32000008
-  ACC=         99 IP=00000008 SP=00fffffd
-  AR=00000008 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [132] uPC=02 CR=32000008
-  ACC=         99 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [133] uPC=11 CR=03000001
-  ACC=         99 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [134] uPC=00 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [135] uPC=01 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000009 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [136] uPC=02 CR=03000001
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [137] uPC=46 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [138] uPC=47 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [139] uPC=00 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [140] uPC=01 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=0000000a DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [141] uPC=02 CR=3100000f
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [142] uPC=03 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [143] uPC=04 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [144] uPC=05 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [145] uPC=00 CR=01000010
-  ACC=         99 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [146] uPC=01 CR=01000010
-  ACC=         99 IP=0000000b SP=00fffffd
-  AR=0000000b DR=00000063 Z=0 N=0
-  -----------------------------
-  Tick: [147] uPC=02 CR=01000010
-  ACC=         99 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [148] uPC=12 CR=04ffffff
-  ACC=         99 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [149] uPC=13 CR=04ffffff
-  ACC=         99 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [150] uPC=00 CR=04ffffff
-  ACC=         99 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [151] uPC=01 CR=04ffffff
-  ACC=         99 IP=0000000c SP=00fffffd
-  AR=0000000c DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [152] uPC=02 CR=04ffffff
-  ACC=         99 IP=0000000d SP=00fffffd
-  AR=0000000c DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [153] uPC=03 CR=01fffffe
-  ACC=         99 IP=0000000d SP=00fffffd
-  AR=0000000c DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [154] uPC=04 CR=01fffffe
-  ACC=         99 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=01fffffe Z=0 N=0
-  -----------------------------
-  Tick: [155] uPC=05 CR=01fffffe
-  ACC=         99 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [156] uPC=00 CR=01fffffe
-  ACC=        100 IP=0000000d SP=00fffffd
-  AR=00fffffe DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [157] uPC=01 CR=01fffffe
-  ACC=        100 IP=0000000d SP=00fffffd
-  AR=0000000d DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [158] uPC=02 CR=01fffffe
-  ACC=        100 IP=0000000e SP=00fffffd
-  AR=0000000d DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [159] uPC=12 CR=04000010
-  ACC=        100 IP=0000000e SP=00fffffd
-  AR=0000000d DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [160] uPC=13 CR=04000010
-  ACC=        100 IP=0000000e SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [161] uPC=00 CR=04000010
-  ACC=        100 IP=0000000e SP=00fffffd
-  AR=00000010 DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [162] uPC=01 CR=04000010
-  ACC=        100 IP=0000000e SP=00fffffd
-  AR=0000000e DR=04000010 Z=0 N=0
-  -----------------------------
-  Tick: [163] uPC=02 CR=04000010
-  ACC=        100 IP=0000000f SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [164] uPC=45 CR=30000003
-  ACC=        100 IP=0000000f SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [165] uPC=00 CR=30000003
-  ACC=        100 IP=00000003 SP=00fffffd
-  AR=0000000e DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [166] uPC=01 CR=30000003
-  ACC=        100 IP=00000003 SP=00fffffd
-  AR=00000003 DR=30000003 Z=0 N=0
-  -----------------------------
-  Tick: [167] uPC=02 CR=30000003
-  ACC=        100 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [168] uPC=03 CR=01000010
-  ACC=        100 IP=00000004 SP=00fffffd
-  AR=00000003 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [169] uPC=04 CR=01000010
-  ACC=        100 IP=00000004 SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [170] uPC=05 CR=01000010
-  ACC=        100 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [171] uPC=00 CR=01000010
-  ACC=        100 IP=00000004 SP=00fffffd
-  AR=00000010 DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [172] uPC=01 CR=01000010
-  ACC=        100 IP=00000004 SP=00fffffd
-  AR=00000004 DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [173] uPC=02 CR=01000010
-  ACC=        100 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [174] uPC=41 CR=21000000
-  ACC=        100 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [175] uPC=00 CR=21000000
-  ACC=        100 IP=00000005 SP=00fffffd
-  AR=00000004 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [176] uPC=01 CR=21000000
-  ACC=        100 IP=00000005 SP=00fffffd
-  AR=00000005 DR=21000000 Z=0 N=0
-  -----------------------------
-  Tick: [177] uPC=02 CR=21000000
-  ACC=        100 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [178] uPC=48 CR=32000008
-  ACC=        100 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [179] uPC=45 CR=32000008
-  ACC=        100 IP=00000006 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [180] uPC=00 CR=32000008
-  ACC=        100 IP=00000008 SP=00fffffd
-  AR=00000005 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [181] uPC=01 CR=32000008
-  ACC=        100 IP=00000008 SP=00fffffd
-  AR=00000008 DR=32000008 Z=0 N=0
-  -----------------------------
-  Tick: [182] uPC=02 CR=32000008
-  ACC=        100 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [183] uPC=11 CR=03000001
-  ACC=        100 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [184] uPC=00 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000008 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [185] uPC=01 CR=03000001
-  ACC=          1 IP=00000009 SP=00fffffd
-  AR=00000009 DR=03000001 Z=0 N=0
-  -----------------------------
-  Tick: [186] uPC=02 CR=03000001
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [187] uPC=46 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [188] uPC=47 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [189] uPC=00 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=00000009 DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [190] uPC=01 CR=3100000f
-  ACC=          1 IP=0000000a SP=00fffffd
-  AR=0000000a DR=3100000f Z=0 N=0
-  -----------------------------
-  Tick: [191] uPC=02 CR=3100000f
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [192] uPC=03 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=0000000a DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [193] uPC=04 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=01000010 Z=0 N=0
-  -----------------------------
-  Tick: [194] uPC=05 CR=01000010
-  ACC=          1 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [195] uPC=00 CR=01000010
-  ACC=        100 IP=0000000b SP=00fffffd
-  AR=00000010 DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [196] uPC=01 CR=01000010
-  ACC=        100 IP=0000000b SP=00fffffd
-  AR=0000000b DR=00000064 Z=0 N=0
-  -----------------------------
-  Tick: [197] uPC=02 CR=01000010
-  ACC=        100 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [198] uPC=12 CR=04ffffff
-  ACC=        100 IP=0000000c SP=00fffffd
-  AR=0000000b DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [199] uPC=13 CR=04ffffff
-  ACC=        100 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
-  Tick: [200] uPC=00 CR=04ffffff
-  ACC=        100 IP=0000000c SP=00fffffd
-  AR=00ffffff DR=04ffffff Z=0 N=0
-  -----------------------------
+  Tick: [1] mPC=01 CR=00000000 ACC=          0 PC=00000001 SP=00fffffd AR=00000000 DR=30000001 Z=0 N=0
+  Tick: [2] mPC=45 CR=30000001 ACC=          0 PC=00000001 SP=00fffffd AR=00000000 DR=30000001 Z=0 N=0
+  Tick: [3] mPC=00 CR=30000001 ACC=          0 PC=00000001 SP=00fffffd AR=00000000 DR=30000001 Z=0 N=0
+  Tick: [4] mPC=01 CR=30000001 ACC=          0 PC=00000002 SP=00fffffd AR=00000000 DR=01fffffe Z=0 N=0
+  Tick: [5] mPC=02 CR=01fffffe ACC=          0 PC=00000002 SP=00fffffd AR=00000000 DR=01fffffe Z=0 N=0
+  Tick: [6] mPC=03 CR=01fffffe ACC=          0 PC=00000002 SP=00fffffd AR=00fffffe DR=01fffffe Z=0 N=0
+  Tick: [7] mPC=04 CR=01fffffe ACC=          0 PC=00000002 SP=00fffffd AR=00fffffe DR=00000061 Z=0 N=0
+  Tick: [8] mPC=01 CR=01fffffe ACC=         97 PC=00000003 SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [9] mPC=11 CR=04000010 ACC=         97 PC=00000003 SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [10] mPC=12 CR=04000010 ACC=         97 PC=00000003 SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [11] mPC=13 CR=04000010 ACC=         97 PC=00000003 SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [12] mPC=01 CR=04000010 ACC=         97 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [13] mPC=02 CR=01000010 ACC=         97 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [14] mPC=03 CR=01000010 ACC=         97 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [15] mPC=04 CR=01000010 ACC=         97 PC=00000004 SP=00fffffd AR=00000010 DR=00000061 Z=0 N=0
+  Tick: [16] mPC=01 CR=01000010 ACC=         97 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [17] mPC=41 CR=21000000 ACC=         97 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [18] mPC=01 CR=21000000 ACC=         97 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [19] mPC=48 CR=32000008 ACC=         97 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [20] mPC=45 CR=32000008 ACC=         97 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [21] mPC=00 CR=32000008 ACC=         97 PC=00000008 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [22] mPC=01 CR=32000008 ACC=         97 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [23] mPC=10 CR=03000001 ACC=         97 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [24] mPC=01 CR=03000001 ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [25] mPC=46 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [26] mPC=47 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [27] mPC=00 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [28] mPC=01 CR=3100000f ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [29] mPC=02 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [30] mPC=03 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [31] mPC=04 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=00000061 Z=0 N=0
+  Tick: [32] mPC=01 CR=01000010 ACC=         97 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [33] mPC=11 CR=04ffffff ACC=         97 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [34] mPC=12 CR=04ffffff ACC=         97 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [35] mPC=13 CR=04ffffff ACC=         97 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [36] mPC=01 CR=04ffffff ACC=         97 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [37] mPC=02 CR=01fffffe ACC=         97 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [38] mPC=03 CR=01fffffe ACC=         97 PC=0000000d SP=00fffffd AR=00fffffe DR=01fffffe Z=0 N=0
+  Tick: [39] mPC=04 CR=01fffffe ACC=         97 PC=0000000d SP=00fffffd AR=00fffffe DR=00000062 Z=0 N=0
+  Tick: [40] mPC=01 CR=01fffffe ACC=         98 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [41] mPC=11 CR=04000010 ACC=         98 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [42] mPC=12 CR=04000010 ACC=         98 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [43] mPC=13 CR=04000010 ACC=         98 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [44] mPC=01 CR=04000010 ACC=         98 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [45] mPC=45 CR=30000003 ACC=         98 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [46] mPC=00 CR=30000003 ACC=         98 PC=00000003 SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [47] mPC=01 CR=30000003 ACC=         98 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [48] mPC=02 CR=01000010 ACC=         98 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [49] mPC=03 CR=01000010 ACC=         98 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [50] mPC=04 CR=01000010 ACC=         98 PC=00000004 SP=00fffffd AR=00000010 DR=00000062 Z=0 N=0
+  Tick: [51] mPC=01 CR=01000010 ACC=         98 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [52] mPC=41 CR=21000000 ACC=         98 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [53] mPC=01 CR=21000000 ACC=         98 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [54] mPC=48 CR=32000008 ACC=         98 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [55] mPC=45 CR=32000008 ACC=         98 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [56] mPC=00 CR=32000008 ACC=         98 PC=00000008 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [57] mPC=01 CR=32000008 ACC=         98 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [58] mPC=10 CR=03000001 ACC=         98 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [59] mPC=01 CR=03000001 ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [60] mPC=46 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [61] mPC=47 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [62] mPC=00 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [63] mPC=01 CR=3100000f ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [64] mPC=02 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [65] mPC=03 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [66] mPC=04 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=00000062 Z=0 N=0
+  Tick: [67] mPC=01 CR=01000010 ACC=         98 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [68] mPC=11 CR=04ffffff ACC=         98 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [69] mPC=12 CR=04ffffff ACC=         98 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [70] mPC=13 CR=04ffffff ACC=         98 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [71] mPC=01 CR=04ffffff ACC=         98 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [72] mPC=02 CR=01fffffe ACC=         98 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [73] mPC=03 CR=01fffffe ACC=         98 PC=0000000d SP=00fffffd AR=00fffffe DR=01fffffe Z=0 N=0
+  Tick: [74] mPC=04 CR=01fffffe ACC=         98 PC=0000000d SP=00fffffd AR=00fffffe DR=00000063 Z=0 N=0
+  Tick: [75] mPC=01 CR=01fffffe ACC=         99 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [76] mPC=11 CR=04000010 ACC=         99 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [77] mPC=12 CR=04000010 ACC=         99 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [78] mPC=13 CR=04000010 ACC=         99 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [79] mPC=01 CR=04000010 ACC=         99 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [80] mPC=45 CR=30000003 ACC=         99 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [81] mPC=00 CR=30000003 ACC=         99 PC=00000003 SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [82] mPC=01 CR=30000003 ACC=         99 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [83] mPC=02 CR=01000010 ACC=         99 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [84] mPC=03 CR=01000010 ACC=         99 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [85] mPC=04 CR=01000010 ACC=         99 PC=00000004 SP=00fffffd AR=00000010 DR=00000063 Z=0 N=0
+  Tick: [86] mPC=01 CR=01000010 ACC=         99 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [87] mPC=41 CR=21000000 ACC=         99 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [88] mPC=01 CR=21000000 ACC=         99 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [89] mPC=48 CR=32000008 ACC=         99 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [90] mPC=45 CR=32000008 ACC=         99 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [91] mPC=00 CR=32000008 ACC=         99 PC=00000008 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [92] mPC=01 CR=32000008 ACC=         99 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [93] mPC=10 CR=03000001 ACC=         99 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [94] mPC=01 CR=03000001 ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [95] mPC=46 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [96] mPC=47 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [97] mPC=00 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [98] mPC=01 CR=3100000f ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [99] mPC=02 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [100] mPC=03 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [101] mPC=04 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=00000063 Z=0 N=0
+  Tick: [102] mPC=01 CR=01000010 ACC=         99 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [103] mPC=11 CR=04ffffff ACC=         99 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [104] mPC=12 CR=04ffffff ACC=         99 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [105] mPC=13 CR=04ffffff ACC=         99 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [106] mPC=01 CR=04ffffff ACC=         99 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [107] mPC=02 CR=01fffffe ACC=         99 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [108] mPC=03 CR=01fffffe ACC=         99 PC=0000000d SP=00fffffd AR=00fffffe DR=01fffffe Z=0 N=0
+  Tick: [109] mPC=04 CR=01fffffe ACC=         99 PC=0000000d SP=00fffffd AR=00fffffe DR=00000064 Z=0 N=0
+  Tick: [110] mPC=01 CR=01fffffe ACC=        100 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [111] mPC=11 CR=04000010 ACC=        100 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=0 N=0
+  Tick: [112] mPC=12 CR=04000010 ACC=        100 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [113] mPC=13 CR=04000010 ACC=        100 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=0 N=0
+  Tick: [114] mPC=01 CR=04000010 ACC=        100 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [115] mPC=45 CR=30000003 ACC=        100 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [116] mPC=00 CR=30000003 ACC=        100 PC=00000003 SP=00fffffd AR=00000010 DR=30000003 Z=0 N=0
+  Tick: [117] mPC=01 CR=30000003 ACC=        100 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [118] mPC=02 CR=01000010 ACC=        100 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [119] mPC=03 CR=01000010 ACC=        100 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [120] mPC=04 CR=01000010 ACC=        100 PC=00000004 SP=00fffffd AR=00000010 DR=00000064 Z=0 N=0
+  Tick: [121] mPC=01 CR=01000010 ACC=        100 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [122] mPC=41 CR=21000000 ACC=        100 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=0 N=0
+  Tick: [123] mPC=01 CR=21000000 ACC=        100 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [124] mPC=48 CR=32000008 ACC=        100 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [125] mPC=45 CR=32000008 ACC=        100 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [126] mPC=00 CR=32000008 ACC=        100 PC=00000008 SP=00fffffd AR=00000010 DR=32000008 Z=0 N=0
+  Tick: [127] mPC=01 CR=32000008 ACC=        100 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [128] mPC=10 CR=03000001 ACC=        100 PC=00000009 SP=00fffffd AR=00000010 DR=03000001 Z=0 N=0
+  Tick: [129] mPC=01 CR=03000001 ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [130] mPC=46 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [131] mPC=47 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [132] mPC=00 CR=3100000f ACC=          1 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=0 N=0
+  Tick: [133] mPC=01 CR=3100000f ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [134] mPC=02 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [135] mPC=03 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=01000010 Z=0 N=0
+  Tick: [136] mPC=04 CR=01000010 ACC=          1 PC=0000000b SP=00fffffd AR=00000010 DR=00000064 Z=0 N=0
+  Tick: [137] mPC=01 CR=01000010 ACC=        100 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [138] mPC=11 CR=04ffffff ACC=        100 PC=0000000c SP=00fffffd AR=00000010 DR=04ffffff Z=0 N=0
+  Tick: [139] mPC=12 CR=04ffffff ACC=        100 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [140] mPC=13 CR=04ffffff ACC=        100 PC=0000000c SP=00fffffd AR=00ffffff DR=04ffffff Z=0 N=0
+  Tick: [141] mPC=01 CR=04ffffff ACC=        100 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [142] mPC=02 CR=01fffffe ACC=        100 PC=0000000d SP=00fffffd AR=00ffffff DR=01fffffe Z=0 N=0
+  Tick: [143] mPC=03 CR=01fffffe ACC=        100 PC=0000000d SP=00fffffd AR=00fffffe DR=01fffffe Z=0 N=0
+  Tick: [144] mPC=04 CR=01fffffe ACC=        100 PC=0000000d SP=00fffffd AR=00fffffe DR=00000000 Z=0 N=0
+  Tick: [145] mPC=01 CR=01fffffe ACC=          0 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=1 N=0
+  Tick: [146] mPC=11 CR=04000010 ACC=          0 PC=0000000e SP=00fffffd AR=00fffffe DR=04000010 Z=1 N=0
+  Tick: [147] mPC=12 CR=04000010 ACC=          0 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=1 N=0
+  Tick: [148] mPC=13 CR=04000010 ACC=          0 PC=0000000e SP=00fffffd AR=00000010 DR=04000010 Z=1 N=0
+  Tick: [149] mPC=01 CR=04000010 ACC=          0 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=1 N=0
+  Tick: [150] mPC=45 CR=30000003 ACC=          0 PC=0000000f SP=00fffffd AR=00000010 DR=30000003 Z=1 N=0
+  Tick: [151] mPC=00 CR=30000003 ACC=          0 PC=00000003 SP=00fffffd AR=00000010 DR=30000003 Z=1 N=0
+  Tick: [152] mPC=01 CR=30000003 ACC=          0 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=1 N=0
+  Tick: [153] mPC=02 CR=01000010 ACC=          0 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=1 N=0
+  Tick: [154] mPC=03 CR=01000010 ACC=          0 PC=00000004 SP=00fffffd AR=00000010 DR=01000010 Z=1 N=0
+  Tick: [155] mPC=04 CR=01000010 ACC=          0 PC=00000004 SP=00fffffd AR=00000010 DR=00000000 Z=1 N=0
+  Tick: [156] mPC=01 CR=01000010 ACC=          0 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=1 N=0
+  Tick: [157] mPC=41 CR=21000000 ACC=          0 PC=00000005 SP=00fffffd AR=00000010 DR=21000000 Z=1 N=0
+  Tick: [158] mPC=01 CR=21000000 ACC=          0 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=1 N=0
+  Tick: [159] mPC=48 CR=32000008 ACC=          0 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=1 N=0
+  Tick: [160] mPC=49 CR=32000008 ACC=          0 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=1 N=0
+  Tick: [161] mPC=00 CR=32000008 ACC=          0 PC=00000006 SP=00fffffd AR=00000010 DR=32000008 Z=1 N=0
+  Tick: [162] mPC=01 CR=32000008 ACC=          0 PC=00000007 SP=00fffffd AR=00000010 DR=03000000 Z=1 N=0
+  Tick: [163] mPC=10 CR=03000000 ACC=          0 PC=00000007 SP=00fffffd AR=00000010 DR=03000000 Z=1 N=0
+  Tick: [164] mPC=01 CR=03000000 ACC=          0 PC=00000008 SP=00fffffd AR=00000010 DR=30000009 Z=1 N=0
+  Tick: [165] mPC=45 CR=30000009 ACC=          0 PC=00000008 SP=00fffffd AR=00000010 DR=30000009 Z=1 N=0
+  Tick: [166] mPC=00 CR=30000009 ACC=          0 PC=00000009 SP=00fffffd AR=00000010 DR=30000009 Z=1 N=0
+  Tick: [167] mPC=01 CR=30000009 ACC=          0 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=1 N=0
+  Tick: [168] mPC=46 CR=3100000f ACC=          0 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=1 N=0
+  Tick: [169] mPC=45 CR=3100000f ACC=          0 PC=0000000a SP=00fffffd AR=00000010 DR=3100000f Z=1 N=0
+  Tick: [170] mPC=00 CR=3100000f ACC=          0 PC=0000000f SP=00fffffd AR=00000010 DR=3100000f Z=1 N=0
+  Tick: [171] mPC=01 CR=3100000f ACC=          0 PC=00000010 SP=00fffffd AR=00000010 DR=ff000000 Z=1 N=0
+  Tick: [172] mPC=74 CR=ff000000 ACC=          0 PC=00000010 SP=00fffffd AR=00000010 DR=ff000000 Z=1 N=0
+  Tick: [173] mPC=75 CR=ff000000 ACC=          0 PC=00000010 SP=00fffffd AR=00000010 DR=ff000000 Z=1 N=0
+out_microcode: |-
+  Tick: [1] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [2] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [3] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [4] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [5] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [6] LD    mPC=02 AR <- CR.arg
+  Tick: [7] LD    mPC=03 DR <- Mem[AR]
+  Tick: [8] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [9] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [10] ST    mPC=11 AR <- CR.arg
+  Tick: [11] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [12] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [13] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [14] LD    mPC=02 AR <- CR.arg
+  Tick: [15] LD    mPC=03 DR <- Mem[AR]
+  Tick: [16] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [17] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [18] CMPI  mPC=41 DR <- Mem[PC]; PC <- PC + 1; N,Z <- ACC - arg; -> FETCH
+  Tick: [19] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [20] BNE   mPC=48 if Z = 0 -> JMP
+  Tick: [21] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [22] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [23] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [24] LDI   mPC=10 DR <- Mem[PC]; PC <- PC + 1; ACC <- CR.arg; -> FETCH
+  Tick: [25] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [26] BEQ   mPC=46 if Z = 1 -> JMP
+  Tick: [27] BEQ   mPC=47 -> FETCH
+  Tick: [28] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [29] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [30] LD    mPC=02 AR <- CR.arg
+  Tick: [31] LD    mPC=03 DR <- Mem[AR]
+  Tick: [32] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [33] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [34] ST    mPC=11 AR <- CR.arg
+  Tick: [35] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [36] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [37] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [38] LD    mPC=02 AR <- CR.arg
+  Tick: [39] LD    mPC=03 DR <- Mem[AR]
+  Tick: [40] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [41] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [42] ST    mPC=11 AR <- CR.arg
+  Tick: [43] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [44] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [45] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [46] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [47] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [48] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [49] LD    mPC=02 AR <- CR.arg
+  Tick: [50] LD    mPC=03 DR <- Mem[AR]
+  Tick: [51] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [52] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [53] CMPI  mPC=41 DR <- Mem[PC]; PC <- PC + 1; N,Z <- ACC - arg; -> FETCH
+  Tick: [54] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [55] BNE   mPC=48 if Z = 0 -> JMP
+  Tick: [56] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [57] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [58] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [59] LDI   mPC=10 DR <- Mem[PC]; PC <- PC + 1; ACC <- CR.arg; -> FETCH
+  Tick: [60] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [61] BEQ   mPC=46 if Z = 1 -> JMP
+  Tick: [62] BEQ   mPC=47 -> FETCH
+  Tick: [63] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [64] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [65] LD    mPC=02 AR <- CR.arg
+  Tick: [66] LD    mPC=03 DR <- Mem[AR]
+  Tick: [67] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [68] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [69] ST    mPC=11 AR <- CR.arg
+  Tick: [70] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [71] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [72] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [73] LD    mPC=02 AR <- CR.arg
+  Tick: [74] LD    mPC=03 DR <- Mem[AR]
+  Tick: [75] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [76] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [77] ST    mPC=11 AR <- CR.arg
+  Tick: [78] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [79] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [80] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [81] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [82] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [83] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [84] LD    mPC=02 AR <- CR.arg
+  Tick: [85] LD    mPC=03 DR <- Mem[AR]
+  Tick: [86] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [87] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [88] CMPI  mPC=41 DR <- Mem[PC]; PC <- PC + 1; N,Z <- ACC - arg; -> FETCH
+  Tick: [89] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [90] BNE   mPC=48 if Z = 0 -> JMP
+  Tick: [91] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [92] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [93] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [94] LDI   mPC=10 DR <- Mem[PC]; PC <- PC + 1; ACC <- CR.arg; -> FETCH
+  Tick: [95] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [96] BEQ   mPC=46 if Z = 1 -> JMP
+  Tick: [97] BEQ   mPC=47 -> FETCH
+  Tick: [98] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [99] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [100] LD    mPC=02 AR <- CR.arg
+  Tick: [101] LD    mPC=03 DR <- Mem[AR]
+  Tick: [102] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [103] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [104] ST    mPC=11 AR <- CR.arg
+  Tick: [105] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [106] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [107] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [108] LD    mPC=02 AR <- CR.arg
+  Tick: [109] LD    mPC=03 DR <- Mem[AR]
+  Tick: [110] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [111] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [112] ST    mPC=11 AR <- CR.arg
+  Tick: [113] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [114] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [115] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [116] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [117] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [118] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [119] LD    mPC=02 AR <- CR.arg
+  Tick: [120] LD    mPC=03 DR <- Mem[AR]
+  Tick: [121] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [122] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [123] CMPI  mPC=41 DR <- Mem[PC]; PC <- PC + 1; N,Z <- ACC - arg; -> FETCH
+  Tick: [124] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [125] BNE   mPC=48 if Z = 0 -> JMP
+  Tick: [126] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [127] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [128] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [129] LDI   mPC=10 DR <- Mem[PC]; PC <- PC + 1; ACC <- CR.arg; -> FETCH
+  Tick: [130] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [131] BEQ   mPC=46 if Z = 1 -> JMP
+  Tick: [132] BEQ   mPC=47 -> FETCH
+  Tick: [133] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [134] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [135] LD    mPC=02 AR <- CR.arg
+  Tick: [136] LD    mPC=03 DR <- Mem[AR]
+  Tick: [137] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [138] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [139] ST    mPC=11 AR <- CR.arg
+  Tick: [140] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [141] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [142] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [143] LD    mPC=02 AR <- CR.arg
+  Tick: [144] LD    mPC=03 DR <- Mem[AR]
+  Tick: [145] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [146] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [147] ST    mPC=11 AR <- CR.arg
+  Tick: [148] ST    mPC=12 Mem[AR] <- ACC
+  Tick: [149] ST    mPC=13 DR <- Mem[PC]; PC <- PC + 1; -> FETCH
+  Tick: [150] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [151] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [152] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [153] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [154] LD    mPC=02 AR <- CR.arg
+  Tick: [155] LD    mPC=03 DR <- Mem[AR]
+  Tick: [156] LD    mPC=04 DR <- Mem[PC]; PC <- PC + 1; ACC <- DR; -> FETCH
+  Tick: [157] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [158] CMPI  mPC=41 DR <- Mem[PC]; PC <- PC + 1; N,Z <- ACC - arg; -> FETCH
+  Tick: [159] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [160] BNE   mPC=48 if Z = 0 -> JMP
+  Tick: [161] BNE   mPC=49 -> FETCH
+  Tick: [162] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [163] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [164] LDI   mPC=10 DR <- Mem[PC]; PC <- PC + 1; ACC <- CR.arg; -> FETCH
+  Tick: [165] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [166] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [167] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [168] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [169] BEQ   mPC=46 if Z = 1 -> JMP
+  Tick: [170] JMP   mPC=45 PC <- CR.arg; -> FETCH
+  Tick: [171] FETCH mPC=00 DR <- Mem[PC]; PC <- PC + 1
+  Tick: [172] FETCH mPC=01 CR <- DR; -> DECODER[opcode]
+  Tick: [173] HALT  mPC=74 HALT
